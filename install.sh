@@ -476,7 +476,26 @@ require_dependencies() {
 # Operations (STUBS — implement stage will fill)
 # ────────────────────────────────────────────────────────────────────────
 
-# Operation 1: Endpoint AI agent safety policy (IMPLEMENT-stage cycle 27, T014 accepted state)
+# Operation 1: Endpoint AI agent policy (settings + hooks + brain pieces)
+#
+# Deploys the full agent-config envelope:
+#   - settings.json: Claude Code permissions + hook wiring
+#   - hooks/*.sh|*.py: Claude Code hook scripts (security envelope)
+#   - rules/*.md: on-demand topic rules (loaded when work touches the topic)
+#   - commands/*.md: operator-invoked slash commands (/orient, /handoff, etc.)
+#   - agents/*.md: brain-loaded subagent definitions (per SB-081)
+#   - modes/*.md: persona modes (PM Scrum Master, DevOps Architect, Dual)
+#   - skills/<name>/SKILL.md: auto-trigger skills (description-match)
+#
+# Path A note (where SRC == DEST_HOME, e.g., $HOME=/root install on this dev
+# host): install_file() detects identical content + skips silently. So this
+# op is a no-op on Path A; for non-Path-A installs ($HOME != /root, e.g.,
+# /home/jfortin/), this is the canonical deployment.
+#
+# Coverage gap fix 2026-05-06 per operator question on install-readiness for
+# fresh machines: prior implementation deployed ONLY settings.json + hooks/,
+# leaving commands/agents/modes/skills/rules undeployed → fresh install would
+# have safety hooks but no /orient, no /handoff, no /mode-*, no surface-state.
 op_install_endpoint_safety_policy() {
     local src_settings="${SRC}/.claude/settings.json"
     local src_hooks_dir="${SRC}/.claude/hooks"
@@ -505,6 +524,51 @@ op_install_endpoint_safety_policy() {
         [[ "${basename}" =~ \.sh$ ]] && mode=0755
         install_file "${f}" "${tgt_hooks_dir}/${basename}" "${mode}"
     done
+
+    # Brain pieces — flat *.md per dir (rules, commands, agents, modes).
+    local subdir basename
+    for subdir in rules commands agents modes; do
+        local src_subdir="${SRC}/.claude/${subdir}"
+        local tgt_subdir="${DEST_CLAUDE}/${subdir}"
+        [[ -d "${src_subdir}" ]] || continue
+        if [[ "${DRY_RUN}" -eq 1 ]]; then
+            log_dry "ensure ${tgt_subdir} exists + install ${subdir}/*.md"
+        else
+            mkdir -p "${tgt_subdir}"
+        fi
+        for f in "${src_subdir}"/*.md; do
+            [[ -e "${f}" ]] || continue
+            basename="$(basename "${f}")"
+            install_file "${f}" "${tgt_subdir}/${basename}" 0644
+        done
+    done
+
+    # Skills — nested: each skill is a subdir containing SKILL.md (+ optional
+    # supporting markdown). Per Claude Code skills convention.
+    local src_skills="${SRC}/.claude/skills"
+    local tgt_skills="${DEST_CLAUDE}/skills"
+    if [[ -d "${src_skills}" ]]; then
+        if [[ "${DRY_RUN}" -eq 1 ]]; then
+            log_dry "ensure ${tgt_skills} exists + install per-skill SKILL.md"
+        else
+            mkdir -p "${tgt_skills}"
+        fi
+        local skill_dir skill_name
+        for skill_dir in "${src_skills}"/*/; do
+            [[ -d "${skill_dir}" ]] || continue
+            skill_name="$(basename "${skill_dir}")"
+            if [[ "${DRY_RUN}" -eq 1 ]]; then
+                log_dry "ensure ${tgt_skills}/${skill_name}/ exists"
+            else
+                mkdir -p "${tgt_skills}/${skill_name}"
+            fi
+            for f in "${skill_dir}"*.md; do
+                [[ -e "${f}" ]] || continue
+                basename="$(basename "${f}")"
+                install_file "${f}" "${tgt_skills}/${skill_name}/${basename}" 0644
+            done
+        done
+    fi
 }
 
 # Operation 2: Opencode bridge plugin (IMPLEMENT-stage cycle 27)

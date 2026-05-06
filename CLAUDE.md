@@ -189,7 +189,7 @@ Topic-specific rules loaded when work touches their domain. Per Claude Code conv
 
 | Surface | Path | Determinism | Notes |
 |---|---|---|---|
-| Slash commands (22) | [.claude/commands/](.claude/commands/) | 100% on invoke | `/orient`, `/cycle`, `/mode-{pm,architect,dual,status,clear}`, `/blockers`, `/progress`, `/decisions`, `/log`, `/audit`, `/sync-progress`, `/help-root`, `/handoff`, `/stamp-{horizontal,vertical,on,off,auto,status}` (6 SB-115), `/install-agent-brain` |
+| Slash commands (25) | [.claude/commands/](.claude/commands/) | 100% on invoke | `/orient`, `/cycle`, `/mode-{pm,architect,dual,status,clear}`, `/blockers`, `/progress`, `/decisions`, `/log`, `/audit`, `/sync-progress`, `/help-root`, `/handoff`, `/stamp-{horizontal,vertical,on,off,auto,status}` (6 SB-115), `/install-agent-brain`, `/mission`, `/focus`, `/impediment` (3 SB-118) |
 | Modes (3) | [.claude/modes/](.claude/modes/) | Operator-picks (durable) | PM Scrum Master / DevOps Architect / Dual Expert. State at `.claude/active-mode`. Combine with `/loop /cycle` for autopilot. |
 | Hooks (13 wired) | [.claude/hooks/](.claude/hooks/) | ~85% (additionalContext JSON) | session-orient + post-compact direct agent to `/orient`; security envelope (policy-block + malware-block + opt-write-block + leak-detector); pre-compact handoff snapshot; UserPromptSubmit context-warning + agent-discipline-gate + mode-enforcement; Stop end-of-cycle-stamp; session-summary on end. |
 | Tools (9 .py + MCP) | [tools/](tools/) | 100% non-LLM | `state, blockers, progress, decisions, cycle, tasks, stamp` Python modules + `mcp_server` exposes 6 MCP tools (read-only) at `tools/mcp_server.py`. Wired via `.mcp.json`. |

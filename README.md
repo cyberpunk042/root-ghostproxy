@@ -305,35 +305,52 @@ The project is at the **scaffold + partial-implement** SFIF stage. Concretely, t
 
 > **Note (added cycle 62, 2026-05-05; refreshed 2026-05-06)**: the "barely started" framing comes from operator's verbatim 2026-05-04 directive (preserved sacrosanct in section "Operator Directives Captured This Session"). Substantial scaffolding has landed since: 14 modules + 66 atomic tasks + 8 brain files + 26 decisions logbook entries (latest D026 captures today's audit + Phase A/B/C deliverables) + install.sh dry-run-passing + 13 hooks across 8 events (PreToolUse, PostToolUse, SessionStart, UserPromptSubmit, PreCompact, PostCompact, Stop, SessionEnd) + 9 custom statusline widgets (operator visually verified) + 3 brain-loaded subagents + trigger-model.md unified rule + ccstatusline integration + deployment scripts at $HOME/scripts/ + hook regression tests at .claude/hooks/tests/ + 22 slash commands (incl. /stamp-* config + /install-agent-brain) + 7 deterministic Python tools (state/blockers/progress/decisions/cycle/tasks/stamp) + 118-row systemic-bugs tracker (post-2026-05-06 audit: 17 verified, 13 recurring, 4 open, 76 structurally-fixed, 5 partial, 3 in-progress). The project-lifecycle macro stage is still scaffold (foundation gate met for install.sh dry-run; advance to implement-stage is operator-decision).
 
-### What exists right now (after this conversation)
+### What exists right now (refreshed 2026-05-06)
 
 | Artefact | Status | Where |
 |---|---|---|
 | Identity registered with the second brain | Complete | `<second-brain>/wiki/config/sister-projects.yaml` → `projects.root-ghostproxy` (type=root, group=operating-system-setup, auto_connect=false) |
 | Identity profile in the second brain | Complete | `<second-brain>/wiki/ecosystem/project_profiles/root-ghostproxy/identity-profile.md` (full Goldilocks 9-dimension) |
 | Methodology engine | Copied from second brain | `$HOME/wiki/config/methodology.yaml` |
-| SDLC profile | `simplified` (right-sized for micro + solo) | `$HOME/wiki/config/sdlc-profile.yaml` |
+| SDLC profile | `simplified` | `$HOME/wiki/config/sdlc-profile.yaml` |
 | Domain profile | `infrastructure` | `$HOME/wiki/config/domain-profile.yaml` |
 | Methodology profile | `stage-gated` | `$HOME/wiki/config/methodology-profile.yaml` |
 | Active epic | `SFIF Rollout + Second-Brain Integration (2026-05)` | `$HOME/wiki/backlog/epics/sfif-rollout-and-second-brain-integration.md` |
-| 10 module pages | M001–M010 covering Stream 2 SFIF base + Stream 1 second-brain integration | `$HOME/wiki/backlog/modules/root-ghostproxy-m{001..010}-*.md` |
-| Source-synthesis pages (Suricata + PolarProxy) | 6 pages in second brain (Layer 0 + Layer 1) | `<second-brain>/wiki/sources/src-{suricata,polarproxy,suricata-install-quickstart,suricata-ips-mode-linux,suricata-yaml-config,hanke-honeypot-polarproxy-suricata-integration}.md` |
-| `tools.setup --connect-project --dry-run` | Patched to support dry-run preview + type/group-aware brain-pointer block | `<second-brain>/tools/setup.py` (variant=ROOT_OS_SETUP renders for this project) |
-| Agent context files | This README + CLAUDE.md, AGENTS.md, CONTEXT.md, ARCHITECTURE.md, TOOLS.md, DESIGN.md, SKILLS.md, SECURITY.md (in progress) | `$HOME/*.md` |
-| Backlog + log directory scaffold | Created | `$HOME/wiki/{backlog/{epics,modules,tasks},log}/` |
+| 14 module pages | M001–M014 across Stream 2 SFIF base + Stream 1 second-brain integration + ccstatusline + pipelock | `$HOME/wiki/backlog/modules/root-ghostproxy-m{001..014}-*.md` |
+| 66 atomic task pages | Per-module breakdowns | `$HOME/wiki/backlog/tasks/T*.md` |
+| Source-synthesis pages (Suricata + PolarProxy) | 6 pages in second brain | `<second-brain>/wiki/sources/src-{suricata*,polarproxy,hanke-honeypot-polarproxy-suricata-integration}.md` |
+| **`install.sh`** (foundation installer) | Authored, implement-stage, readiness 98% — `--dry-run` + `--check` + `--profile {base\|full\|project\|interactive}` + `--mode {bridge\|endpoint\|hybrid\|auto}` + per-op toggles. shellcheck PASS. | `$HOME/install.sh` |
+| **Per-project install** (`--profile project`) | Deploys agent brain (settings + hooks + rules + commands + agents + modes + skills + tools) to a sister project; OS-level ops disabled in this profile | `$HOME/install.sh --profile project --dest <path>` OR `/install-agent-brain <path>` slash command |
+| **Network bridge config templates** | systemd-networkd .netdev + .network templates | `$HOME/templates/systemd-networkd/*.{netdev,network}` |
+| **Management wifi (outbound-only)** | wpa_supplicant template + nftables INPUT-drop ruleset + idempotent /etc/nftables.conf include + systemd unit enable | `$HOME/templates/{wpa_supplicant,nftables}/` |
+| **Integrity sentinel** | SHA256 baselines for safety-policy artefacts; `op_install_integrity_sentinel` registers; `op_verify` + `integrity_check()` validate | `$HOME/.claude/integrity.json` (per host) |
+| **Post-install verification** | `install.sh --check` runs 16+ checks: settings.json parses, hooks executable, integrity match, opencode bridge, br0 UP, wifi config + ruleset + table loaded + service enabled, brain-piece counts | `$HOME/install.sh --check` |
+| **Agent context files** (10) | README + CLAUDE.md, AGENTS.md, BOOTSTRAP.md, CONTEXT.md, ARCHITECTURE.md, TOOLS.md, DESIGN.md, SKILLS.md, SECURITY.md | `$HOME/*.md` |
+| **25 slash commands** | /orient, /handoff, /cycle, /stamp-{on,off,auto,horizontal,vertical,status}, /mode-{pm,architect,dual,clear,status}, /blockers, /progress, /decisions, /audit, /sync-progress, /log, /help-root, /install-agent-brain, /mission, /focus, /impediment | `$HOME/.claude/commands/*.md` |
+| **3 brain-loaded subagents** | root-explorer, root-architect, root-pm-scoper | `$HOME/.claude/agents/*.md` |
+| **3 modes** | PM Scrum Master, DevOps Architect, Dual Expert | `$HOME/.claude/modes/*.md` |
+| **2 skills** | surface-state, surface-blockers (description-match auto-trigger) | `$HOME/.claude/skills/<name>/SKILL.md` |
+| **10 rules** | routing, methodology, hook-architecture, work-mode, self-reference, words-are-sacrosanct, operating-principles, loop-cron-lifecycle, trigger-model, context-engineering | `$HOME/.claude/rules/*.md` |
+| **Hooks** (12 wired across 8 events) | PreToolUse (3), PostToolUse (1), SessionStart (2), UserPromptSubmit (2), PreCompact (1), PostCompact (1), Stop (1), SessionEnd (1) | `$HOME/.claude/hooks/*.{sh,py}` |
+| **Hook regression tests** | policy-block, malware-block, opt-write-block | `$HOME/.claude/hooks/tests/*.py` |
+| **9 deterministic Python tools** | state, blockers, progress, decisions, cycle, tasks, stamp, mcp_server, _paths | `$HOME/tools/*.py` |
+| **Stamp control** | Persistent config (layout horizontal/vertical, enabled on/off/auto) + 6 slash commands + UserPromptSubmit marker hook | `$HOME/.claude/stamp-config.json` + `$HOME/tools/stamp.py` + `$HOME/.claude/hooks/stamp-control.sh` |
+| **ccstatusline integration** | 13 custom widgets + 5 profiles + wrapper + switch-profile.sh | `$HOME/templates/ccstatusline-{config,widgets}/` |
+| **Decisions logbook** | 26+ entries, full audit trail | `$HOME/wiki/governance/decisions.md` |
+| **Systemic-bugs tracker** | 118-row register; per-bug status + verification evidence | `$HOME/wiki/governance/systemic-bugs.md` |
+| **Backlog + log + governance dirs** | Full structure | `$HOME/wiki/{backlog/{epics,modules,tasks},log,governance,lessons}/` |
+| **Bootstrap scripts** | install-from-curl, checkout-{a,b}, mcp-launcher, merge-from-backup | `$HOME/scripts/*.sh` |
 
-### What does not yet exist
+### What does not yet exist (or is operator-decision-pending)
 
 | Missing | Status | Why deferred |
 |---|---|---|
-| `install.sh` (foundation IaC bootstrap) | Not yet authored | Foundation work — comes after agent-context files are stable so methodology-driven authoring of install.sh has the right context |
-| Network bridge configuration | Not yet authored | Same — part of foundation IaC |
-| Suricata module integration | Not authored | Facultative module — operator-driven future-session work |
-| PolarProxy module integration | Not authored | Facultative module — operator-driven future-session work |
-| TLS-firewall ruleset for PolarProxy | Not authored | Module-level work, downstream of PolarProxy module install |
-| AI-specific Suricata rule sets | Not authored | Module-level work, downstream of Suricata module install |
-| Test pcap captures (canary threat for Suricata, benign HTTPS for PolarProxy) | Not captured | Module-level smoke testing, downstream of module installs |
-| Atomic task pages under M001–M010 | Not yet authored | Task-level breakdown work |
+| Bridge FORWARD/OUTPUT nftables rules | Operator-decision pending (T013) | Threat-model question: default-accept vs default-drop FORWARD policy |
+| Suricata module integration (M005) | Module not authored | Facultative module — operator-driven future-session work |
+| PolarProxy module integration | Module not authored | Facultative module |
+| AI-specific Suricata rule sets | Module-level work, downstream of Suricata install |  |
+| Test pcap captures (canary threat / benign HTTPS) | Module-level smoke testing | Downstream of module installs |
+| Idempotency invariant test (T016) | Separate task | T016 covers test-stage assertions for install_file's "unchanged" path |
 
 ### What was prior-session debris (now considered not part of the project)
 
@@ -616,86 +633,119 @@ The second brain's three governing principles (Infrastructure Over Instructions,
 
 ## Setup Path
 
-The setup path is **aspirational at present**. The IaC bootstrap that takes a fresh Linux host and brings it to foundation tier does not yet exist. This section documents what setup will look like once Foundation work (M003) lands.
+`install.sh` exists (implement-stage, readiness 98%) and is the canonical foundation installer. Two scopes: OS-root install (this dev host's mode) and per-project agent-brain install into a sister project.
 
-### Prerequisites (planned)
+### Prerequisites
 
-- **Linux host (Debian 13 is the operator-confirmed target distribution per *"new machine (non-GUI) debian 13"*)**. The IaC may also work on Debian 12 / Ubuntu 24.04+ / other Debian-derivatives, but Debian 13 is what's targeted; cross-distribution support is a Foundation-tier decision, not a project-level invariant.
-- Two ethernet ports for bridging (specific device names are host-specific)
-- One wifi interface for outbound-only management
-- Wifi credentials for the operator's existing secure SSID
-- Local console access (for fallback recovery if the management wifi is misconfigured)
-- Python 3.11+ for project tooling
-- `git` for the project repo
-- Connection to the second-brain host (for methodology + sister-project integration)
-- Claude Code and/or opencode installed on the host (the endpoint-safety capability targets these; other AI tools are facultative add-ons)
+- **Linux host** — Debian-family fully supported (Debian 11+, Ubuntu 20.04+, derivatives); RHEL-family + Arch OS-family detection in place; cross-distro install hints emitted per family.
+- Two ethernet ports for L2 bridge (only when running in `--mode bridge` or `hybrid`)
+- One wifi interface for outbound-only management (only when `--with-wifi`)
+- Wifi credentials for operator's existing SSID (operator fills `wpa_supplicant-mgmt0.conf` placeholders post-deploy)
+- Local console access for recovery (if wifi config goes wrong)
+- Python 3.11+ for project tooling (`python3` + `jq` are core deps; `nft` + `ip` + `wpa_supplicant` are conditional per enabled ops — install.sh's `require_dependencies` checks + emits per-OS install hint when missing)
+- `git`, optional Claude Code and/or opencode installed (the endpoint-safety + brain target these; other AI tools are facultative)
 
-### Setup steps (planned)
+### Setup steps
 
 ```bash
-# 1. Get the project repo on the host (anywhere on disk; install.sh handles the install path)
+# 1. Get the project repo onto the host (anywhere — install.sh handles path resolution)
 git clone <url> /tmp/root-ghostproxy
 cd /tmp/root-ghostproxy
 
-# 2. (Future) Run the foundation install. NOTE: install.sh DOES NOT YET EXIST.
-#    M003 (Foundation hardening) is the work block that produces this.
-./install.sh --dry-run            # preview what install will do
-./install.sh                      # execute install (idempotent)
-./install.sh --dest /alt/path     # alternate install root for testing
+# 2. Preview the foundation install
+./install.sh --dry-run                  # base profile, default mode=auto
+./install.sh --dry-run --profile full   # base + facultative modules (ccstatusline)
+./install.sh --check                    # drift-check existing install state (read-only)
 
-# 3. (Future) Verify foundation:
-sudo brctl show br0               # bridge has the two ethernet members
-ip addr show <management-wifi>    # management wifi has the host's management IP
-# Bridge forwards frames; box is L3-invisible to LAN.
+# 3. Execute foundation install (idempotent — re-runs are no-ops where state matches)
+sudo ./install.sh                       # base profile (hooks + opencode + bridge + wifi + integrity)
+sudo ./install.sh --profile full        # base + ccstatusline (npm-based)
+sudo ./install.sh --mode endpoint       # endpoint-only (no bridge/wifi ops)
 
-# 4. Connect to second brain (operator-authorized; auto_connect=false):
-#    Run from the second brain side:
+# 4. Per-op toggles (override profile defaults)
+sudo ./install.sh --no-bridge --no-wifi   # safety policy + opencode bridge plugin only
+sudo ./install.sh --with-ccstatusline     # add ccstatusline to base
+
+# 5. Post-install verification (runs op_verify — same as --check)
+./install.sh --check
+# Reports: settings.json parses, hooks executable, integrity match,
+# opencode bridge resolves, br0 UP, wifi config + ruleset + table loaded,
+# brain pieces deployed counts. Exit 0 = clean; exit 1 = drift detected.
+
+# 6. (Optional) Connect to second brain (operator-authorized; auto_connect=false):
 cd <second-brain>/
 python3 -m tools.setup --connect-project $HOME --dry-run    # preview
 python3 -m tools.setup --connect-project $HOME              # apply
 
-# 5. Verify connection from inside $HOME:
+# 7. Verify second-brain connection from $HOME:
 cd $HOME
-python3 -m tools.gateway orient                              # second-brain orientation
-python3 -m tools.view spine                                  # browse second-brain knowledge
+python3 -m tools.gateway orient
+python3 -m tools.view spine
+```
+
+### Per-project install — agent brain into a sister project
+
+Per operator directive 2026-05-06 (*"this should also probably be part of the things we can chose to install into project and not only the root"*), `--profile project` deploys the agent brain (settings + hooks + rules + commands + agents + modes + skills + tools) into a sister project. OS-level ops (bridge/wifi/integrity/ccstatusline/opencode) are disabled in project mode.
+
+```bash
+# Preview deployment to a sister project
+./install.sh --dry-run --profile project --dest /opt/devops-solutions-information-hub
+./install.sh --dry-run --profile project --dest /home/jfortin/openarms
+
+# Real deploy
+./install.sh --profile project --dest /opt/devops-solutions-information-hub
+
+# Operator-facing slash command (equivalent wrapper; no-install-script invocation)
+/install-agent-brain /opt/devops-solutions-information-hub
+/install-agent-brain /home/jfortin/openarms --dry-run
+```
+
+After deploy, verify in the target project:
+```bash
+cd /opt/devops-solutions-information-hub
+python3 -m tools.stamp show              # confirms tools/ deployed + working
+ls .claude/{rules,commands,agents,modes,skills,hooks}/  # confirms brain pieces
 ```
 
 ### Module install (future, operator-driven)
 
 ```bash
-# (Future, after M005 work block) Install a chosen first module:
-./install-module.sh suricata       # if Suricata-first
-./install-module.sh polarproxy     # if PolarProxy-first
-
-# Both modules together (full install):
-./install-modules.sh --all
+# Future, after M005 work block — module structure decided at M005 design time
+sudo ./install.sh --with-suricata          # facultative IDS/IPS module
+sudo ./install.sh --with-polarproxy        # facultative TLS inspection module
+sudo ./install.sh --profile full           # all facultative modules
 ```
-
-The exact command shape is decided at M005 design time. The structure shown is illustrative.
 
 ## Verification
 
-Verification is **also aspirational at present**. The verifier tooling (M004 Infrastructure work block) does not yet exist. This section documents what verification will look like.
+`install.sh --check` is the canonical verification path. It runs the same `op_verify` chain that real-install runs at the end (read-only mode — exits non-zero on drift).
 
-### Foundation verification (planned)
+### Foundation verification
 
 ```bash
-# Bridge forwards frames + has the right members:
-sudo brctl show br0
-ip link show <upstream-eth> <lan-eth> br0
+# Comprehensive drift + integrity check (16+ sub-checks)
+./install.sh --check                      # exit 0 = clean; exit 1 = drift
+./install.sh --check --profile full       # full-profile expectations
 
-# Wifi is outbound-only:
-sudo nft list table filter | grep -A 5 'iif "<management-wifi>"'
+# Per-component spot-checks (manual):
 
-# Idempotency — re-running install changes nothing:
-./install.sh                                                 # exit 0, no changes
-diff <(state-snapshot before) <(state-snapshot after)        # empty
+# Bridge forwards frames + members are correct (when --with-bridge):
+ip link show br0
+ip link show <upstream-eth> <lan-eth>
 
-# Project-tooling verification (M004):
-python3 -m tools.verify-policy                               # all checks pass, exit 0
+# Wifi outbound-only enforced at nftables (when --with-wifi):
+sudo nft list table inet ghp_mgmt_wifi    # ruleset loaded
+systemctl is-enabled wpa_supplicant@mgmt0.service
+systemctl is-active wpa_supplicant@mgmt0.service
+
+# Idempotency — re-running real install touches nothing when state matches:
+sudo ./install.sh                         # all `install_file` lines say "unchanged"
+
+# Integrity baselines (when --with-integrity):
+cat $HOME/.claude/integrity.json | jq '.baselines | length'
 ```
 
-### Module verification (planned)
+### Module verification (future)
 
 ```bash
 # Suricata module canary alert (per src-suricata-install-quickstart):

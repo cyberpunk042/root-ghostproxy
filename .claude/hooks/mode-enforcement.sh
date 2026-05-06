@@ -59,13 +59,20 @@ from typing import Optional
 
 PROJECT_ROOT = Path.home()
 ACTIVE_MODE_FILE = PROJECT_ROOT / ".claude" / "active-mode"
+ACTIVE_MISSION_FILE = PROJECT_ROOT / ".claude" / "active-mission"
+ACTIVE_FOCUS_FILE = PROJECT_ROOT / ".claude" / "active-focus"
+ACTIVE_IMPEDIMENT_FILE = PROJECT_ROOT / ".claude" / "active-impediment"
 MODES_DIR = PROJECT_ROOT / ".claude" / "modes"
 SYSTEMIC_BUGS_PATH = PROJECT_ROOT / "wiki" / "governance" / "systemic-bugs.md"
 LOG_DIR = PROJECT_ROOT / "wiki" / "log"
 PROGRESS_PATH = PROJECT_ROOT / "wiki" / "governance" / "progress.md"
 
-# Hard cap for additionalContext output (Claude Code context-budget courtesy).
-MAX_REMINDER_CHARS = 1200
+# NO hard cap on reminder length. Operator directive 2026-05-06: capping
+# mode-enforcement output is the agent self-managing operator-context-budget
+# without authorization (same family as SB-119 — % self-interpretation). The
+# reminder surfaces persona + cycle steps + mission/focus/impediment + live
+# state — all operator-explicit-set or operator-authored content. Truncating
+# is dismissive; let it land at full fidelity.
 
 
 def is_project_context() -> bool:
@@ -193,7 +200,20 @@ def get_live_state_context() -> dict:
     traced with reason for post-hoc diagnosis.
     """
     state: dict = {"open_sbs": [], "recurring_sbs": [], "recent_logs": [], "task_cursor": "",
+                   "mission": "", "focus": "", "impediment": "",
                    "_sb_load_error": ""}
+
+    # Mission / focus / impediment state files (SB-118 build, operator directive 2026-05-06)
+    for layer, path in (
+        ("mission", ACTIVE_MISSION_FILE),
+        ("focus", ACTIVE_FOCUS_FILE),
+        ("impediment", ACTIVE_IMPEDIMENT_FILE),
+    ):
+        try:
+            if path.exists():
+                state[layer] = path.read_text().strip()[:160]
+        except Exception:
+            pass
 
     # Systemic bugs — explicit sys.path injection for cwd-independent import
     if str(PROJECT_ROOT) not in sys.path:
@@ -261,6 +281,19 @@ def compose_reminder(mode: str, sections: dict, state: dict) -> tuple[str, list]
         parts.append("CYCLE STEPS: " + " · ".join(s[:80] for s in cycle_steps))
         keys.append("cycle-sequence")
 
+    # Mission / Focus / Impediment (SB-118) — operator-explicit-set, high priority
+    # placed BEFORE ambient LIVE STATE so the cap doesn't truncate them
+    objective_parts: list = []
+    if state.get("mission"):
+        objective_parts.append(f"MISSION: {state['mission']}")
+    if state.get("focus"):
+        objective_parts.append(f"FOCUS: {state['focus']}")
+    if state.get("impediment"):
+        objective_parts.append(f"IMPEDIMENT: {state['impediment']}")
+    if objective_parts:
+        parts.append(" · ".join(objective_parts))
+        keys.append("objective")
+
     # Live state cross-reference
     live_parts: list = []
     if state["open_sbs"]:
@@ -282,9 +315,6 @@ def compose_reminder(mode: str, sections: dict, state: dict) -> tuple[str, list]
         keys.append("live-state")
 
     text = "  ".join(parts)
-    if len(text) > MAX_REMINDER_CHARS:
-        text = text[: MAX_REMINDER_CHARS - 3] + "..."
-
     return text, keys
 
 

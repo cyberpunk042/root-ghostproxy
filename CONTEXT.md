@@ -173,7 +173,7 @@ All 8 top-level brain files are project-specific authoring (no longer verbatim c
 
 | File | Status |
 |---|---|
-| README.md | Substantive. Refreshed 2026-05-06 (13 hooks / 22 commands / 7 tools / 118-row tracker counts). |
+| README.md | Substantive. Refreshed 2026-05-06 (13 hooks / 25 commands / 10 tools / 124-row tracker counts post SB-118 build). |
 | CLAUDE.md | Substantive. Refreshed 2026-05-06 (hook + command + tool counts). |
 | AGENTS.md | Substantive. Refreshed 2026-05-06 (lifecycle hooks list: added UserPromptSubmit + Stop). |
 | BOOTSTRAP.md | Substantive. Refreshed 2026-05-06 (hook + command + tool tables). |

@@ -232,15 +232,18 @@ def emit_status_block_ansi_horizontal(result: dict, fence: bool = True) -> None:
     )
     ts = _dt_h.now().strftime("%H:%M:%S")
 
-    LABEL_WIDTH = 8  # widest = "Progress"
+    LABEL_WIDTH = 10  # widest = "Impediment"
     # Semantic glyph per section for visual scanning at line-start
     GLYPHS = {
-        "Status":   "●",   # filled circle = current state
-        "Journey":  "↺",   # history loop
-        "Plan":     "◆",   # diamond = priority
-        "Blocked":  "⊘",   # circle-slash = blocker
-        "Progress": "▰",   # filled block = progress
-        "Cursor":   "▶",   # play/now-pointer
+        "Status":     "●",   # filled circle = current state
+        "Journey":    "↺",   # history loop
+        "Plan":       "◆",   # diamond = priority
+        "Blocked":    "⊘",   # circle-slash = blocker
+        "Progress":   "▰",   # filled block = progress
+        "Cursor":     "▶",   # play/now-pointer
+        "Mission":    "✦",   # 4-point star = north star
+        "Focus":      "◉",   # bullseye = current sub-objective
+        "Impediment": "⚠",   # warning sign = block on focus
     }
     def lbl(name: str) -> str:
         glyph = GLYPHS.get(name, "·")
@@ -332,6 +335,21 @@ def emit_status_block_ansi_horizontal(result: dict, fence: bool = True) -> None:
     else:
         print(f"{lbl('Cursor')}  {D}(no open or recurring SBs){X}")
 
+    # Mission / Focus / Impediment — operator-explicit objective layer (SB-118 + SB-124a)
+    try:
+        from tools.objective import read_layer
+        mission = read_layer("mission")
+        focus = read_layer("focus")
+        impediment = read_layer("impediment")
+        if mission:
+            print(f"{lbl('Mission')}  {B}{mission}{X}")
+        if focus:
+            print(f"{lbl('Focus')}  {M}{focus}{X}")
+        if impediment:
+            print(f"{lbl('Impediment')}  {Y}{impediment}{X}")
+    except Exception:
+        pass
+
     if fence:
         print("```")
 
@@ -420,6 +438,23 @@ def emit_status_block_ansi(result: dict, fence: bool = True) -> None:
     else:
         print(f"{Y}(no open/recurring SBs — feature work resumes){X}")
     print(f"{B}parallel branches:      see wiki/log/ + governance/{{progress,blockers,systemic-bugs}}.md{X}")
+    print()
+    # Mission / Focus / Impediment — operator-explicit objective layer (SB-118 + SB-124a)
+    try:
+        from tools.objective import read_layer
+        mission = read_layer("mission")
+        focus = read_layer("focus")
+        impediment = read_layer("impediment")
+        if mission or focus or impediment:
+            print(f"{M}{BO}@@ ✦ OBJECTIVE (mission · focus · impediment) @@{X}")
+            if mission:
+                print(f"{B}{BO}✦ MISSION   {X}{B}{mission}{X}")
+            if focus:
+                print(f"{M}{BO}◉ FOCUS     {X}{M}{focus}{X}")
+            if impediment:
+                print(f"{Y}{BO}⚠ IMPEDIMENT{X}{Y} {impediment}{X}")
+    except Exception:
+        pass
     print(f"{D}{bar}{X}")
     if fence:
         print("```")

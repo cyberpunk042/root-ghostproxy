@@ -42,39 +42,56 @@ The project's authoritative state at $HOME includes:
 - The backlog scaffold (`$HOME/wiki/backlog/{epics,modules,tasks}/`) with active epic + 14 modules + 66 atomic tasks
 - The log directory (`$HOME/wiki/log/`) — populated with session logs + cycle reports + handoff docs
 - The governance directory (`$HOME/wiki/governance/{blockers,progress,decisions}.md` + `systemic-bugs.md`)
-- 8 Python tools at `$HOME/tools/` (state, blockers, progress, decisions, cycle, tasks + mcp_server + _paths)
-- 11 hooks at `.claude/hooks/` + 2 regression tests at `.claude/hooks/tests/`
-- 15 slash commands at `.claude/commands/`
+- 10 Python tools at `$HOME/tools/` (state, blockers, progress, decisions, cycle, tasks, **stamp**, **objective** + mcp_server + _paths)
+- 16 hooks at `.claude/hooks/` (incl. context-warning, end-of-cycle-stamp, stamp-control, integrity.py + test fixtures)
+- 25 slash commands at `.claude/commands/` (incl. /stamp-* config + /install-agent-brain + /mode-* + /mission + /focus + /impediment SB-118)
 - 3 modes at `.claude/modes/` + 3 brain-loaded subagents at `.claude/agents/`
+- 2 skills at `.claude/skills/<name>/SKILL.md` (surface-state + surface-blockers)
 - 10 rules files at `.claude/rules/`
-- ccstatusline integration: 3 profiles + 9 custom AIDLC widgets + wrapper + switch script
-- 4 deployment scripts at `$HOME/scripts/` + lib/ helpers + README (cycle-53 publish-readiness)
-- install.sh + uninstall.sh at scaffold-stage-stub tier
+- ccstatusline integration: 5 profiles + 13 custom widgets + wrapper + switch script
+- 5 deployment scripts at `$HOME/scripts/` + lib/ helpers + README (cycle-53 publish-readiness)
+- install.sh implement-stage (readiness 98%) — `--profile {base|full|project|interactive}`, `--mode {bridge|endpoint|hybrid|auto}`, per-op toggles, `--dry-run` + `--check` + 16-step `op_verify`, shellcheck PASS
 
-**Project is past initial scaffold and into partial-implement tier for several modules** — install.sh dry-run passes; M011 ccstatusline operator-verified; modes-architecture working in production via /loop /cycle since cycle 41.
+**Project is at implement-stage for foundation install** — install.sh fully functional incl. real wifi/nftables/integrity ops; M011 ccstatusline operator-verified; modes-architecture working via /loop /cycle since cycle 41; per-project install via `--profile project` enables sister-project agent-brain deploy.
 
 ## Per-Tool Reference
 
-### `install.sh` (planned, M003)
+### `install.sh` (implemented, M003 — implement-stage 98% readiness)
 
-**Purpose.** Take a fresh Linux host and bring it to foundation-tier root-ghostproxy state. Idempotent: re-running on an already-installed host is a no-op (or cleanly applies any config drift). Multi-host portable: same script deploys to a new host without modification.
+**Purpose.** Take a fresh Linux host and bring it to foundation-tier root-ghostproxy state. Idempotent: re-running on an already-installed host is a no-op (or cleanly applies any config drift). OS-family-aware (Debian/RHEL/Arch). Two install scopes: OS-root install (`--profile base|full`) and per-project agent-brain install (`--profile project`).
 
-**Planned invocations:**
+**Invocations:**
 
 ```bash
 cd $HOME
-./install.sh --dry-run              # Preview what install would do; no changes
-./install.sh                         # Apply install (idempotent; backs up out-of-sync files)
-./install.sh --dest /alt/path        # Install into an alternate prefix (testing)
-./install.sh --check                 # Verify installed state matches expected (planned subcommand)
-./install.sh --help                  # Print usage
+
+# OS-root install (default mode for this dev host)
+./install.sh --dry-run                            # Preview; no changes
+./install.sh --dry-run --profile full             # Base + ccstatusline (Features tier)
+./install.sh                                       # Apply base install (idempotent; backups divergent files)
+./install.sh --profile full                        # Base + facultative modules (npm-based ccstatusline)
+./install.sh --profile base --mode endpoint       # Endpoint-only host (no bridge/wifi ops)
+./install.sh --no-bridge --no-wifi                # Per-op toggle override
+./install.sh --check                               # Verify installed state (read-only; exit 1 on drift)
+./install.sh --help                                # Full usage incl. all 14 flags + 4 profiles + examples
+./install.sh --version                             # 0.0.3-implement-partial
+
+# Per-project install (deploy agent brain into a sister project)
+./install.sh --dry-run --profile project --dest /opt/devops-solutions-information-hub
+./install.sh --profile project --dest /home/jfortin/openarms
+# OR equivalent slash command from any session:
+/install-agent-brain /opt/devops-solutions-information-hub
 ```
 
-**Planned invariants** (foundation gate):
-- `./install.sh --dry-run` prints `unchanged` per file when the host is currently consistent with the expected state.
-- `./install.sh` exits 0 when install applies cleanly (or no-ops); non-zero with explanation otherwise.
-- Backup of out-of-sync files goes to `~/.<name>.ghostproxy.bak.<ts>` (timestamp-suffixed; never overwrites previous backups).
-- Post-install: integrity check returns OK; opencode bridge resolves; bridge topology comes up.
+**Verified invariants:**
+- Idempotent: `install_file()` detects identical content + skips with `unchanged` log; divergent files backup to `<path>.ghostproxy.bak.<UTC-ts>` before overwrite.
+- Path-A safe: when `SRC == DEST_HOME` (e.g., installing on this dev host), all `op_install_*` functions short-circuit unchanged content.
+- Per-op composition: `--profile project` disables OS-level ops (bridge/wifi/integrity/ccstatusline/opencode) since those are scope=root-only; deploys agent brain (settings/hooks/rules/commands/agents/modes/skills/tools) to `<dest>/.claude/` + `<dest>/tools/`.
+- Post-install verification: 16+ checks (`op_verify`) — settings.json parses, hooks executable, integrity match, opencode bridge, br0 UP, wifi config + ruleset + table loaded + service enabled, brain pieces deployed counts.
+- `bash -n install.sh` PASS; `shellcheck install.sh` PASS (zero findings).
+- nftables ruleset for management wifi syntax-checked via `nft -c` before deploy.
+- `ensure_nftables_d_include()` idempotently provisions `/etc/nftables.conf` with `include "/etc/nftables.d/*.nft"` (creates fresh OR appends with backup-first if missing).
+- `wpa_supplicant@mgmt0.service` enabled at install; conditional start (skipped if SSID/PSK placeholders unfilled to avoid auth-fail log spam).
 
 ### `uninstall.sh` (planned, M003)
 

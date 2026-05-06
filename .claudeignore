@@ -1,0 +1,99 @@
+# /root/.claudeignore — Claude Code context-window auto-load filter
+#
+# Purpose (per GitHub issue #29455): tell Claude Code which files to EXCLUDE
+# from automatic context loading at session start / file discovery. Prevents
+# context-budget consumption + behavior-biasing from non-code artifacts.
+#
+# This is NOT a permissions block. Explicit Read tool calls bypass this filter
+# (known limitation per GitHub issue #36163). Hard blocks belong in
+# /root/.claude/settings.json `permissions.deny`. The .gitignore handles git
+# tracking. The three layers are complementary:
+#   .gitignore       → tracks/denies for git
+#   .claudeignore    → auto-context-load filter (THIS FILE; soft)
+#   permissions.deny → hard tool-access block (settings.json)
+#
+# Syntax: standard .gitignore globbing. Patterns are paths relative to /root.
+#
+# Added 2026-05-05 per operator directive: ".claudeignore... it serves another
+# purpose..." — distinguishing it from permissions.deny.
+
+# ---------------------------------------------------------------------------
+# 1. Claude Code runtime artifacts (large + biasing if auto-loaded)
+# ---------------------------------------------------------------------------
+.claude/projects/
+.claude/sessions/
+.claude/file-history/
+.claude/shell-snapshots/
+.claude/session-env/
+.claude/tasks/
+.claude/backups/
+.claude/cache/
+.claude/history.jsonl
+
+# ---------------------------------------------------------------------------
+# 2. opencode runtime artifacts
+# ---------------------------------------------------------------------------
+.opencode/storage/
+.opencode/cache/
+.opencode/state/
+.opencode/logs/
+
+# ---------------------------------------------------------------------------
+# 3. Build / package caches (defensive — may not exist yet)
+# ---------------------------------------------------------------------------
+.cache/
+.npm/
+node_modules/
+**/__pycache__/
+**/*.pyc
+
+# ---------------------------------------------------------------------------
+# 4. Hooks runtime outputs (the hooks themselves stay tracked + auto-loadable;
+#    their log files don't)
+# ---------------------------------------------------------------------------
+.claude/hooks/deny.log
+.claude/hooks/leaks.log
+.claude/hooks/malware-deny.log
+**/*.log
+
+# ---------------------------------------------------------------------------
+# 5. Vendor binaries / downloads (when M005 modules land — defensive now)
+# ---------------------------------------------------------------------------
+vendor/
+vendors/
+downloads/
+**/*.tar.gz
+**/*.tar.xz
+**/*.zip
+**/*.deb
+**/*.pkg
+
+# ---------------------------------------------------------------------------
+# 6. Local-only / generated state
+# ---------------------------------------------------------------------------
+.local/
+.config/cache/
+*.bak
+*.backup
+*.orig
+*.swp
+
+# ---------------------------------------------------------------------------
+# Note on what's NOT in this file (and why):
+#
+#   /root/wiki/log/                — kept LOADED. Project history is intel,
+#                                    not noise. May be revisited if log files
+#                                    grow huge enough to bias context.
+#   /root/wiki/backlog/            — kept LOADED. The active backlog IS the
+#                                    spec; auto-context inclusion is the point.
+#   /root/wiki/config/             — kept LOADED. Methodology engine.
+#   /root/.claude/rules/           — kept LOADED. Agent-context rules.
+#   /root/.claude/hooks/*.sh, *.py — kept LOADED. Hook scripts are spec.
+#   /root/.claude/commands/        — kept LOADED. Slash command definitions.
+#   /root/.claude/skills/          — kept LOADED if/when authored.
+#   /root/.claude/settings.json    — kept LOADED. The hook + permissions wiring.
+#
+# Secrets (.env, credentials, keys) are denied by both .gitignore + the
+# settings.json permissions.deny + policy-block.sh hook. Adding them here too
+# would be redundant (defense-in-depth at three layers is already in place).
+# ---------------------------------------------------------------------------

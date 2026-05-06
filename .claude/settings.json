@@ -1,0 +1,295 @@
+{
+  "model": "opus",
+  "permissions": {
+    "disableBypassPermissionsMode": "disable",
+    "deny": [
+      "Read(.env)",
+      "Read(**/.env)",
+      "Read(.env.*)",
+      "Read(**/.env.*)",
+      "Read(*.env)",
+      "Read(**/*.env)",
+      "Read(secrets)",
+      "Read(secret)",
+      "Read(secrets.*)",
+      "Read(secret.*)",
+      "Read(**/secrets*)",
+      "Read(**/secret.*)",
+      "Read(*.pem)",
+      "Read(**/*.pem)",
+      "Read(*.key)",
+      "Read(**/*.key)",
+      "Read(*.crt)",
+      "Read(**/*.crt)",
+      "Read(*.p12)",
+      "Read(**/*.p12)",
+      "Read(*.pfx)",
+      "Read(**/*.pfx)",
+      "Read(id_rsa)",
+      "Read(id_rsa.*)",
+      "Read(id_ed25519)",
+      "Read(id_ed25519.*)",
+      "Read(id_ecdsa)",
+      "Read(id_ecdsa.*)",
+      "Read(id_dsa)",
+      "Read(id_dsa.*)",
+      "Read(**/id_rsa)",
+      "Read(**/id_rsa.*)",
+      "Read(**/id_ed25519)",
+      "Read(**/id_ed25519.*)",
+      "Read(**/id_ecdsa)",
+      "Read(**/id_ecdsa.*)",
+      "Read(**/id_dsa)",
+      "Read(**/id_dsa.*)",
+      "Read(**/.ssh/id_*)",
+      "Read(credentials)",
+      "Read(credentials.*)",
+      "Read(*credentials*)",
+      "Read(**/credentials*)",
+      "Read(.aws/credentials)",
+      "Read(**/.aws/credentials)",
+      "Read(.aws/config)",
+      "Read(**/.aws/config)",
+      "Read(.netrc)",
+      "Read(**/.netrc)",
+      "Read(.npmrc)",
+      "Read(**/.npmrc)",
+      "Read(.pgpass)",
+      "Read(**/.pgpass)",
+      "Read(.htpasswd)",
+      "Read(**/.htpasswd)",
+      "Read(kubeconfig)",
+      "Read(**/kubeconfig)",
+      "Read(*.kubeconfig)",
+      "Read(**/*.kubeconfig)",
+      "Read(*.kdbx)",
+      "Read(**/*.kdbx)",
+      "Read(*.gpg)",
+      "Read(**/*.gpg)",
+      "Read(*.asc)",
+      "Read(**/*.asc)",
+      "Read(wpa_supplicant.conf)",
+      "Read(wpa_supplicant-*.conf)",
+      "Read(**/wpa_supplicant*.conf)",
+      "Read(token.json)",
+      "Read(**/token.json)",
+      "Read(*token*.json)",
+      "Read(*api*key*)",
+      "Read(*oauth*token*)",
+      "Bash(cat .env*)",
+      "Bash(cat *.env)",
+      "Bash(cat */.env*)",
+      "Bash(cat *.pem)",
+      "Bash(cat *.key)",
+      "Bash(cat *.crt)",
+      "Bash(cat *.p12)",
+      "Bash(cat *.pfx)",
+      "Bash(cat *.kdbx)",
+      "Bash(cat id_rsa*)",
+      "Bash(cat id_ed25519*)",
+      "Bash(cat id_ecdsa*)",
+      "Bash(cat id_dsa*)",
+      "Bash(cat *credentials*)",
+      "Bash(cat *secrets*)",
+      "Bash(cat *.htpasswd)",
+      "Bash(cat *kubeconfig*)",
+      "Bash(cat wpa_supplicant*)",
+      "Bash(head .env*)",
+      "Bash(head *.env)",
+      "Bash(head *.pem)",
+      "Bash(head *.key)",
+      "Bash(head id_*)",
+      "Bash(head *credentials*)",
+      "Bash(head *secrets*)",
+      "Bash(tail .env*)",
+      "Bash(tail *.env)",
+      "Bash(tail *.pem)",
+      "Bash(tail *.key)",
+      "Bash(tail id_*)",
+      "Bash(tail *credentials*)",
+      "Bash(tail *secrets*)",
+      "Bash(less .env*)",
+      "Bash(less *.env)",
+      "Bash(less *.pem)",
+      "Bash(less *.key)",
+      "Bash(less id_*)",
+      "Bash(less *credentials*)",
+      "Bash(less *secrets*)",
+      "Bash(more .env*)",
+      "Bash(more *.env)",
+      "Bash(more *.pem)",
+      "Bash(more *.key)",
+      "Bash(more id_*)",
+      "Bash(more *credentials*)",
+      "Bash(more *secrets*)",
+      "Bash(strings .env*)",
+      "Bash(strings *.env)",
+      "Bash(strings *.pem)",
+      "Bash(strings *.key)",
+      "Bash(strings id_*)",
+      "Bash(xxd .env*)",
+      "Bash(xxd *.pem)",
+      "Bash(xxd *.key)",
+      "Bash(xxd id_*)",
+      "Bash(od .env*)",
+      "Bash(od *.pem)",
+      "Bash(od *.key)",
+      "Bash(hexdump .env*)",
+      "Bash(hexdump *.pem)",
+      "Bash(hexdump *.key)",
+      "Bash(base64 .env*)",
+      "Bash(base64 *.env)",
+      "Bash(base64 *.pem)",
+      "Bash(base64 *.key)",
+      "Bash(base64 *.p12)",
+      "Bash(base64 *.pfx)",
+      "Bash(base64 id_*)",
+      "Bash(base64 *credentials*)",
+      "Bash(base64 *secrets*)",
+      "Bash(grep * .env*)",
+      "Bash(grep * *.env)",
+      "Bash(grep * *credentials*)",
+      "Bash(grep * *secrets*)",
+      "Bash(awk * .env*)",
+      "Bash(awk * *credentials*)",
+      "Bash(sed * .env*)",
+      "Bash(sed * *credentials*)",
+      "Read(.claude/projects/**)",
+      "Read(.claude/sessions/**)",
+      "Read(.claude/file-history/**)",
+      "Read(.claude/shell-snapshots/**)",
+      "Read(.claude/session-env/**)",
+      "Read(.claude/tasks/**)",
+      "Read(.claude/backups/**)",
+      "Read(.claude/cache/**)",
+      "Read(.claude/history.jsonl)",
+      "Read(.opencode/storage/**)",
+      "Read(.opencode/cache/**)",
+      "Read(.opencode/state/**)",
+      "Read(.opencode/logs/**)",
+      "Read(.cache/**)",
+      "Read(.npm/**)",
+      "Read(.local/share/**)",
+      "Read(node_modules/**)",
+      "Read(**/__pycache__/**)"
+    ],
+    "ask": [
+      "Read(.claude/hooks/deny.log)",
+      "Read(.claude/hooks/leaks.log)",
+      "Read(.claude/hooks/malware-deny.log)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Bash|Edit|Write|NotebookEdit|Glob|Grep|WebFetch|WebSearch|Agent|TaskCreate|TaskUpdate|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/policy-block.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/malware-block.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/opt-write-block.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read|Bash|WebFetch|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/leak-detector.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/session-start.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/session-orient.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/pre-compact.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/post-compact.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/session-summary.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/end-of-cycle-stamp.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash $HOME/templates/ccstatusline-config/claude-code-statusline-wrapper.sh"
+  }
+}

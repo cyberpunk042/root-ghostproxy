@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+"""opt-write-block — PreToolUse hook that denies Write/Edit/NotebookEdit to /opt paths.
+
+Per operator binding rule 2026-05-05: "LET THE SECOND-BRAIN BE ITS OWN... THE ONLY
+WAY TO SEND TO THE SECOND-BRAIN IS TO USE THE CONTRIBUTE FEATURE." The /root agent
+must not write into <second-brain>/ directly. The canonical
+channel is `tools.gateway contribute` (gated on M007 connect).
+
+This hook is structural enforcement on top of the rule-layer prevention in
+`.claude/rules/work-mode.md` + `.claude/rules/operating-principles.md` §9. It catches
+the bug at tool-call time, not just rule-warning time.
+
+Bypass mechanism: env var `ROOT_OPT_WRITE_REASON=<reason>` documents a justified
+exception (e.g., operator-explicit one-time direction). Logged to opt-write-block.log
+for audit. Without bypass, the tool call is denied with a remediation message.
+
+Wired in `.claude/settings.json` as PreToolUse hook with matcher `Write|Edit|NotebookEdit`.
+
+Status: DRAFT — authored 2026-05-05 during systemic-fix workblock. NOT YET WIRED
+in settings.json — operator approval required (work-mode.md PO approval boundary
+covers hook configuration changes).
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import sys
+from datetime import datetime
+from pathlib import Path
+
+LOG_PATH = Path.home() / ".claude/hooks/opt-write-block.log"
+
+
+def _resolve_second_brain():
+    """Resolve second-brain root: env var → $HOME default → /opt legacy."""
+    env = os.environ.get("RGP_SECOND_BRAIN_ROOT")
+    if env:
+        return Path(env).expanduser().resolve()
+    home_candidate = Path.home() / "devops-solutions-information-hub"
+    if home_candidate.exists():
+        return home_candidate
+    opt_candidate = Path("/opt/devops-solutions-information-hub")
+    if opt_candidate.exists():
+        return opt_candidate
+    return home_candidate  # default; may not exist
+
+
+SECOND_BRAIN_ROOT = _resolve_second_brain()
+PROTECTED_PREFIX = str(SECOND_BRAIN_ROOT) + "/"
+
+
+def is_project_context() -> bool:
+    """Detect if the calling agent is operating from THIS host's project context ($HOME).
+
+    The hook lives at machine-level (~/.claude/) so it fires for all sessions
+    on the host. We only enforce the second-brain-write-block rule for sessions
+    whose project root is $HOME (the canonical project location for type=root
+    install) — NOT for second-brain's own agent or other sister projects that
+    legitimately write into their own directories.
+
+    Detection (in priority order):
+    1. CLAUDE_PROJECT_DIR env var — set by Claude Code per session
+    2. cwd — falls back to working directory
+    """
+    home = str(Path.home())
+    project_dir = os.environ.get("CLAUDE_PROJECT_DIR", "").strip()
+    if project_dir:
+        return project_dir == home or project_dir.startswith(home + "/")
+    cwd = os.getcwd()
+    return cwd == home or cwd.startswith(home + "/")
+
+
+def main() -> int:
+    try:
+        payload = json.load(sys.stdin)
+    except json.JSONDecodeError:
+        # If we can't parse, allow (don't break the harness)
+        return 0
+
+    tool_name = payload.get("tool_name", "")
+    tool_input = payload.get("tool_input", {})
+
+    if tool_name not in ("Write", "Edit", "NotebookEdit"):
+        return 0
+
+    file_path = tool_input.get("file_path") or tool_input.get("notebook_path") or ""
+
+    if not file_path.startswith(PROTECTED_PREFIX):
+        return 0
+
+    # Only enforce when calling agent is operating from THIS host's project ($HOME).
+    # Second-brain's own agent (cwd inside SECOND_BRAIN_ROOT) legitimately writes
+    # into its own directory and must not be blocked.
+    if not is_project_context():
+        return 0
+
+    # Bypass check
+    bypass_reason = os.environ.get("ROOT_OPT_WRITE_REASON", "").strip()
+    timestamp = datetime.utcnow().isoformat()
+
+    if bypass_reason:
+        # Allow but log the bypass
+        try:
+            with LOG_PATH.open("a") as f:
+                f.write(f"{timestamp} BYPASS tool={tool_name} path={file_path} reason={bypass_reason!r}\n")
+        except OSError:
+            pass
+        return 0
+
+    # Deny + remediation
+    try:
+        with LOG_PATH.open("a") as f:
+            f.write(f"{timestamp} DENY tool={tool_name} path={file_path}\n")
+    except OSError:
+        pass
+
+    response = {
+        "decision": "block",
+        "reason": (
+            f"BLOCKED: {tool_name} to {file_path}. "
+            f"REASON: project agent must not write into second-brain at {PROTECTED_PREFIX} "
+            "directly (operator binding rule 2026-05-05: 'LET THE SECOND-BRAIN BE ITS OWN'). "
+            f"INSTEAD: write to {Path.home()}/wiki/log/<date>-<slug>.md for project iteration "
+            "directives, or use `tools.gateway contribute` (gated on M007 connect) "
+            "for second-brain submissions. "
+            "BYPASS: set env var ROOT_OPT_WRITE_REASON=<reason> on the tool call to "
+            "document a justified exception (logged to opt-write-block.log)."
+        ),
+    }
+    print(json.dumps(response))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

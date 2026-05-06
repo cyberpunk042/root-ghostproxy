@@ -1,0 +1,264 @@
+# root-ghostproxy: deny-all then whitelist publishable, curated config.
+# When this directory is `git init`'d, only the entries below the
+# whitelist section are tracked. Everything else stays local.
+
+# ---------------------------------------------------------------------------
+# 1. Deny everything in the home root
+# ---------------------------------------------------------------------------
+/*
+/.*
+
+# ---------------------------------------------------------------------------
+# 2. Whitelist top-level publishable files
+# ---------------------------------------------------------------------------
+!/.gitignore
+!/.claudeignore
+!/.mcp.json
+!/README.md
+!/LICENSE
+!/install.sh
+!/uninstall.sh
+
+# ---------------------------------------------------------------------------
+# 2.5 Whitelist top-level brain files (agent-context spec)
+#     These define how every AI tool (Claude Code, opencode, etc.) operates
+#     on a host where root-ghostproxy is installed. Spec, not state.
+#     Added 2026-05-05 per operator approval (M012 Phase A).
+# ---------------------------------------------------------------------------
+!/CLAUDE.md
+!/AGENTS.md
+!/CONTEXT.md
+!/BOOTSTRAP.md
+!/ARCHITECTURE.md
+!/DESIGN.md
+!/TOOLS.md
+!/SKILLS.md
+!/SECURITY.md
+!/open-interfaces.template
+
+# ---------------------------------------------------------------------------
+# 3. Whitelist Claude Code curated config
+#    Only the policy: settings.json + hook scripts. No logs, no transcripts,
+#    no sessions, no plugins, no credentials.
+# ---------------------------------------------------------------------------
+!/.claude/
+/.claude/*
+!/.claude/settings.json
+!/.claude/hooks/
+/.claude/hooks/*
+!/.claude/hooks/*.sh
+!/.claude/hooks/*.py
+!/.claude/hooks/tests/
+!/.claude/hooks/tests/*.py
+
+# ---------------------------------------------------------------------------
+# 3.5 Whitelist .claude/rules/ — on-demand agent context
+#     Per Claude Code convention. Loaded by topic when work touches it.
+#     Added 2026-05-05 per operator approval (M012 Phase A).
+# ---------------------------------------------------------------------------
+!/.claude/rules/
+/.claude/rules/*
+!/.claude/rules/*.md
+
+# ---------------------------------------------------------------------------
+# 4. Whitelist opencode curated config
+#    Only opencode.json + the bridge plugin source. No node_modules, no DB,
+#    no logs, no tool-output cache.
+# ---------------------------------------------------------------------------
+!/.config/
+/.config/*
+!/.config/opencode/
+/.config/opencode/*
+!/.config/opencode/opencode.json
+!/.config/opencode/plugin/
+/.config/opencode/plugin/*
+!/.config/opencode/plugin/*.ts
+!/.config/opencode/plugin/*.json
+!/.config/opencode/plugin/*.md
+
+# ---------------------------------------------------------------------------
+# 4.5 Whitelist /wiki/ tree — methodology engine + backlog spec
+#     This is the project-management + methodology source-of-truth.
+#     Yamls + markdown only; no logs (caught by section 5), no caches.
+#     Added 2026-05-05 per operator approval (M012 Phase A).
+# ---------------------------------------------------------------------------
+!/wiki/
+/wiki/*
+!/wiki/config/
+/wiki/config/*
+!/wiki/config/*.yaml
+!/wiki/config/*.md
+!/wiki/backlog/
+/wiki/backlog/*
+!/wiki/backlog/epics/
+/wiki/backlog/epics/*
+!/wiki/backlog/epics/*.md
+!/wiki/backlog/modules/
+/wiki/backlog/modules/*
+!/wiki/backlog/modules/*.md
+!/wiki/backlog/tasks/
+/wiki/backlog/tasks/*
+!/wiki/backlog/tasks/*.md
+!/wiki/log/
+/wiki/log/*
+!/wiki/log/*.md
+
+# ---------------------------------------------------------------------------
+# 4.6 Whitelist /docs/ if used (currently empty; future module artefacts)
+#     Added 2026-05-05 per operator approval (M012 Phase A).
+# ---------------------------------------------------------------------------
+!/docs/
+/docs/*
+!/docs/*.md
+
+# ---------------------------------------------------------------------------
+# 4.7 Whitelist /scripts/ — bash deployment / checkout scripts:
+#     install-from-curl.sh (one-liner bootstrap), checkout-a-init-remote.sh
+#     (Path A: $HOME=repo-root flow), checkout-b-clone-subdir.sh (Path B:
+#     clone-to-subdir flow). Added 2026-05-05 per operator directive on
+#     publish-readiness (separate from /tools/ which is Python autopilot).
+# ---------------------------------------------------------------------------
+!/scripts/
+/scripts/*
+!/scripts/*.sh
+!/scripts/README.md
+!/scripts/lib/
+!/scripts/lib/*.sh
+
+# ---------------------------------------------------------------------------
+# 5. Belt-and-braces: even inside whitelisted dirs, never track these
+#    (defends against a future careless `git add` or whitelist regression)
+# ---------------------------------------------------------------------------
+
+# Claude / opencode runtime artifacts
+**/deny.log
+**/leaks.log
+**/malware-deny.log
+**/*.log
+**/*.jsonl
+**/history.jsonl
+**/mcp-needs-auth-cache.json
+**/known_marketplaces.json
+
+# Session / state DBs
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/sessions/
+**/projects/
+**/file-history/
+**/shell-snapshots/
+**/session-env/
+**/tool-output/
+**/storage/
+
+# Node / Python build artifacts
+**/node_modules/
+**/__pycache__/
+**/*.pyc
+**/.npm/
+**/package-lock.json
+
+# Backups
+**/backups/
+**/*.bak
+**/*.backup
+**/*.orig
+**/*.old
+
+# Cache directories
+**/cache/
+**/.cache/
+
+# ---------------------------------------------------------------------------
+# 6. Hard-deny secrets — never track regardless of any whitelist above.
+#    These patterns repeat the policy-block.sh deny list at the git layer
+#    so a malformed whitelist can't leak them.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+*.env
+*.envrc
+.envrc
+.credentials.json
+.claude.json
+claude-auth-url.txt
+qr.code
+
+# Keys / certs
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+id_ecdsa
+id_ecdsa.*
+id_dsa
+id_dsa.*
+
+# Cloud / infra credentials
+**/credentials
+**/credentials.*
+*credentials*
+**/.aws/
+**/.azure/
+**/.gcloud/
+**/.config/gcloud/
+**/.docker/config.json
+**/kubeconfig
+*.kubeconfig
+**/.kube/
+**/.vault-token
+
+# OS / shell history & state
+.bash_history
+.zsh_history
+.lesshst
+.fim_history
+.python_history
+.node_repl_history
+.viminfo
+.wget-hsts
+
+# SSH / GPG
+.ssh/
+.gnupg/
+
+# Tokens / API keys (catch-all)
+*token*
+*api*key*
+*oauth*token*
+.netrc
+.npmrc
+.pypirc
+.pgpass
+.htpasswd
+.git-credentials
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+
+# ---------------------------------------------------------------------------
+# Whitelist /tools/ — autopilot infrastructure (Python).
+# ---------------------------------------------------------------------------
+!/tools/
+/tools/*
+!/tools/*.py
+
+# ---------------------------------------------------------------------------
+# Whitelist /templates/ — config + widget templates referenced by modules.
+# ---------------------------------------------------------------------------
+!/templates/
+/templates/**

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "root-ghostproxy": {
+      "command": "bash",
+      "args": ["scripts/mcp-launcher.sh"]
+    }
+  }
+}

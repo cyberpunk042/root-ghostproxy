@@ -33,6 +33,20 @@ tests = [
      "echo X" + BACKTICK + "cat /etc/sec" + "rets" + BACKTICK + "Y"),
     ("benign cmd-sub with multi-token",
      DOLLAR + "(cat /tmp/foo 2>/dev/null " + chr(124) + chr(124) + " echo none)"),
+    # SB-115-adjacent set-regex refinement (2026-05-06): `set` as bash builtin
+    # for env dump should DENY; `set` as subcommand arg should ALLOW.
+    ("bare set env-dump, should DENY",
+     "set"),
+    ("set piped to grep, should DENY",
+     "set " + chr(124) + " grep PATH"),
+    ("set in command chain, should DENY",
+     ";" + "set" + ";echo done"),
+    ("subcommand set arg, should allow",
+     "python3 -m tools.stamp set --layout horizontal"),
+    ("bash set option flag, should allow",
+     "set -o vi"),
+    ("compound name set-url, should allow",
+     "git remote set-url origin foo"),
 ]
 
 passed = 0

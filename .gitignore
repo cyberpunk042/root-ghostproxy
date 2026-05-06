@@ -67,6 +67,12 @@
 #     fresh-machine install would have hooks but no /orient, no /handoff,
 #     no /mode-*, no surface-state etc. Coverage gap surfaced 2026-05-06
 #     per operator question on install-readiness for fresh machines.
+#
+#     Also whitelist .claude/stamp-config.json — operator's stamp render
+#     preference (layout + enabled). Defaulting via tools.stamp DEFAULTS
+#     would lose operator's choice on fresh checkout; ship the canonical
+#     config as a default each install picks up. Operator can re-flip via
+#     /stamp-{auto,on,off,horizontal,vertical} slash commands per host.
 # ---------------------------------------------------------------------------
 !/.claude/commands/
 /.claude/commands/*
@@ -86,6 +92,8 @@
 /.claude/skills/*/*
 !/.claude/skills/*/SKILL.md
 !/.claude/skills/*/*.md
+
+!/.claude/stamp-config.json
 
 # ---------------------------------------------------------------------------
 # 4. Whitelist opencode curated config

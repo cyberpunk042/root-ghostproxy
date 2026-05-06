@@ -286,6 +286,22 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/context-warning.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/output-discipline-guard.sh",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   },
   "statusLine": {

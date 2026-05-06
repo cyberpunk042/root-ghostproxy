@@ -397,14 +397,79 @@ detect_os_family() {
     fi
 }
 
+# Translate generic dependency name → distro-specific package name for the install hint.
+# Args: <family> <dep1> [dep2 ...]
+# Stdout: space-separated package names
+_translate_pkg_names() {
+    local family="$1"; shift
+    local d out=""
+    for d in "$@"; do
+        case "${family}:${d}" in
+            *:nft)                                   out+="nftables " ;;
+            debian:ip)                               out+="iproute2 " ;;
+            rhel:ip)                                 out+="iproute " ;;
+            arch:ip)                                 out+="iproute2 " ;;
+            debian:wpa_supplicant)                   out+="wpasupplicant " ;;
+            rhel:wpa_supplicant|arch:wpa_supplicant) out+="wpa_supplicant " ;;
+            *)                                       out+="${d} " ;;
+        esac
+    done
+    printf '%s' "${out% }"
+}
+
 require_dependencies() {
-    # TODO (implement stage): which python3, jq, nft, brctl/ip-link, wpa_supplicant
-    local -a deps=(python3 jq)
-    if [[ "${DRY_RUN}" -eq 1 ]]; then
-        log_dry "verify dependencies present: ${deps[*]}"
-    else
-        log_warn "STUB: dependency check not implemented (scaffold stage)"
+    # Verify required CLI tools are present BEFORE running ops. Required set
+    # depends on enabled ops (per profile + per-op toggles after apply_profile).
+    # Hint OS-family-specific install command when something is missing so the
+    # operator can resolve quickly. In --dry-run mode, missing deps WARN only;
+    # in real-install mode, missing required deps EXIT with code 2 (per --help
+    # exit-code semantics: "prerequisite missing").
+    #
+    # Required-set composition:
+    #   core (always):        python3, jq
+    #   if WITH_BRIDGE=1:     nft, ip
+    #   if WITH_WIFI=1:       wpa_supplicant
+    # Hooks/opencode/integrity ops add no extra deps beyond core.
+    # ccstatusline check (npm) is already done inside op_install_ccstatusline.
+    local -a req_core=(python3 jq)
+    local -a req_optional=()
+    [[ "${WITH_BRIDGE}" == "1" ]] && req_optional+=(nft ip)
+    [[ "${WITH_WIFI}"   == "1" ]] && req_optional+=(wpa_supplicant)
+
+    local -a missing=()
+    local d
+    for d in "${req_core[@]}" "${req_optional[@]}"; do
+        if ! command -v "${d}" >/dev/null 2>&1; then
+            missing+=("${d}")
+        fi
+    done
+
+    local checked="${req_core[*]}${req_optional:+ ${req_optional[*]}}"
+    if [[ "${#missing[@]}" -eq 0 ]]; then
+        if [[ "${DRY_RUN}" -eq 1 ]]; then
+            log_dry "verify dependencies present: ${checked}"
+        else
+            log_info "dependencies OK: ${checked}"
+        fi
+        return 0
     fi
+
+    # Build family-aware install hint
+    local hint pkgs
+    case "${OS_FAMILY}" in
+        debian) pkgs=$(_translate_pkg_names debian "${missing[@]}"); hint="apt-get install ${pkgs}" ;;
+        rhel)   pkgs=$(_translate_pkg_names rhel   "${missing[@]}"); hint="dnf install ${pkgs}" ;;
+        arch)   pkgs=$(_translate_pkg_names arch   "${missing[@]}"); hint="pacman -S ${pkgs}" ;;
+        *)      hint="install via your distro's package manager: ${missing[*]}" ;;
+    esac
+
+    if [[ "${DRY_RUN}" -eq 1 ]]; then
+        log_warn "dry-run: missing dependencies (${missing[*]}); install with: ${hint}"
+        return 0
+    fi
+    log_error "missing required dependencies: ${missing[*]}"
+    log_error "install with: ${hint}"
+    exit 2
 }
 
 # ────────────────────────────────────────────────────────────────────────
@@ -941,8 +1006,11 @@ main() {
 
     detect_os_family
     detect_ghostproxy_mode
-    require_dependencies
     apply_profile
+    # apply_profile must run BEFORE require_dependencies so WITH_BRIDGE / WITH_WIFI
+    # are set per profile + mode_includes filtering — require_dependencies adds
+    # nft/ip/wpa_supplicant to the required set only when those ops are enabled.
+    require_dependencies
 
     [[ "${WITH_HOOKS}"        == "1" ]] && op_install_endpoint_safety_policy || log_info "skip: endpoint safety policy (per profile/toggle)"
     [[ "${WITH_OPENCODE}"     == "1" ]] && op_install_opencode_bridge        || log_info "skip: opencode bridge (per profile/toggle)"

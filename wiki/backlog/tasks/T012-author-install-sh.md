@@ -6,10 +6,10 @@ priority: P0
 parent_module: "root-ghostproxy-m003-foundation-hardening"
 parent_epic: "sfif-rollout-and-second-brain-integration"
 current_stage: implement
-readiness: 80
+readiness: 88
 sfif_stage: Foundation
 created: 2026-05-04
-updated: 2026-05-05
+updated: 2026-05-06
 sources:
   - id: parent-module
     type: wiki
@@ -41,18 +41,18 @@ Author the foundation's idempotent installer. Takes a fresh Linux host (target: 
 - [x] Prior `/root/install.sh` debris backed up to `install.sh.prior-debris.bak.<UTC-ts>` before greenfield overwrite (per T011 + T006 decisions)
 - [x] Greenfield framing in file header explicitly cites T011 + T006 decisions
 
-**Implement-stage (pending — requires operator approval to advance):**
-- [ ] STUB: Debian 13 verification (`/etc/os-release VERSION_ID=13`)
-- [ ] STUB: dependency check (python3, jq, nft, brctl/ip-link, wpa_supplicant)
-- [ ] STUB: deploy `~/.claude/settings.json` + hook scripts
-- [ ] STUB: deploy opencode bridge plugin (`~/.config/opencode/`)
-- [ ] STUB: configure network bridge (ifupdown/netplan/systemd-networkd — operator-chosen)
-- [ ] STUB: configure nftables rules (INPUT/FORWARD/OUTPUT)
-- [ ] STUB: configure management wifi (outbound-only)
-- [ ] STUB: integrity sentinel registration
-- [ ] STUB: post-install verification
-- [ ] Idempotency invariant: re-run = no-op when state matches (T016 covers)
-- [ ] `bash -n install.sh` passes ✓ (verified cycle 23)
+**Implement-stage (in-progress — partial completion):**
+- [x] STUB: dependency check (python3, jq, nft, ip, wpa_supplicant) — implemented 2026-05-06; OS-family-aware install hint (debian/rhel/arch); conditional optional-deps per WITH_BRIDGE/WITH_WIFI; `--dry-run` warns on missing, real-install exits 2. Verified: 3 toggle scenarios produce correct required-set (`base mode=bridge` requires nft+ip+wpa_supplicant; `--no-wifi` drops wpa_supplicant; `--mode endpoint` drops bridge+wifi deps). brctl replaced by `ip` (iproute2) — modern alternative.
+- [x] STUB: OS-family detection (Debian/RHEL/Arch) — implemented earlier (cycle ~22-24); detect_os_family parses /etc/os-release. Note: original Done When said "Debian 13 verification" — superseded per SB-073 to be OS-family-aware (operator: "this project is not limited to being on debian 13").
+- [x] STUB: deploy `~/.claude/settings.json` + hook scripts — implemented (op_install_endpoint_safety_policy at install.sh:415)
+- [x] STUB: deploy opencode bridge plugin (`~/.config/opencode/`) — implemented (op_install_opencode_bridge at install.sh:446)
+- [x] STUB: configure network bridge (systemd-networkd per T013) — implemented (op_install_network_bridge at install.sh:467)
+- [ ] STUB: configure nftables rules (INPUT/FORWARD/OUTPUT) — TODO at install.sh:501; needs separate template
+- [ ] STUB: configure management wifi (outbound-only) — STUB at install.sh ~505
+- [x] STUB: integrity sentinel registration — implemented (op_install_integrity_sentinel)
+- [ ] STUB: post-install verification — partial (op_verify dry-run preview only; real verification logic pending)
+- [ ] Idempotency invariant: re-run = no-op when state matches (T016 covers; verifies install_file's "unchanged" path)
+- [x] `bash -n install.sh` passes ✓ (verified 2026-05-06 after dep-check edit)
 - [ ] `shellcheck install.sh` passes (TBD; not yet run)
 
 ## Dependencies

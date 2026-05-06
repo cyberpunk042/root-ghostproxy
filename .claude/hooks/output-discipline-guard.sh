@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-# output-discipline-guard.sh — UserPromptSubmit hook for runtime SB-094 enforcement.
+# agent-discipline-gate (file: output-discipline-guard.sh — name kept for stability).
 #
-# Detects operator-frustration / escalation patterns in input and injects a
-# reminder to apply output-discipline-under-pressure: shorter response, no
-# tables-of-options, action-first, no new frameworks.
+# UserPromptSubmit hook for runtime SB-090 + SB-094 detection. Combines:
+#   - PREMISE-RISK detection (SB-090): operator words enumerate observations or
+#     ask questions without imperative verbs → agent should not infer action.
+#   - ESCALATION detection (SB-094): operator-frustration / shouting markers →
+#     agent should shorten response, drop tables, action-first.
 #
-# Self-gates via BOOTSTRAP.md presence + cwd-aware (only fires for /root sessions).
-# Generative-compliance ~85%; runtime nudge for the rule layer in
-# /root/.claude/rules/work-mode.md "Output discipline under pressure" subsection.
+# Design constraint per Phase B step 2:
+#   - Single-line additionalContext banner (high-confidence triggers only).
+#   - Silent on routine prompts (no banner = no UI noise).
+#   - Compatible with end-of-cycle-stamp.sh on Stop event (different mechanism).
+#
+# Self-gates via BOOTSTRAP.md presence + CLAUDE_PROJECT_DIR or cwd match.
 
 from __future__ import annotations
 
@@ -17,9 +22,7 @@ import re
 import sys
 from pathlib import Path
 
-
-HOME = Path.home()
-PROJECT_ROOT = HOME
+PROJECT_ROOT = Path.home()
 
 
 def is_project_context() -> bool:
@@ -31,51 +34,93 @@ def is_project_context() -> bool:
     return cwd == home or cwd.startswith(home + "/")
 
 
-# Frustration / escalation markers. Order: cheapest first.
-_FRUSTRATION_WORDS = re.compile(
-    r"\b(wtf|fucking|fuck|trash|retard|useless|stupid|"
-    r"lazy|cheap|broken|pathetic|incompetent)\b",
+_IMPERATIVE_VERBS = re.compile(
+    r"\b(fix|do|make|build|implement|add|remove|delete|update|run|test|verify|"
+    r"author|write|edit|stop|start|continue|pick|finish|commit|revert|"
+    r"restore|apply|use|wire|enable|disable|configure|patch|create|change)\b",
     re.IGNORECASE,
 )
 
-_PROFANITY_OR_ALL_CAPS_RE = re.compile(r"[A-Z]{4,}")
+_FRUSTRATION_WORDS = re.compile(
+    r"\b(wtf|fuck|fucking|trash|retard|retarded|useless|stupid|"
+    r"hopeless|pathetic|incompetent|broken|catastrophic)\b",
+    re.IGNORECASE,
+)
+
+_CAPS_RE = re.compile(r"\b[A-Z]{4,}\b")
+_REPEATED_PUNCT = re.compile(r"[?!]{3,}")
+
+_BENIGN_CAPS = {
+    "AIDLC", "IPS", "SFIF", "HOME", "ROOT", "OPT", "JSON", "YAML", "MCP",
+    "SDLC", "URL", "API", "HTTP", "HTTPS", "TODO", "ASAP", "OS",
+}
 
 
-def detect_escalation(prompt: str) -> tuple[bool, str]:
-    """Heuristic: classify input as showing operator-escalation/frustration.
+def detect_premise_risk(prompt: str) -> str | None:
+    """High-confidence premise-construction trigger detection.
 
-    Returns (is_escalation, reason).
+    Returns reason string if detected, else None. Conservative — only fires when
+    operator words are clearly observation/question without imperative.
     """
     text = (prompt or "").strip()
     if not text:
-        return (False, "")
-
-    # Skip slash commands (operator-explicit, not emotional)
+        return None
     if text.lstrip().startswith("/"):
-        return (False, "")
+        return None  # slash command = explicit imperative
 
-    matches = []
+    if _IMPERATIVE_VERBS.search(text):
+        return None  # imperative present → not premise risk
 
-    # ALL-CAPS words of length >= 4 (typed shouting)
-    caps = _PROFANITY_OR_ALL_CAPS_RE.findall(text)
-    # Filter out common acronyms / project tokens we don't want to flag
-    benign = {"AIDLC", "IPS", "SFIF", "HOME", "ROOT", "OPT", "JSON", "YAML", "MCP", "SDLC", "PR", "URL"}
-    caps = [c for c in caps if c not in benign and not c.startswith("SB")]
+    lower = text.lower()
+
+    # STRONG signal: enumerative observation ("everything ... doesn't seem")
+    if re.search(r"\b(everything|every|all)\b.+?\b(don'?t|doesn'?t|seems?|looks?|appears?|isn'?t)\b", lower):
+        return "enumerative observation without imperative"
+
+    # STRONG signal: observational adjective (no imperative) — "weird X happens"
+    if re.search(r"\b(weird|strange|odd|funny|interesting|broken)\b", lower):
+        return "observational adjective without imperative"
+
+    # STRONG signal: short reaction word (≤4 words)
+    words = lower.split()
+    if len(words) <= 4 and words and words[0] in {"wtf", "weird", "huh", "really", "strange", "odd"}:
+        return "short reaction without imperative"
+
+    # NOTE: bare "?" without imperative was REMOVED — too many false positives on
+    # legitimate information questions. Operator's prior complaint about premise-guard
+    # was the same trigger firing too often.
+
+    return None
+
+
+def detect_escalation(prompt: str) -> str | None:
+    """High-confidence operator-escalation detection (≥2 markers required)."""
+    text = (prompt or "").strip()
+    if not text:
+        return None
+    if text.lstrip().startswith("/"):
+        return None
+
+    score = 0
+    parts = []
+
+    caps = [w for w in _CAPS_RE.findall(text) if w not in _BENIGN_CAPS and not w.startswith("SB")]
     if len(caps) >= 2:
-        matches.append(f"{len(caps)} ALL-CAPS words")
+        score += 1
+        parts.append(f"{len(caps)} ALL-CAPS")
 
-    # Frustration vocabulary
     frust = _FRUSTRATION_WORDS.findall(text)
     if frust:
-        matches.append(f"{len(frust)} frustration markers ({', '.join(set(m.lower() for m in frust))})")
+        score += 1
+        parts.append(f"{len(frust)} frustration markers")
 
-    # Repeated "?" or "!" (high-emphasis punctuation)
-    if re.search(r"[?!]{3,}", text):
-        matches.append("repeated punctuation (??? or !!!)")
+    if _REPEATED_PUNCT.search(text):
+        score += 1
+        parts.append("repeated punctuation")
 
-    if matches:
-        return (True, "; ".join(matches))
-    return (False, "")
+    if score >= 2:
+        return "; ".join(parts)
+    return None
 
 
 def main() -> None:
@@ -93,35 +138,19 @@ def main() -> None:
     if not isinstance(prompt, str):
         sys.exit(0)
 
-    is_esc, reason = detect_escalation(prompt)
-    if not is_esc:
-        sys.exit(0)
+    premise = detect_premise_risk(prompt)
+    escalation = detect_escalation(prompt)
 
-    additional_context = (
-        "═══════════════════════════════════════════════════════════════════════════\n"
-        "OUTPUT DISCIPLINE GUARD — operator escalation detected\n"
-        "═══════════════════════════════════════════════════════════════════════════\n"
-        f"\n"
-        f"Detected: {reason}\n"
-        f"\n"
-        f"Per SB-094 (output-discipline-under-pressure, work-mode.md):\n"
-        f"\n"
-        f"  - Shorten the response (don't lengthen)\n"
-        f"  - Drop tables and option-trees (operator wants resolution, not choices)\n"
-        f"  - State the next concrete action and TAKE IT (or one-sentence blocker)\n"
-        f"  - No new principles, frameworks, or analyses unless explicitly requested\n"
-        f"\n"
-        f"Per SB-099 (abdication-as-freeze): 'holding here / your move / I'm not going\n"
-        f"to act on a guess' is FREEZING IN DISGUISE. Build forward by addressing\n"
-        f"the actual workload.\n"
-        f"\n"
-        f"Per SB-093 (anti-extremes pre-flight): if your last move swung opposite to\n"
-        f"the prior correction, don't ship — adjust by ONE notch only.\n"
-        f"\n"
-        f"This is a nudge. If operator literally requested analysis ('HARD ANALYSIS\n"
-        f"REQUIRED'), structured response is appropriate.\n"
-        f"═══════════════════════════════════════════════════════════════════════════"
-    )
+    if not (premise or escalation):
+        sys.exit(0)  # silent on routine prompts
+
+    flags = []
+    if premise:
+        flags.append(f"PREMISE-RISK ({premise}) — don't infer action; confirm or refrain")
+    if escalation:
+        flags.append(f"ESCALATION ({escalation}) — shorten · drop tables · action-first")
+
+    additional_context = "AGENT-DISCIPLINE: " + " | ".join(flags)
 
     output = {
         "hookSpecificOutput": {

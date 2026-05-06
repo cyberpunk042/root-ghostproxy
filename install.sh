@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# /root/install.sh — root-ghostproxy foundation installer (SCAFFOLD STAGE — T012).
+# $HOME/install.sh — root-ghostproxy foundation installer (SCAFFOLD STAGE — T012).
 #
 # OS scope: Linux, Debian-family supported (Debian 11+, Ubuntu 20.04+, derivatives).
 # Broader Linux (Fedora/RHEL/Arch) — TBD per operator.
@@ -45,7 +45,7 @@
 #
 # This is GREENFIELD per T011 decision (operator verbatim 2026-05-05): "imagine
 # virgin... build from bottom-up... STOP working in reverse". The prior
-# /root/install.sh debris was backed up to install.sh.prior-debris.bak.<ts> per
+# $HOME/install.sh debris was backed up to install.sh.prior-debris.bak.<ts> per
 # T006 (leave-in-place: backup-not-delete) before this file was authored.
 #
 # CURRENT STAGE: scaffold (readiness 50). Implementations are STUBS marked TODO;
@@ -59,7 +59,9 @@ set -euo pipefail
 # Globals + defaults
 # ────────────────────────────────────────────────────────────────────────
 
+# shellcheck disable=SC2155  # readonly+command-sub: basename/dirname always succeed; mask risk = nil
 readonly SCRIPT_NAME="$(basename "$0")"
+# shellcheck disable=SC2155
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly VERSION="0.0.3-implement-partial"
 
@@ -77,7 +79,9 @@ DEST_OPENCODE="${DEST_HOME}/.config/opencode"
 # Flags
 DRY_RUN=0
 CHECK_MODE=0
+# shellcheck disable=SC2034  # VERBOSE: documented in --help; logging hooks pending wire-up
 VERBOSE=0
+# shellcheck disable=SC2034  # ASSUME_YES: documented in --help; --interactive prompt wire-up pending
 ASSUME_YES=0
 
 # Profile + per-operation toggles (default: profile=base unless overridden)
@@ -101,6 +105,7 @@ MODE="auto"
 DETECTED_MODE=""   # set by detect_ghostproxy_mode
 
 # Backup timestamp (UTC, ISO 8601-ish, safe-for-filename)
+# shellcheck disable=SC2155  # readonly+command-sub: date always succeeds
 readonly BACKUP_TS="$(date -u +%Y%m%dT%H%M%SZ)"
 readonly BACKUP_SUFFIX=".ghostproxy.bak.${BACKUP_TS}"
 
@@ -204,6 +209,7 @@ EOF
 # ────────────────────────────────────────────────────────────────────────
 
 parse_args() {
+    # shellcheck disable=SC2034  # VERBOSE + ASSUME_YES wire-up pending; documented in --help
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --dry-run)         DRY_RUN=1; shift ;;
@@ -541,9 +547,9 @@ require_dependencies() {
 #   - modes/*.md: persona modes (PM Scrum Master, DevOps Architect, Dual)
 #   - skills/<name>/SKILL.md: auto-trigger skills (description-match)
 #
-# Path A note (where SRC == DEST_HOME, e.g., $HOME=/root install on this dev
+# Path A note (where SRC == DEST_HOME, e.g., $HOME=$HOME install on this dev
 # host): install_file() detects identical content + skips silently. So this
-# op is a no-op on Path A; for non-Path-A installs ($HOME != /root, e.g.,
+# op is a no-op on Path A; for non-Path-A installs ($HOME != $HOME, e.g.,
 # /home/jfortin/), this is the canonical deployment.
 #
 # Coverage gap fix 2026-05-06 per operator question on install-readiness for
@@ -630,7 +636,7 @@ op_install_endpoint_safety_policy() {
 # Deploys /tools/*.py to ${DEST_HOME}/tools/. Slash commands (/cycle, /stamp-*,
 # /handoff, /audit, etc.) invoke `python3 -m tools.<module>`, so the modules
 # must be importable from the project's working directory. For Path A install
-# (SRC == DEST_HOME, e.g., /root install on this dev host), this op is a no-op
+# (SRC == DEST_HOME, e.g., $HOME install on this dev host), this op is a no-op
 # because tools/ is already in place. For non-Path-A or project-profile
 # installs, this op deploys tools/ alongside the agent brain so slash commands
 # work out-of-the-box.
@@ -782,7 +788,7 @@ ensure_nftables_d_include() {
         # mechanism to load /etc/nftables.d/*.nft files we deploy.
         cat > "${conf}" <<'EOF'
 #!/usr/sbin/nft -f
-# Provisioned by /root/install.sh on first install — extend as operator wishes.
+# Provisioned by $HOME/install.sh on first install — extend as operator wishes.
 flush ruleset
 
 # Load all rulesets from /etc/nftables.d/*.nft (canonical Debian convention).
@@ -1222,6 +1228,24 @@ except Exception as e:
         fi
     fi
 
+    # Git audit sub-step (T015 Done When) — only meaningful at SRC (the repo
+    # root); when DEST != SRC, target is a deployed brain and `git status`
+    # there is unrelated to the spec repo. Skip silently if no .git/ at SRC.
+    if [[ -d "${SRC}/.git" ]]; then
+        if command -v git >/dev/null 2>&1; then
+            local git_changes
+            git_changes=$(cd "${SRC}" && git status --porcelain 2>/dev/null | wc -l)
+            if [[ "${git_changes}" -eq 0 ]]; then
+                _verify_check "git tree clean (${SRC})" true
+            else
+                # Modified-or-untracked files — not a hard fail (active work)
+                # but surface so operator knows verification flag is showing
+                # the active dev state, not a violation.
+                log_check "git tree" "INFO: ${git_changes} modified/untracked files in ${SRC} (active work)"
+            fi
+        fi
+    fi
+
     # Brain pieces (rules/commands/agents/modes/skills) — verify presence.
     # These are deployed by op_install_endpoint_safety_policy; absence here
     # would mean install partial-failed even if hooks landed.
@@ -1283,7 +1307,10 @@ run_check() {
     #   - in-sync   : SHA256 matches between SRC and DEST
     #   - drifted   : DEST exists but content differs from SRC
     #   - missing   : DEST file absent
-    local synced=0 drifted=0 missing=0
+    # Renamed from {synced,drifted,missing} to avoid shellcheck SC2178 false-
+    # positive (the dep-check function `require_dependencies` uses `missing` as
+    # an array; same name in different scope still triggers the warning).
+    local synced_count=0 drifted_count=0 missing_count=0
     local drift_paths=()
 
     _check_artefact() {
@@ -1295,7 +1322,7 @@ run_check() {
             return  # source absent → not our concern (e.g. optional artefact)
         fi
         if [[ ! -f "${dest_path}" ]]; then
-            missing=$((missing + 1))
+            missing_count=$((missing_count + 1))
             drift_paths+=("MISSING: ${dest_path}")
             return
         fi
@@ -1303,9 +1330,9 @@ run_check() {
         src_hash=$(sha256sum "${src_path}" 2>/dev/null | awk '{print $1}')
         dest_hash=$(sha256sum "${dest_path}" 2>/dev/null | awk '{print $1}')
         if [[ "${src_hash}" == "${dest_hash}" ]]; then
-            synced=$((synced + 1))
+            synced_count=$((synced_count + 1))
         else
-            drifted=$((drifted + 1))
+            drifted_count=$((drifted_count + 1))
             drift_paths+=("DRIFTED: ${dest_path}")
         fi
     }
@@ -1332,11 +1359,11 @@ run_check() {
         fi
     fi
 
-    log_check "hooks-in-sync" "${synced}"
-    log_check "hooks-drifted" "${drifted}"
-    log_check "hooks-missing" "${missing}"
+    log_check "hooks-in-sync" "${synced_count}"
+    log_check "hooks-drifted" "${drifted_count}"
+    log_check "hooks-missing" "${missing_count}"
 
-    if [[ "${drifted}" -gt 0 ]] || [[ "${missing}" -gt 0 ]]; then
+    if [[ "${drifted_count}" -gt 0 ]] || [[ "${missing_count}" -gt 0 ]]; then
         log_warn "drift detected:"
         for p in "${drift_paths[@]}"; do
             log_warn "  - ${p}"
@@ -1365,7 +1392,7 @@ run_check() {
         log_check "integrity sentinel" "absent (not registered yet; run --with-integrity)"
     fi
 
-    if [[ "${drifted}" -gt 0 ]] || [[ "${missing}" -gt 0 ]]; then
+    if [[ "${drifted_count}" -gt 0 ]] || [[ "${missing_count}" -gt 0 ]]; then
         return 1
     fi
     return 0
@@ -1442,12 +1469,19 @@ main() {
     fi
     require_dependencies
 
+    # shellcheck disable=SC2015  # set -euo pipefail: op_* failure exits before || branch runs
     [[ "${WITH_HOOKS}"        == "1" ]] && op_install_endpoint_safety_policy || log_info "skip: endpoint safety policy (per profile/toggle)"
+    # shellcheck disable=SC2015
     [[ "${WITH_TOOLS}"        == "1" ]] && op_install_tools                  || log_info "skip: tools/ (per profile/toggle)"
+    # shellcheck disable=SC2015
     [[ "${WITH_OPENCODE}"     == "1" ]] && op_install_opencode_bridge        || log_info "skip: opencode bridge (per profile/toggle)"
+    # shellcheck disable=SC2015
     [[ "${WITH_BRIDGE}"       == "1" ]] && op_install_network_bridge         || log_info "skip: network bridge (per profile/toggle)"
+    # shellcheck disable=SC2015
     [[ "${WITH_WIFI}"         == "1" ]] && op_install_management_wifi        || log_info "skip: management wifi (per profile/toggle)"
+    # shellcheck disable=SC2015
     [[ "${WITH_INTEGRITY}"    == "1" ]] && op_install_integrity_sentinel     || log_info "skip: integrity sentinel (per profile/toggle)"
+    # shellcheck disable=SC2015
     [[ "${WITH_CCSTATUSLINE}" == "1" ]] && op_install_ccstatusline           || log_info "skip: ccstatusline (per profile/toggle — Features tier)"
     op_verify
 

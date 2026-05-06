@@ -8,7 +8,7 @@ source "$(dirname "$0")/_lib.sh"
 readonly TOOLS_PYTHON="$(rgp_resolve_python)"
 readonly TOOLS_DIR="$(rgp_resolve_project)"
 
-# Path 1: tools.progress with module-derived SFIF tier (works for /root)
+# Path 1: tools.progress with module-derived SFIF tier (works for $HOME)
 if [[ -x "${TOOLS_PYTHON}" ]] && [[ -f "${TOOLS_DIR}/tools/progress.py" ]]; then
     cd "${TOOLS_DIR}" || exit 0
     stage=$("${TOOLS_PYTHON}" -c "

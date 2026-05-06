@@ -23,10 +23,15 @@ Settings: `$HOME/.claude/settings.json`. All scripts at `$HOME/.claude/hooks/` a
 |---|---|---|---|
 | PreToolUse | `Read\|Bash\|Edit\|Write\|NotebookEdit\|Glob\|Grep\|WebFetch\|WebSearch\|Agent\|TaskCreate\|TaskUpdate\|mcp__.*` | `policy-block.sh` (Python) | Deny reads of secret patterns (.env, *.pem, id_rsa, credentials, etc.). |
 | PreToolUse | `Bash\|Edit\|Write\|NotebookEdit` | `malware-block.sh` (Python) | Block dangerous bash patterns (rm -rf /, fork bombs, etc.). |
+| PreToolUse | `Write\|Edit\|NotebookEdit` | `opt-write-block.sh` (Python) | Block knowledge-content writes to /opt second-brain (cross-project boundary); allow operational-config writes via documented bypass per SB-098. |
 | PostToolUse | `Read\|Bash\|WebFetch\|Grep` | `leak-detector.sh` (Python) | Scan tool output for leaked secret patterns; log to `$HOME/.claude/hooks/leaks.log`. |
 | SessionStart | (any) | `session-start.sh` (Python) | Print one-line confirmation that policy hooks are active. |
-| SessionStart | (any) | `session-orient.sh` (Python) | Project-priming via `additionalContext` JSON; directs agent to invoke `/orient` for the deterministic 21-step intel-gathering chain. Self-gates via BOOTSTRAP.md presence. |
-| PostCompact | (any) | `post-compact.sh` (Python) | Warn about behavioral-state degradation post-compaction; chain to `/orient` to re-load brain. |
+| SessionStart | (any) | `session-orient.sh` (Python) | Project-priming via `additionalContext` JSON; directs agent to invoke `/orient` for the deterministic 21-step intel-gathering chain. Self-gates via BOOTSTRAP.md + `CLAUDE_PROJECT_DIR` cross-fire prevention (SB-088). |
+| UserPromptSubmit | (any) | `context-warning.sh` (Python) | Surface % context remaining at strategic thresholds (5/3/2/0%) so operator strategic-compaction decision is informed. Pure observability. |
+| UserPromptSubmit | (any) | `output-discipline-guard.sh` (Python, agent-discipline-gate) | Per SB-090 + SB-094 + SB-108: high-confidence-only premise-construction-risk + operator-escalation detection. Single-line concise banner via `additionalContext` when triggered; silent on routine prompts. Closes detection layer for SB-090 / SB-094 / SB-105 / SB-107 / SB-111 family. |
+| PreCompact | (any) | `pre-compact.sh` (Python) | Per SB-078: write deterministic state snapshot to `wiki/log/<ts>-pre-compact-handoff.md` before compaction destroys nuance; `additionalContext` directs post-compact agent to read it. |
+| PostCompact | (any) | `post-compact.sh` (Python) | Warn about behavioral-state degradation post-compaction; chain to `/orient` + reads most-recent pre-compact-handoff doc for state recovery. |
+| Stop | (any) | `end-of-cycle-stamp.sh` (Python) | Per SB-114/SB-115: emit end-of-turn status stamp via `systemMessage` (the only valid display channel for Stop hook per Claude Code schema). Reads `$HOME/.claude/stamp-config.json` for layout (horizontal/vertical) and enabled (on/off/auto) — slash-command-driven config via `tools/stamp.py`. DRAFT per SB-116 UX redesign Epic. |
 | SessionEnd | (any) | `session-summary.sh` (Python) | Print session-end summary. |
 
 ## Hook design pattern (every hook MUST follow)
@@ -46,7 +51,7 @@ Hooks must offer a documented bypass for legitimate cases. Blind enforcement cre
 
 ## Status (this project)
 
-The 7 wired machine-level hook fires (5 distinct events) are functional but **not yet operator-confirmed canonical**. T006 (prior-debris reconciliation) decides which artefacts at /root are operator-authoritative vs prior-session debris. Until T006, the hooks fire actively but their canonical status is provisional. False-positive refinement queued at M003 task **T-M003-7**.
+The 12 wired machine-level hook fires (8 distinct events: PreToolUse + PostToolUse + SessionStart + UserPromptSubmit + PreCompact + PostCompact + Stop + SessionEnd) are functional but **not yet operator-confirmed canonical** for all of them. T006 (prior-debris reconciliation) decides which artefacts at $HOME are operator-authoritative vs prior-session debris. Until T006, the hooks fire actively but their canonical status is provisional. False-positive refinement queued at M003 task **T-M003-7**. New 2026-05-06 additions (DRAFT pending operator-empirical): `output-discipline-guard.sh` UserPromptSubmit (SB-108), `end-of-cycle-stamp.sh` Stop (SB-114/115).
 
 ## Cross-references
 

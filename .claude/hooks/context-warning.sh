@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # context-warning.sh — UserPromptSubmit + PostCompact hook. Surfaces % context
 # remaining at strategic thresholds so the operator's strategic-compaction
-# decision (per /root/wiki/log/2026-05-06-strategic-context-window-management-synthesis.md
+# decision (per $HOME/wiki/log/2026-05-06-strategic-context-window-management-synthesis.md
 # 4 modes: auto / strategic-early / edging / scope-shift-clear) is informed by
 # real perception. Pure observability — does NOT prescribe action.
 #
@@ -178,7 +178,7 @@ def main() -> None:
         sys.exit(0)
     # NO project-context self-gate: context-window is a per-SESSION concern,
     # not per-project. Operator directive 2026-05-06: hook must fire from /opt
-    # second-brain sessions too, not only /root project sessions.
+    # second-brain sessions too, not only $HOME project sessions.
 
     try:
         payload = json.load(sys.stdin)

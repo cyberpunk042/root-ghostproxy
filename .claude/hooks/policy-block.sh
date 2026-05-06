@@ -144,7 +144,7 @@ SECRET_FILE_PATTERNS = [
     r'secrets?(\.|_)?(bak|backup|orig|old)($|\s)',
 
     # Session transcripts may carry historical credential leaks (e.g. the
-    # 2026-05-04 incident still in /root/.claude/projects/-root/*.jsonl).
+    # 2026-05-04 incident still in $HOME/.claude/projects/-root/*.jsonl).
     # Block reads to prevent re-leaking or model-introspection.
     r'\.claude/projects/[^/\s]+/[^/\s]+\.jsonl($|\s)',
 ]

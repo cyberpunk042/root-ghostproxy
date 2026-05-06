@@ -1,6 +1,6 @@
 # /etc/wpa_supplicant/wpa_supplicant-mgmt0.conf — TEMPLATE, operator-fills
 #
-# Deployed by /root/install.sh op_install_management_wifi.
+# Deployed by $HOME/install.sh op_install_management_wifi.
 # Activated by `wpa_supplicant@mgmt0.service` (systemd template unit).
 #
 # Operator-config required: SSID + PSK MUST be filled in by operator BEFORE

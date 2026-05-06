@@ -1,4 +1,4 @@
-Run integrity audits on /root project state.
+Run integrity audits on $HOME project state.
 
 > Slash-invoked. Operator types `/audit` literally. Read-only.
 
@@ -19,7 +19,7 @@ Run the deterministic checks below, in sequence. Report each pass/fail with cont
    import json
    cfg = json.load(open('$HOME/.claude/settings.json'))
    hooks = cfg.get('hooks', {})
-   for evt in ['PreToolUse', 'PostToolUse', 'SessionStart', 'PreCompact', 'PostCompact', 'SessionEnd']:
+   for evt in ['PreToolUse', 'PostToolUse', 'SessionStart', 'UserPromptSubmit', 'PreCompact', 'PostCompact', 'Stop', 'SessionEnd']:
        count = sum(len(e.get('hooks', [])) for e in hooks.get(evt, []))
        print(f'{evt}: {count} hooks')
    print(f'permissions.deny entries: {len(cfg.get(\"permissions\", {}).get(\"deny\", []))}')
@@ -44,18 +44,18 @@ Run the deterministic checks below, in sequence. Report each pass/fail with cont
 
 5. **Blockers doc and live tasks in sync**:
    ```bash
-   cd /root && python3 -m tools.blockers --check
+   cd $HOME && python3 -m tools.blockers --check
    ```
    Exit code 0 = in sync; non-zero = drift.
 
 6. **State sanity**:
    ```bash
-   cd /root && python3 -m tools.state
+   cd $HOME && python3 -m tools.state
    ```
 
 7. **All `.gitignore` whitelist entries resolve to real files**:
    ```bash
-   cd /root && for f in CLAUDE.md AGENTS.md BOOTSTRAP.md CONTEXT.md ARCHITECTURE.md DESIGN.md TOOLS.md SKILLS.md SECURITY.md README.md install.sh .claudeignore; do
+   cd $HOME && for f in CLAUDE.md AGENTS.md BOOTSTRAP.md CONTEXT.md ARCHITECTURE.md DESIGN.md TOOLS.md SKILLS.md SECURITY.md README.md install.sh .claudeignore; do
      [ -e "$f" ] && echo "  OK $f" || echo "  MISSING $f"
    done
    ```
@@ -64,7 +64,7 @@ Run the deterministic checks below, in sequence. Report each pass/fail with cont
    ```bash
    ls $HOME/.claude/commands/ | wc -l
    ```
-   Expected: 15 (orient, cycle, mode-pm, mode-architect, mode-dual, mode-status, mode-clear, blockers, progress, decisions, log, audit, sync-progress, help-root, handoff)
+   Expected: 22 (orient, cycle, mode-{pm,architect,dual,status,clear}, blockers, progress, decisions, log, audit, sync-progress, help-root, handoff, stamp-{horizontal,vertical,on,off,auto,status}, install-agent-brain)
 
 9. **All modes present**:
    ```bash

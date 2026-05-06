@@ -1,8 +1,8 @@
 """tools/_paths.py — project-root + second-brain path resolution.
 
-Resolves all project + cross-project paths DYNAMICALLY so /root/tools/*.py
-modules work regardless of where root-ghostproxy is cloned ($HOME, /root,
-or anywhere). No `/root/...` or `/opt/devops-solutions-information-hub/...`
+Resolves all project + cross-project paths DYNAMICALLY so $HOME/tools/*.py
+modules work regardless of where root-ghostproxy is cloned ($HOME, $HOME,
+or anywhere). No `$HOME/...` or `/opt/devops-solutions-information-hub/...`
 literals appear elsewhere in tools/.
 
 PROJECT_ROOT       — derived from __file__; the directory containing tools/.

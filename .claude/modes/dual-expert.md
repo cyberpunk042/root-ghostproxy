@@ -98,7 +98,7 @@ Surface-without-act: agent in dual mode runs cycles, surfaces findings, but does
 
 This mode + `/loop /cycle` enables the **full wiki LLM PM + Architect autopilot** simultaneously. Useful for solo + AI configurations: one operator, one agent, both roles covered, cycle keeps both workstreams fresh without manual switching. The trade-off vs focused modes is breadth over depth per fire — operator picks based on session goal.
 
-## Loop-cron-lifecycle (per `/root/.claude/rules/loop-cron-lifecycle.md`)
+## Loop-cron-lifecycle (per `$HOME/.claude/rules/loop-cron-lifecycle.md`)
 
 Dual mode loop has the LOWEST sensitivity to autonomous cancellation among the three modes — both lenses must report idle for cancellation to be appropriate.
 

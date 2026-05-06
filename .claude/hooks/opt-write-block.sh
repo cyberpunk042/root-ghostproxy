@@ -2,7 +2,7 @@
 """opt-write-block — PreToolUse hook that denies Write/Edit/NotebookEdit to /opt paths.
 
 Per operator binding rule 2026-05-05: "LET THE SECOND-BRAIN BE ITS OWN... THE ONLY
-WAY TO SEND TO THE SECOND-BRAIN IS TO USE THE CONTRIBUTE FEATURE." The /root agent
+WAY TO SEND TO THE SECOND-BRAIN IS TO USE THE CONTRIBUTE FEATURE." The $HOME agent
 must not write into <second-brain>/ directly. The canonical
 channel is `tools.gateway contribute` (gated on M007 connect).
 

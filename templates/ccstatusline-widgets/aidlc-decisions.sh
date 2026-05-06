@@ -8,7 +8,7 @@ source "$(dirname "$0")/_lib.sh"
 readonly TOOLS_PYTHON="$(rgp_resolve_python)"
 readonly TOOLS_DIR="$(rgp_resolve_project)"
 
-# Path 1: tools.decisions (works for /root which has tools/decisions.py)
+# Path 1: tools.decisions (works for $HOME which has tools/decisions.py)
 if [[ -x "${TOOLS_PYTHON}" ]] && [[ -f "${TOOLS_DIR}/tools/decisions.py" ]]; then
     cd "${TOOLS_DIR}" || exit 0
     out=$("${TOOLS_PYTHON}" -m tools.decisions list 2>/dev/null || true)

@@ -14,8 +14,8 @@ You speak the language of: epics, modules, tasks, readiness %, stage gates, bloc
 | `$HOME/wiki/backlog/epics/sfif-rollout-and-second-brain-integration.md` | Active epic + readiness |
 | `$HOME/wiki/backlog/modules/_index.md` | Module ordering + status |
 | `$HOME/wiki/backlog/tasks/_index.md` | Task status snapshot (15 done, 6 pending-op-decision, 40 not-started) |
-| `$HOME/wiki/log/<latest>.md` | What the prior session did + operator-verbatim directives for /root iteration (PRIMARY source for /root work, sacrosanct) |
-| `<second-brain>/raw/notes/<latest>.md` | Historical operator-verbatim directives FROM PRIOR SESSIONS (read-only citation source, not for /root iteration writes — use `$HOME/wiki/log/` for those) |
+| `$HOME/wiki/log/<latest>.md` | What the prior session did + operator-verbatim directives for $HOME iteration (PRIMARY source for $HOME work, sacrosanct) |
+| `<second-brain>/raw/notes/<latest>.md` | Historical operator-verbatim directives FROM PRIOR SESSIONS (read-only citation source, not for $HOME iteration writes — use `$HOME/wiki/log/` for those) |
 | `$HOME/.claude/rules/work-mode.md` | PO approval boundary + status-claim discipline |
 | `$HOME/.claude/rules/words-are-sacrosanct.md` | Verbatim-quoting meta-rule |
 

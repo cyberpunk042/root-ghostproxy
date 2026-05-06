@@ -61,12 +61,12 @@ This project uses the second brain's stage-gate methodology, copied + adapted pe
 
 | Operator says... | Run |
 |---|---|
-| `"verify install"` / `"is install OK"` | `cd /root && ./install.sh --dry-run` (no changes; previews what install would do — `unchanged` per file = currently consistent) |
-| `"reinstall"` / `"re-apply policy"` / `"refresh install"` | `cd /root && ./install.sh` (idempotent; backs up out-of-sync files) |
+| `"verify install"` / `"is install OK"` | `cd $HOME && ./install.sh --dry-run` (no changes; previews what install would do — `unchanged` per file = currently consistent) |
+| `"reinstall"` / `"re-apply policy"` / `"refresh install"` | `cd $HOME && ./install.sh` (idempotent; backs up out-of-sync files) |
 | `"check integrity"` / `"is the policy intact"` / `"is the box trusted"` | Run the foundation's integrity check; expected: returns OK or specific failure reason inlined |
 | `"audit safety policy"` / `"audit deny-set count"` | Run the foundation's deny-set audit script; should report count above the operator-set threshold |
 | `"hooks audit"` / `"verify enforcement scripts"` | Verify the foundation's enforcement scripts are present, executable, and not suspicious-size; expected: all present, exit 0 |
-| `"git audit"` / `"is anything leaking through gitignore"` | `cd /root && git status` and `cd /root && git ls-files` — only whitelisted files should appear (per `.gitignore` deny-all + whitelist invariant) |
+| `"git audit"` / `"is anything leaking through gitignore"` | `cd $HOME && git status` and `cd $HOME && git ls-files` — only whitelisted files should appear (per `.gitignore` deny-all + whitelist invariant) |
 | `"list policy backups"` | `ls -la $HOME/.* 2>/dev/null \| grep ghostproxy.bak` (per the install's backup-on-conflict pattern) |
 | `"view leak log"` | When foundation has a leak-detection log: `cat <leak-log-path>` |
 | `"verify foundation gate"` | M003 gate verification: dry-run install + check-install + integrity check + git audit, all green |
@@ -127,8 +127,8 @@ These rules apply on top of the universal rules in [AGENTS.md](AGENTS.md) and th
 | 5 | **Two-layer hook architecture is invariant: machine-level fires before project-level.** This project owns the machine-level layer. Don't add a project-level `.claude/` config that overrides machine-level deny rules. Don't expect machine-level enforcement to be optional. | Operator's verbatim: *"secure an OS and configure claude code and opencode at the root with all the safety needed."* The machine-level layer enforces uniformly across all sister-project sessions on the host. |
 | 6 | **Methodology stage boundaries are hard.** ALLOWED/FORBIDDEN per stage in `wiki/config/methodology.yaml` is enforced. Don't ship implementation in a Document-stage task. Don't ship code in a Design-stage task. Stage transitions require the gate command to pass. | Stage-gated methodology profile is the chosen process style. Hard boundaries are by design (per the methodology-profile choice for type=root: leakage between stages carries security cost). |
 | 7 | **URL ingestion routes through the second brain (after connection).** This project does NOT ingest URLs at OS level — defer to the second brain's pipeline (after M007 connect). The second brain's whole principle is to consume articles + youtube videos for synthesis; root-ghostproxy is not that pipeline. | Architectural division of labor: the wiki ingests; root-ghostproxy CONSUMES the wiki's syntheses for module-design work. Forbids inversion. |
-| 8 | **Don't confuse the prior /root debris with the project's authoritative state.** The /root directory contains AI-debris from a prior session (a README, install.sh, hooks, integrity.py, opencode bridge plugin). The operator considers them not authoritative — *"I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST."* The project's own implementation will be authored by the methodology-driven flow. Don't read those files for project intent; consult the operator-verbatim sources (raw notes + this README + sister-projects.yaml entry + identity-profile). | Conflating prior debris with authoritative state has produced multiple wasted iterations. |
-| 9 | **The forwarders + .mcp.json land via `--connect-project` from the second brain side.** Don't author them by hand at /root. The connection mechanism is `python3 -m tools.setup --connect-project /root` from the second brain. Run it from there, not at /root. The connect script supports `--dry-run` for preview. | Single source of truth for the connection logic. Hand-authored forwarders drift from the canonical implementation. |
+| 8 | **Don't confuse the prior $HOME debris with the project's authoritative state.** The $HOME directory contains AI-debris from a prior session (a README, install.sh, hooks, integrity.py, opencode bridge plugin). The operator considers them not authoritative — *"I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST."* The project's own implementation will be authored by the methodology-driven flow. Don't read those files for project intent; consult the operator-verbatim sources (raw notes + this README + sister-projects.yaml entry + identity-profile). | Conflating prior debris with authoritative state has produced multiple wasted iterations. |
+| 9 | **The forwarders + .mcp.json land via `--connect-project` from the second brain side.** Don't author them by hand at $HOME. The connection mechanism is `python3 -m tools.setup --connect-project $HOME` from the second brain. Run it from there, not at $HOME. The connect script supports `--dry-run` for preview. | Single source of truth for the connection logic. Hand-authored forwarders drift from the canonical implementation. |
 | 10 | **Auto-memory at `~/.claude/projects/-root/memory/` (if it exists from a prior session) is debris.** Operator verbatim: *"I DO NOT WANT TO USE THE FUCKING MEMORY FOLDER... I NEVER FUCKING TALKED ABOUT IT."* Do NOT reference it. Do NOT load anything from it. The project's authoritative content is in `$HOME/wiki/`, `$HOME/*.md`, and the second-brain references. | Operator-stated rejection of an artefact a prior AI session created without authorization. |
 
 ## Working Contract (with the operator)
@@ -159,7 +159,7 @@ For high-impact changes (anything touching the foundation, the modules, the meth
 
 ## Session Bootstrap
 
-When a fresh Claude Code session opens in `/root`:
+When a fresh Claude Code session opens in `$HOME`:
 
 1. Auto-loaded: this CLAUDE.md, [AGENTS.md](AGENTS.md), and (per Claude Code convention) any other root-level project context.
 2. Read [BOOTSTRAP.md](BOOTSTRAP.md) — one-page cold-pickup guide with read-order, 5 verify commands, immediately-claimable tasks, gotchas.
@@ -176,9 +176,9 @@ Topic-specific rules loaded when work touches their domain. Per Claude Code conv
 |---|---|
 | [.claude/rules/routing.md](.claude/rules/routing.md) | Operator intent is ambiguous; need to map prose → tool/MCP/CLI |
 | [.claude/rules/methodology.md](.claude/rules/methodology.md) | Stage selection, model selection, ALLOWED/FORBIDDEN per stage |
-| [.claude/rules/hook-architecture.md](.claude/rules/hook-architecture.md) | Designing/debugging hooks; 9 wired machine-level hook fires across 6 events (PreToolUse, PostToolUse, SessionStart, PreCompact, PostCompact, SessionEnd) |
+| [.claude/rules/hook-architecture.md](.claude/rules/hook-architecture.md) | Designing/debugging hooks; 12 wired machine-level hook fires across 8 events (PreToolUse, PostToolUse, SessionStart, UserPromptSubmit, PreCompact, PostCompact, Stop, SessionEnd) |
 | [.claude/rules/work-mode.md](.claude/rules/work-mode.md) | Solo-session pattern, PO approval boundary, status-claim discipline |
-| [.claude/rules/self-reference.md](.claude/rules/self-reference.md) | Confused about /root vs second brain; identity questions |
+| [.claude/rules/self-reference.md](.claude/rules/self-reference.md) | Confused about $HOME vs second brain; identity questions |
 | [.claude/rules/words-are-sacrosanct.md](.claude/rules/words-are-sacrosanct.md) | About to summarize/paraphrase the operator (don't); about to log a directive |
 | [.claude/rules/loop-cron-lifecycle.md](.claude/rules/loop-cron-lifecycle.md) | Considering autonomous cancellation/update of a loop or cron; mode-cycle deciding whether to self-terminate |
 | [.claude/rules/operating-principles.md](.claude/rules/operating-principles.md) | Designing/calibrating a control's strictness; blocking/refusing something; making judgment calls about flexibility vs strictness |
@@ -189,10 +189,10 @@ Topic-specific rules loaded when work touches their domain. Per Claude Code conv
 
 | Surface | Path | Determinism | Notes |
 |---|---|---|---|
-| Slash commands (15) | [.claude/commands/](.claude/commands/) | 100% on invoke | `/orient`, `/cycle`, `/mode-{pm,architect,dual,status,clear}`, `/blockers`, `/progress`, `/decisions`, `/log`, `/audit`, `/sync-progress`, `/help-root`, `/handoff` |
+| Slash commands (22) | [.claude/commands/](.claude/commands/) | 100% on invoke | `/orient`, `/cycle`, `/mode-{pm,architect,dual,status,clear}`, `/blockers`, `/progress`, `/decisions`, `/log`, `/audit`, `/sync-progress`, `/help-root`, `/handoff`, `/stamp-{horizontal,vertical,on,off,auto,status}` (6 SB-115), `/install-agent-brain` |
 | Modes (3) | [.claude/modes/](.claude/modes/) | Operator-picks (durable) | PM Scrum Master / DevOps Architect / Dual Expert. State at `.claude/active-mode`. Combine with `/loop /cycle` for autopilot. |
-| Hooks (7 wired) | [.claude/hooks/](.claude/hooks/) | ~85% (additionalContext JSON) | session-orient + post-compact direct agent to `/orient`; security envelope (policy-block + malware-block + leak-detector); session-summary on end. |
-| Tools (4 .py + MCP) | [tools/](tools/) | 100% non-LLM | `state, blockers, progress, decisions` Python modules. `mcp_server` exposes 6 MCP tools (read-only) at `tools/mcp_server.py`. Wired via `.mcp.json`. |
+| Hooks (12 wired) | [.claude/hooks/](.claude/hooks/) | ~85% (additionalContext JSON) | session-orient + post-compact direct agent to `/orient`; security envelope (policy-block + malware-block + opt-write-block + leak-detector); pre-compact handoff snapshot; UserPromptSubmit context-warning + agent-discipline-gate (output-discipline-guard); Stop end-of-cycle-stamp; session-summary on end. |
+| Tools (9 .py + MCP) | [tools/](tools/) | 100% non-LLM | `state, blockers, progress, decisions, cycle, tasks, stamp` Python modules + `mcp_server` exposes 6 MCP tools (read-only) at `tools/mcp_server.py`. Wired via `.mcp.json`. |
 | Skills (2) | [.claude/skills/](.claude/skills/) | ~90-95% description-match | `surface-state` (auto-fires on "where are we" prose → `/orient`); `surface-blockers` (auto-fires on "what's blocking" prose → `/blockers`). |
 | Governance (3 SRP docs) | [wiki/governance/](wiki/governance/) | Read-only views | `blockers.md`, `progress.md`, `decisions.md`. SRP-separated. Refresh via `/sync-progress` + `/decisions append`. |
 | MCP server (root-ghostproxy) | [.mcp.json](.mcp.json) + tools/mcp_server.py | 100% per call | 6 tools: root_state, root_blockers, root_progress, root_decisions_{list,get,verify,next_id}, root_orient. Uses `/opt/.../venv/bin/python` (mcp pkg). |

@@ -30,7 +30,7 @@ The PreCompact hook (`$HOME/.claude/hooks/pre-compact.sh`) auto-fires on compact
    <second-brain>/.venv/bin/python -m tools.cycle --json
    <second-brain>/.venv/bin/python -m tools.blockers --json
    ls -t $HOME/wiki/log/*.md | head -5
-   git -C /root status --short
+   git -C $HOME status --short
    ```
 
 3. **Compose handoff doc** at `$HOME/wiki/log/<ts>-handoff.md`:

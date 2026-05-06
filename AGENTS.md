@@ -73,7 +73,7 @@ Every tool call from every AI tool fires hooks in this order:
 2. **Pre-tool-call policy hooks** — credential-file blocker + behavior-pattern blocker + any operator-curated additions. Each receives the canonical envelope, returns a decision.
 3. **Tool executes** if all pre-hooks allowed.
 4. **Post-tool-call output hooks** — leak-detector + any operator-curated post-processing. Output is scanned for credential-shaped patterns; detections logged + alerted.
-5. **Session lifecycle hooks** run on session events: SessionStart (banner + integrity check + project-priming directive to invoke `/orient`); PreCompact (writes deterministic state snapshot to `wiki/log/<ts>-pre-compact-handoff.md` BEFORE compaction summarizes context away); PostCompact (directs agent to invoke `/orient` + reference the most-recent pre-compact handoff doc); SessionEnd (deny/leak count summary).
+5. **Session lifecycle hooks** run on session events: SessionStart (banner + integrity check + project-priming directive to invoke `/orient`); UserPromptSubmit (context-window warning + agent-discipline-gate per SB-108: high-confidence premise-construction-risk + operator-escalation detection); PreCompact (writes deterministic state snapshot to `wiki/log/<ts>-pre-compact-handoff.md` BEFORE compaction summarizes context away); PostCompact (directs agent to invoke `/orient` + reference the most-recent pre-compact handoff doc); Stop (end-of-cycle-stamp per SB-114/SB-115: persistent-config-driven status stamp via `systemMessage`; layout horizontal/vertical, enabled on/off/auto via slash commands `/stamp-*`); SessionEnd (deny/leak count summary).
 
 This order is invariant across AI tools. Claude Code calls these hooks natively; opencode runs them via the bridge plugin. The hook scripts themselves are the same code, invoked from different runtimes.
 
@@ -110,7 +110,7 @@ Full identity profile (canonical): `<second-brain>/wiki/ecosystem/project_profil
 
 ## Mission (operator verbatim)
 
-> *"I am able to start a session in the /root project and am able to start working on the two vendors & modules integrations and following the methodology with the wiki LLM and everything"*
+> *"I am able to start a session in the $HOME project and am able to start working on the two vendors & modules integrations and following the methodology with the wiki LLM and everything"*
 
 > *"its IAC and its basically a IPS sitting in between the Edge firewall (OPNSense) and the first switch / the local network. its aiming to secure an OS and configure claude code and opencode at the root with all the safety needed. it will do this and it will also offer in the future to for instance we use this machine or another [new] one. So its not just an IPS its a system AI safety setup project and the IPS tools (suricata and [polarproxy]) as modules."*
 
@@ -150,7 +150,7 @@ These rules apply regardless of which AI tool is operating. They are NOT Claude-
 | 2 | **Tamper detection precedes every tool call.** Before honoring any tool call, verify the safety controls are intact. If they are not, refuse every call until restored. | Safety controls being silently disabled is the failure mode tamper detection exists to prevent. |
 | 3 | **Cross-AI-tool consistency: same policy, different runtimes.** When a new AI tool is added (e.g. Codex, Cursor, Gemini), wire it into the existing policy via a thin adapter that mirrors hooks under the new tool's SDK. **Do not duplicate** the policy regex / deny lists / hook logic per tool. | No-policy-duplication invariant. Multiple parallel policies drift; one source-of-truth doesn't. |
 | 4 | **Operator words are sacrosanct — quote verbatim, never paraphrase.** When the operator's framing shapes a rule, decision, artefact, or threat-model entry, quote them verbatim. The agent's role is to preserve the operator's reasoning chain, not to compress it. **Log path: `$HOME/wiki/log/<YYYY-MM-DD>-<slug>.md`** (NOT `<second-brain>/raw/notes/` — second-brain has its own contribute channel; project iteration directives stay in `$HOME/`). Use `/log` slash command. | The operator's words define the project. Compression is loss. Path discipline (added 2026-05-05): writes from project agent into the second-brain are forbidden — second-brain is its own. |
-| 5 | **Don't conflate the prior /root debris with the project's authoritative state.** The /root directory contains AI-debris from a prior session (a README, install.sh, hooks, integrity.py, opencode bridge plugin). Operator considers them not authoritative. The project's own implementation will be authored by the methodology-driven flow. Read operator-verbatim sources for project intent, not the prior debris. | Conflating prior debris with authoritative state has produced multiple wasted iterations. |
+| 5 | **Don't conflate the prior $HOME debris with the project's authoritative state.** The $HOME directory contains AI-debris from a prior session (a README, install.sh, hooks, integrity.py, opencode bridge plugin). Operator considers them not authoritative. The project's own implementation will be authored by the methodology-driven flow. Read operator-verbatim sources for project intent, not the prior debris. | Conflating prior debris with authoritative state has produced multiple wasted iterations. |
 | 6 | **Auto-memory at `~/.claude/projects/-root/memory/` (if it exists from a prior session) is debris.** Operator verbatim: *"I DO NOT WANT TO USE THE FUCKING MEMORY FOLDER... I NEVER FUCKING TALKED ABOUT IT."* Do NOT reference it. Do NOT load anything from it. | Operator-stated rejection. |
 | 7 | **Methodology stage boundaries are hard.** ALLOWED/FORBIDDEN per stage in `wiki/config/methodology.yaml` is enforced. Don't ship implementation in a Document-stage task. Don't ship code in a Design-stage task. Stage transitions require the gate command to pass. | Stage-gated methodology profile is the chosen process style. Hard boundaries are by design (per the methodology-profile choice for type=root: leakage between stages carries security cost). |
 | 8 | **Modules are facultative.** Don't conflate "the project" with "the project + modules." Base install (foundation) is functional standalone. Don't fail a foundation gate because a module isn't installed. | Operator's verbatim. |
@@ -164,7 +164,7 @@ Operator drives, AI is the horse. Each artefact is operator-reviewed before it l
 Operator-decided actions need explicit operator authorization before execution. Examples:
 - Editing the safety policy (`~/.claude/settings.json`, `~/.claude/hooks/*`)
 - Editing methodology files (`wiki/config/methodology.yaml`, profile yamls)
-- Running `tools.setup --connect-project /root` for real (not --dry-run)
+- Running `tools.setup --connect-project $HOME` for real (not --dry-run)
 - Module install/uninstall
 - Network bridge configuration changes
 
@@ -172,7 +172,7 @@ Low-impact iterations within an authorized work block (e.g. "iterate on this fil
 
 ## Session Bootstrap (for any AI tool)
 
-When a fresh session opens in `/root`:
+When a fresh session opens in `$HOME`:
 
 1. Read this file (AGENTS.md) and any tool-specific layer (e.g. CLAUDE.md for Claude Code).
 2. Read [README.md](README.md) for project vision + identity.

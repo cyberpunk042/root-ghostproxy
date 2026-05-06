@@ -1,6 +1,6 @@
 # $HOME/.claude/rules/routing.md — Operator intent → tool routing for root-ghostproxy
 
-> Loaded on demand when operator intent is ambiguous. CLAUDE.md has the summary delta; this file has the routing table for THIS project (OS-setup IaC at /root).
+> Loaded on demand when operator intent is ambiguous. CLAUDE.md has the summary delta; this file has the routing table for THIS project (OS-setup IaC at $HOME).
 
 ## Mechanism Selection (commands vs hooks vs MCP vs CLI)
 
@@ -21,10 +21,10 @@
 | `"verify state"` | Run BOOTSTRAP.md's 4 verify commands | BOOTSTRAP.md |
 | `"status"` / `"where are we"` | Show SFIF stage + active modules + pending-decision tasks | CONTEXT.md + _index.md |
 | `"add Suricata"` / `"PolarProxy"` | M005 territory; check ordering against ccstatusline (M011 ordered before M005) | M005 / M011 module pages |
-| `"connect to second brain"` | M007 — `tools.setup --connect-project /root --dry-run` first | M007 task pages T038-T043 |
-| `"verify second brain knows /root"` | T053 — `gateway query --backlog`, sister-projects.yaml grep | T053 |
+| `"connect to second brain"` | M007 — `tools.setup --connect-project $HOME --dry-run` first | M007 task pages T038-T043 |
+| `"verify second brain knows $HOME"` | T053 — `gateway query --backlog`, sister-projects.yaml grep | T053 |
 | `"ingest a URL"` | NOT this project's role. Route to second brain (`pipeline fetch` / `wiki_fetch` MCP from /opt). | second brain |
-| `"the operator said X"` (verbatim) | Log verbatim to `$HOME/wiki/log/<date>-<slug>.md` BEFORE acting. **NOT** `/opt/.../raw/notes/` — that's the second-brain's own layer; /root must not write there. | /root iteration log |
+| `"the operator said X"` (verbatim) | Log verbatim to `$HOME/wiki/log/<date>-<slug>.md` BEFORE acting. **NOT** `/opt/.../raw/notes/` — that's the second-brain's own layer; $HOME must not write there. | $HOME iteration log |
 | `"check pending decisions"` | List `pending-operator-decision` tasks | _index.md status table |
 | `"claim a task"` | List `not-started` with no `BLOCKED BY` outstanding → operator picks → work it per Done When + stage gate | _index.md → T###*.md |
 

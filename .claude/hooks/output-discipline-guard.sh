@@ -86,6 +86,22 @@ def detect_premise_risk(prompt: str) -> str | None:
     if len(words) <= 4 and words and words[0] in {"wtf", "weird", "huh", "really", "strange", "odd"}:
         return "short reaction without imperative"
 
+    # STRONG signal: unclear-reference start — pronoun + state-adjective forces
+    # agent to guess WHAT "it/this/that" refers to → premise construction risk.
+    # Pattern: [optional "now"] + pronoun (with optional contraction-s OR
+    # explicit copula) + state-adjective.
+    # Examples caught: "it's broken", "this is wrong", "now it's worse",
+    #                  "that's missing", "everything's off"
+    if re.match(
+        r"^\s*(?:now\s+)?"
+        r"(?:it|this|that|what|everything|nothing|something)"
+        r"(?:'s|\s+(?:is|isn'?t|was|wasn'?t|seems?|looks?|appears?|feels?))?\s+"
+        r"(?:gone|broken|missing|wrong|weird|different|bad|worse|better|"
+        r"off|stuck|odd|wrong|broken)\b",
+        lower,
+    ):
+        return "unclear-reference start (it/this/that + state, no explicit subject)"
+
     # NOTE: bare "?" without imperative was REMOVED — too many false positives on
     # legitimate information questions. Operator's prior complaint about premise-guard
     # was the same trigger firing too often.
@@ -123,25 +139,45 @@ def detect_escalation(prompt: str) -> str | None:
     return None
 
 
+def _trace(tag: str, extra: str = "") -> None:
+    try:
+        from datetime import datetime as _dt
+        with open("/tmp/hook-fire-trace.log", "a") as f:
+            f.write(
+                f"[{_dt.now().isoformat()}] hook=output-discipline-guard.sh "
+                f"path={tag} cwd={os.getcwd()} home={os.environ.get('HOME', '')} "
+                f"claude_proj={os.environ.get('CLAUDE_PROJECT_DIR', '<unset>')} {extra}\n"
+            )
+    except Exception:
+        pass
+
+
 def main() -> None:
+    _trace("entered")
+
     if not (PROJECT_ROOT / "BOOTSTRAP.md").exists():
+        _trace("exit-bootstrap-missing")
         sys.exit(0)
     if not is_project_context():
+        _trace("exit-not-project-context")
         sys.exit(0)
 
     try:
         payload = json.load(sys.stdin)
     except Exception:
+        _trace("exit-json-error")
         sys.exit(0)
 
     prompt = payload.get("prompt", "") or payload.get("user_prompt", "")
     if not isinstance(prompt, str):
+        _trace("exit-bad-prompt-type")
         sys.exit(0)
 
     premise = detect_premise_risk(prompt)
     escalation = detect_escalation(prompt)
 
     if not (premise or escalation):
+        _trace("exit-silent-routine")
         sys.exit(0)  # silent on routine prompts
 
     flags = []
@@ -159,6 +195,12 @@ def main() -> None:
         }
     }
     print(json.dumps(output))
+    fired_kinds = []
+    if premise:
+        fired_kinds.append("premise")
+    if escalation:
+        fired_kinds.append("escalation")
+    _trace(f"fired-{'+'.join(fired_kinds)}", f"banner_len={len(additional_context)}")
     sys.exit(0)
 
 

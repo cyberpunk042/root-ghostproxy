@@ -20,7 +20,7 @@ Every layer should anticipate degradation, drift, and regression. Failures are i
 | Methodology | Stage gates; ALLOWED/FORBIDDEN per stage; verifier (when M004 lands) catches drift |
 | Hooks | Draft-tier acceptance + queued refinement (M003 T-M003-7) — failure mode handled |
 
-Adapted: safety controls match the project's identity (Goldilocks). A POC needs different safety than production. /root currently is type=root + group=operating-system-setup + scale=micro + execution_mode=solo + trust_tier=operator-supervised — controls calibrated to that.
+Adapted: safety controls match the project's identity (Goldilocks). A POC needs different safety than production. $HOME currently is type=root + group=operating-system-setup + scale=micro + execution_mode=solo + trust_tier=operator-supervised — controls calibrated to that.
 
 ### 2. Always flexible
 
@@ -42,7 +42,7 @@ Operator's verbatim: *"we know when it need to be strict or even enforced or det
 
 The spectrum:
 
-| Tier | Definition | Where it applies in /root |
+| Tier | Definition | Where it applies in $HOME |
 |---|---|---|
 | **Aspirational** | The target; not yet achievable; tracked as future-decision | F-items in blockers.md (F008-F015); milestones v0.2-v1.0 |
 | **Advisory** | Rule informs judgment; agent applies discretion; failure correctable on next iteration | Most prose-rule guidance in brain files; soft suggestions in cycle reports |
@@ -150,18 +150,18 @@ Before claiming a "blocker" or asking the operator to grant a permission:
 
 Asking the operator to "grant" what's already authorized is anti-research-first behavior. The operator-stated principle (#5 research-first) means USE tools, don't ask for them.
 
-### 9. /root scope discipline (boundary respect)
+### 9. $HOME scope discipline (boundary respect)
 
 Per operator directive 2026-05-05 (severe correction): *"LET THE SECOND-BRAIN BE ITS OWN... THE ONLY WAY TO SEND TO THE SECOND-BRAIN IS TO USE THE CONTRIBUTE FEATURE... THIS HAD NOTHING TO DO WITH THE SECOND-BRAIN"*.
 
-| Layer | Where /root agent may write |
+| Layer | Where $HOME agent may write |
 |---|---|
-| /root/* | YES (this project's authoring layer) |
+| $HOME/* | YES (this project's authoring layer) |
 | <second-brain>/* | NO (second-brain's own authoring layer) |
 | `gateway contribute` (after M007 connect) | YES (the canonical channel for sending to second-brain) |
 | Direct write to /opt | NEVER, regardless of subdirectory (raw notes, wiki, lessons, sources, anything) |
 
-The /opt/.../raw/notes/ path that earlier brain files referenced for verbatim logs was WRONG. /root iteration directives go to `$HOME/wiki/log/`. Second-brain has its own raw-notes layer.
+The /opt/.../raw/notes/ path that earlier brain files referenced for verbatim logs was WRONG. $HOME iteration directives go to `$HOME/wiki/log/`. Second-brain has its own raw-notes layer.
 
 **Knowledge-vs-operational-config distinction** (refinement — closes SB-098, 2026-05-05). The binding rule scope is **knowledge contributions**, not all writes:
 
@@ -300,7 +300,7 @@ Anti-pattern violations (recurring):
 - `work-mode.md` covers DAY-TO-DAY operation (PO approval boundary, output discipline, status-claim discipline). This rule covers META principles that work-mode applies.
 - `hook-architecture.md` covers HOW to design hooks. This rule's "remediation+explanation" is the WHY hooks must include them.
 - `loop-cron-lifecycle.md` covers WHEN agent may auto-cancel loops. This rule's "always flexible" is the WHY autonomous cancellation exists at all (loops shouldn't be locked-in forever).
-- `self-reference.md` covers WHAT /root IS. This rule covers HOW /root operates within that identity.
+- `self-reference.md` covers WHAT $HOME IS. This rule covers HOW $HOME operates within that identity.
 
 ## Operator-verbatim primary sources
 

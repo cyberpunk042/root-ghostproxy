@@ -8,7 +8,7 @@
 
 Per operator directive 2026-05-05: *"with proper context engineering and facultative auto or pre-injection modes and the autocomplete & prompt engineering knowlegde too."*
 
-| Mode | When content lands in context | Where used in /root |
+| Mode | When content lands in context | Where used in $HOME |
 |---|---|---|
 | **Auto-injection** | Without agent action — system-level | SessionStart hook output (additionalContext JSON) → CLAUDE.md auto-load → AGENTS.md auto-load |
 | **Pre-injection** | Agent proactively loads BEFORE responding to user — agent action triggered by directive | `/orient` deterministic 21-step chain runs Reads + Bashes |
@@ -24,7 +24,7 @@ Per operator directive 2026-05-05: *"with proper context engineering and faculta
 | Topic-specific rules (hook-architecture, methodology, etc.) | On-demand | Avoids context bloat; load when topic comes up |
 | Active state (current SFIF stage, blockers, progress) | Pre-injection (/orient command) | Needs to be FRESH each session; deterministic pre-load |
 | Sub-deliverables (sources, lessons, patterns) | Facultative | Load when relevant; avoid blanket inclusion |
-| Operator-verbatim directives (/root iteration) | Pre-injection (`$HOME/wiki/log/<latest>.md` read by /orient + /cycle) + Sacrosanct retention | Primary source for /root iteration; must be quoted verbatim if relevant |
+| Operator-verbatim directives ($HOME iteration) | Pre-injection (`$HOME/wiki/log/<latest>.md` read by /orient + /cycle) + Sacrosanct retention | Primary source for $HOME iteration; must be quoted verbatim if relevant |
 | Operator-verbatim directives (PRIOR sessions, historical) | On-demand (`/opt/.../raw/notes/2026-*.md` read for project-history context) | Read-only citation source; do NOT write back |
 | Mode-specific persona | Facultative (per active mode) | Only loaded when the mode is active |
 
@@ -54,13 +54,13 @@ The `.claude/active-mode` state file + `/orient` step 19-21 jointly drive this �
 
 Operator's directive: *"the autocomplete & prompt engineering knowlegde too."*
 
-These belong in the second brain (cross-project knowledge resource); /root consumes them via `gateway query` or `wiki_search` MCP.
+These belong in the second brain (cross-project knowledge resource); $HOME consumes them via `gateway query` or `wiki_search` MCP.
 
-For /root specifically:
+For $HOME specifically:
 - **Autocomplete metadata** in command frontmatter would empower harness-side completion (F011 future-decision; not currently consumed)
 - **Prompt engineering** as content lives in second brain; agents reach for it when authoring prompts (e.g., refining a skill description for better trigger-match)
 
-When `/root` agent needs autocomplete or prompt-engineering knowledge: query the second brain via `wiki_search` MCP. Don't duplicate in /root.
+When `$HOME` agent needs autocomplete or prompt-engineering knowledge: query the second brain via `wiki_search` MCP. Don't duplicate in $HOME.
 
 ## Frontmatter parameters as empowerment (related)
 

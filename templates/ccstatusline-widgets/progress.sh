@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# /root/templates/ccstatusline-widgets/progress.sh
+# $HOME/templates/ccstatusline-widgets/progress.sh
 # ccstatusline Custom Text widget data source — root-ghostproxy "progress %" field.
 #
 # Output: epic readiness % from tools.progress (e.g., "10%") or "?" if unavailable.

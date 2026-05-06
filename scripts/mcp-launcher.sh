@@ -41,6 +41,6 @@ if [ ! -x "$SECOND_BRAIN/.venv/bin/python" ]; then
   exit 1
 fi
 
-# Run from project root so `python -m tools.mcp_server` finds /root/tools/
+# Run from project root so `python -m tools.mcp_server` finds $HOME/tools/
 cd "$PROJECT_ROOT"
 exec "$SECOND_BRAIN/.venv/bin/python" -m tools.mcp_server "$@"

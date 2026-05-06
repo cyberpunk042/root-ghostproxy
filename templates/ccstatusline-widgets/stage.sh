@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# /root/templates/ccstatusline-widgets/stage.sh
+# $HOME/templates/ccstatusline-widgets/stage.sh
 # ccstatusline Custom Text widget data source — root-ghostproxy "SFIF stage" field.
 #
 # Output: the active SFIF stage name (e.g., "Foundation") or "?".

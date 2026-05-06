@@ -1,6 +1,6 @@
 # /etc/systemd/network/30-ghostproxy-bridge.netdev
 # root-ghostproxy transparent L2 bridge interface definition.
-# Deployed by /root/install.sh op_install_network_bridge (T013 — systemd-networkd).
+# Deployed by $HOME/install.sh op_install_network_bridge (T013 — systemd-networkd).
 #
 # Bridge name fixed: gpbr0 (root-ghostproxy bridge 0). Members assigned by
 # matching .network files (see 30-ghostproxy-bridge.network).

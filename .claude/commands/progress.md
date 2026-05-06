@@ -9,7 +9,7 @@ Show the journey view — current position + planning + path traveled.
    - SFIF stage matches CONTEXT.md
    - Module status counts match `_index.md` realities
    - Task status counts match (15 done / 6 pending / 40 not-started — re-derive from frontmatter scan)
-   - git state line accurate (`cd /root && git status --short` for live state)
+   - git state line accurate (`cd $HOME && git status --short` for live state)
    - Active milestone reflects current epic
 3. If drift found between `progress.md` and live reality: flag the discrepancy + offer to refresh `progress.md`. Do NOT silently update.
 4. Present:

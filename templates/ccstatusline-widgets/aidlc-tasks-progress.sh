@@ -8,7 +8,7 @@ source "$(dirname "$0")/_lib.sh"
 readonly TOOLS_PYTHON="$(rgp_resolve_python)"
 readonly TOOLS_DIR="$(rgp_resolve_project)"
 
-# Path 1: tools.progress (--json) — works for /root which has tools/progress.py
+# Path 1: tools.progress (--json) — works for $HOME which has tools/progress.py
 if [[ -x "${TOOLS_PYTHON}" ]] && [[ -f "${TOOLS_DIR}/tools/progress.py" ]]; then
     cd "${TOOLS_DIR}" || exit 0
     out=$("${TOOLS_PYTHON}" -c "
@@ -34,7 +34,7 @@ if [[ -d "${TASKS_DIR}" ]]; then
     # count (0 for empty input).
     done_n=$( { grep -lE '^status: done$' "${TASKS_DIR}"/T*.md 2>/dev/null || true; } | wc -l)
     inprog_n=$( { grep -lE '^status: (in-progress|active)$' "${TASKS_DIR}"/T*.md 2>/dev/null || true; } | wc -l)
-    # "not-started" in /root vocabulary; /opt uses "draft" — count both
+    # "not-started" in $HOME vocabulary; /opt uses "draft" — count both
     notstarted_n=$( { grep -lE '^status: (not-started|draft)$' "${TASKS_DIR}"/T*.md 2>/dev/null || true; } | wc -l)
     # Strip whitespace from wc -l output for safe arithmetic comparison
     done_n=${done_n//[[:space:]]/}

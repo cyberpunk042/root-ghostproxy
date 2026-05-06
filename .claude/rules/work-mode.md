@@ -1,4 +1,4 @@
-# $HOME/.claude/rules/work-mode.md — How Claude operates in /root
+# $HOME/.claude/rules/work-mode.md — How Claude operates in $HOME
 
 > Loaded on demand for solo session pattern + behavioral discipline + PO approval boundary. CLAUDE.md has the hot-path summary; this file has the project-specific detail.
 
@@ -8,7 +8,7 @@ This project is **system AI safety setup IaC at the OS root level**. The agent i
 
 ## Default operation mode
 
-**Solo session.** No git branches yet (`/root` is not a git repo as of 2026-05-05). When the repo is initialized:
+**Solo session.** No git branches yet (`$HOME` is not a git repo as of 2026-05-05). When the repo is initialized:
 - Work on `main` always. No feature branches unless operator explicitly asks.
 - Operator decides when and what to commit. Don't auto-commit.
 - No worktrees.
@@ -18,9 +18,9 @@ This project is **system AI safety setup IaC at the OS root level**. The agent i
 
 ## Sacrosanct verbatim quoting (Hard Rule)
 
-The operator's words are sacrosanct. Quote verbatim. Never paraphrase, dilute, or summarize. Verbatim log to **`$HOME/wiki/log/<date>-<slug>.md`** BEFORE acting — this is /root's own iteration log layer.
+The operator's words are sacrosanct. Quote verbatim. Never paraphrase, dilute, or summarize. Verbatim log to **`$HOME/wiki/log/<date>-<slug>.md`** BEFORE acting — this is $HOME's own iteration log layer.
 
-**DO NOT write to `<second-brain>/`** for /root iteration directives. The second-brain has its own authoring layer + its own contribute channel (`tools.gateway contribute`, gated on M007 connect). Operator's binding rule 2026-05-05: *"THE ONLY WAY TO SEND TO THE SECOND-BRAIN IS TO USE THE CONTRIBUTE FEATURE... LET THE SECOND-BRAIN BE ITS OWN."*
+**DO NOT write to `<second-brain>/`** for $HOME iteration directives. The second-brain has its own authoring layer + its own contribute channel (`tools.gateway contribute`, gated on M007 connect). Operator's binding rule 2026-05-05: *"THE ONLY WAY TO SEND TO THE SECOND-BRAIN IS TO USE THE CONTRIBUTE FEATURE... LET THE SECOND-BRAIN BE ITS OWN."*
 
 Reference: `$HOME/.claude/rules/words-are-sacrosanct.md` for the operator's verbatim rule statement and the conflation patterns it forbids (questions are not decisions; conversation is not rejection; clarification is not instruction).
 
@@ -62,10 +62,10 @@ The exception: operator literally requests analysis ("HARD ANALYSIS REQUIRED", "
 **Safe unilateral work** (no approval needed unless operator redirects):
 - Reading the codebase, the wiki, any documentation. Includes: WebFetch, WebSearch, gh CLI for read-only operations — these are STANDARD agent tools. Don't ask permission for them.
 - Running tools (gateway, pipeline, view, lint, validate, provider-check from second brain — read-only operations only; writes go through `gateway contribute` after M007).
-- Drafting in `$HOME/wiki/log/<date>-*.md` (verbatim directive logs + iteration logs go HERE, not in /opt) or other /root scratch locations.
-- Authoring new wiki pages within /root that follow brain standards.
+- Drafting in `$HOME/wiki/log/<date>-*.md` (verbatim directive logs + iteration logs go HERE, not in /opt) or other $HOME scratch locations.
+- Authoring new wiki pages within $HOME that follow brain standards.
 - Closing mechanical lint/validate errors that require no judgment.
-- Bulk-renaming broken references in /root (with audit + diff visible).
+- Bulk-renaming broken references in $HOME (with audit + diff visible).
 - Mechanical doc-drift fixes to top-level brain files (small fixes; large rewrites need approval).
 - Tools-internal bug fixes (parsers, regex, etc.).
 - Recovery from agent's own bugs: when the agent recognizes a mistake, build forward (restore the value, fix in correct place) — don't freeze, don't ask permission for reversible cleanup.
@@ -75,7 +75,7 @@ The exception: operator literally requests analysis ("HARD ANALYSIS REQUIRED", "
 - Changes to $HOME/wiki/config/*.yaml.
 - Hook configuration in $HOME/.claude/settings.json.
 - Git operations that could lose work.
-- New top-level files at /root.
+- New top-level files at $HOME.
 - Any change that would alter the safety envelope (policy-block, malware-block, leak-detector behavior).
 
 ## Don't fabricate
@@ -93,7 +93,7 @@ When an Edit fails (e.g., "old_string not found", "anchor missing"), the agent m
 
 Pattern observed 2026-05-05: agent claimed "file was concurrently modified" when the actual cause was "agent never re-read the file in this exchange and the SB tracker had grown since the cached snapshot". Operator: *"it was no concurently modified you just didn't look at it before and then you entered insanity"*. Wrong-cause-attribution is its own failure (cousin to synthetic-test-as-verified — both attribute internal-model state to external reality).
 
-Hard rule for parallel-agent contexts (per operator note "the root project will work in parallel"): assume any shared file may have been modified by sister-session work. Re-read before every edit on shared state files (`/root/wiki/governance/*.md`, `/root/wiki/log/`, `/root/.claude/rules/*.md`).
+Hard rule for parallel-agent contexts (per operator note "the root project will work in parallel"): assume any shared file may have been modified by sister-session work. Re-read before every edit on shared state files (`$HOME/wiki/governance/*.md`, `$HOME/wiki/log/`, `$HOME/.claude/rules/*.md`).
 
 ## Verify status claims
 

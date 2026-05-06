@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# /root/uninstall.sh — root-ghostproxy foundation uninstaller (SCAFFOLD STAGE).
+# $HOME/uninstall.sh — root-ghostproxy foundation uninstaller (SCAFFOLD STAGE).
 #
 # Companion to install.sh. Reverses operations install.sh applied — by mode + profile,
 # with same orthogonal axes (per SB-074):
@@ -10,7 +10,7 @@
 # Default behavior: REMOVE-WITH-BACKUP — every removed file is mv'd to <path>.ghostproxy.removed.<UTC-ts>
 # rather than deleted. Restore by mv-ing back. --purge flag deletes outright (require --yes).
 #
-# This is GREENFIELD per T011 decision. Prior /root/uninstall.sh debris backed up to
+# This is GREENFIELD per T011 decision. Prior $HOME/uninstall.sh debris backed up to
 # uninstall.sh.prior-debris.bak.<ts>.
 #
 # CURRENT STAGE: scaffold — operations are STUBS. Implement-stage will fill the actual

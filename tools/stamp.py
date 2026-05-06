@@ -2,7 +2,7 @@
 
 Replaces the failed `!stamp=...` prompt-marker mechanism with deterministic
 slash-command-driven config. Slash commands invoke this tool; tool writes to
-`/root/.claude/stamp-config.json`; end-of-cycle-stamp.sh reads it on Stop event.
+`$HOME/.claude/stamp-config.json`; end-of-cycle-stamp.sh reads it on Stop event.
 
 Schema of stamp-config.json:
     {
@@ -13,12 +13,12 @@ Schema of stamp-config.json:
 Semantics of `enabled`:
     "on"   — stamp always renders (even with no active-mode)
     "off"  — stamp never renders
-    "auto" — stamp renders ONLY when /root/.claude/active-mode is non-empty
+    "auto" — stamp renders ONLY when $HOME/.claude/active-mode is non-empty
              (per SB-114 sub-req c: default-hide-when-no-mode)
 
 Layout `horizontal` selects --ansi-horizontal output; `vertical` selects --ansi-fence.
 
-Slash commands in /root/.claude/commands/ (thin wrappers):
+Slash commands in $HOME/.claude/commands/ (thin wrappers):
     /stamp-horizontal → set layout=horizontal
     /stamp-vertical   → set layout=vertical
     /stamp-on         → set enabled=on

@@ -94,7 +94,7 @@ Each mode has its own evaluation lens. A scenario triggers in one mode might NOT
 ## What is NEVER autonomously cancellable
 
 - Loops with explicit operator-set non-expiring intent (rare; operator-flagged)
-- Loops that ARE the work (e.g., a long-running data sync that is the deliverable; not applicable in /root currently)
+- Loops that ARE the work (e.g., a long-running data sync that is the deliverable; not applicable in $HOME currently)
 - Hooks (hooks are not loops; never autonomously remove hooks)
 
 ## Reporting protocol

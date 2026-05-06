@@ -15,15 +15,15 @@ Execute the chain below in order. Each step is a deterministic Read / Bash invoc
 3. Read `$HOME/.claude/rules/words-are-sacrosanct.md` — verbatim-quoting meta-rule (load BEFORE any operator-quoting work)
 4. Read `$HOME/.claude/rules/work-mode.md` — solo session, PO approval boundary, status-claim discipline
 5. Read `$HOME/.claude/rules/routing.md` — operator-intent → tool routing
-6. Read `$HOME/.claude/rules/self-reference.md` — /root vs /opt second brain
+6. Read `$HOME/.claude/rules/self-reference.md` — $HOME vs /opt second brain
 7. Read `$HOME/.claude/rules/methodology.md` — 5 stages with project-specific gates
 8. Read `$HOME/.claude/rules/hook-architecture.md` — 2-layer hook design + draft-tier false-positive notes
 
 ### Step 2 — Load backlog + state
 
 9. Read `$HOME/wiki/backlog/tasks/_index.md` — task status snapshot
-10. Bash: `ls -t $HOME/wiki/log/ | head -5` — find most-recent /root logs (PRIMARY source for /root iteration directives — sacrosanct)
-11. Read the 3 most-recent `$HOME/wiki/log/*.md` (per step 10) — verbatim operator directives + iteration logs live HERE for /root work
+10. Bash: `ls -t $HOME/wiki/log/ | head -5` — find most-recent $HOME logs (PRIMARY source for $HOME iteration directives — sacrosanct)
+11. Read the 3 most-recent `$HOME/wiki/log/*.md` (per step 10) — verbatim operator directives + iteration logs live HERE for $HOME work
 12. Bash: `ls -t <second-brain>/raw/notes/2026-*.md | head -5` — find historical operator directives from PRIOR sessions (read-only citation source for project-history context)
 13. Read the 2 most-recent `/opt/.../raw/notes/2026-*.md` (per step 12) — historical context only; do NOT write back here
 
@@ -32,8 +32,8 @@ Execute the chain below in order. Each step is a deterministic Read / Bash invoc
 14. Bash: `for f in $HOME/wiki/config/{methodology,sdlc-profile,domain-profile,methodology-profile}.yaml; do <second-brain>/.venv/bin/python -c "import yaml; yaml.safe_load(open('$f')); print('OK $f')"; done` — confirm methodology engine parses
 15. Bash: `ls <second-brain>/wiki/spine/references/adoption-guide.md` — confirm second-brain reachable
 16. Bash: `grep -A2 "^  root-ghostproxy:" <second-brain>/wiki/config/sister-projects.yaml` — confirm registered with second brain
-17. Bash: `cd /root && git status --short` — git state (commit/uncommit summary)
-18. (Optional, costly) Bash: `cd <second-brain>/ && <second-brain>/.venv/bin/python -m tools.gateway orient --orient-as sister` — second-brain agent's orient view of /root as sister project
+17. Bash: `cd $HOME && git status --short` — git state (commit/uncommit summary)
+18. (Optional, costly) Bash: `cd <second-brain>/ && <second-brain>/.venv/bin/python -m tools.gateway orient --orient-as sister` — second-brain agent's orient view of $HOME as sister project
 
 ### Step 3.5 — Detect active mode
 
@@ -43,7 +43,7 @@ Execute the chain below in order. Each step is a deterministic Read / Bash invoc
 
 ### Step 4 — Compose intel report
 
-After all 18 steps complete, emit a structured report (terse — operator reads diff, not novel):
+After all 21 steps complete, emit a structured report (terse — operator reads diff, not novel):
 
 ```
 ROOT-GHOSTPROXY ORIENT REPORT
@@ -79,7 +79,7 @@ Modes (if no mode active, mention briefly):
 
 Next-best-actions (operator-facing):
   - Walk through pending decision: <best-fit decision per current state>
-  - OR commit /root spec to git (requires operator decision: scope + message)
+  - OR commit $HOME spec to git (requires operator decision: scope + message)
   - OR work specific task (operator names which)
   - OR enable a mode + autopilot (operator-choice; not auto-enabled)
 
@@ -93,7 +93,7 @@ Do NOT proceed past the report. Wait for operator direction. The 6 pending decis
 
 ## Why this command exists
 
-Per operator directive 2026-05-05: hook output is a directive (~70% deterministic compliance); commands are 100% deterministic when the harness executes them. The SessionStart hook (`$HOME/.claude/hooks/session-orient.sh`) frames the conversation + tells the agent to invoke `/orient`. This command IS that deterministic chain. Combined: hook fires → agent sees "invoke /orient now" → invokes → harness runs this chain → 18-step deterministic load → structured report.
+Per operator directive 2026-05-05: hook output is a directive (~70% deterministic compliance); commands are 100% deterministic when the harness executes them. The SessionStart hook (`$HOME/.claude/hooks/session-orient.sh`) frames the conversation + tells the agent to invoke `/orient`. This command IS that deterministic chain. Combined: hook fires → agent sees "invoke /orient now" → invokes → harness runs this chain → 21-step deterministic load → structured report.
 
 If a Claude Code mechanism exists for hook-direct-invokes-command, this same chain should fire automatically without the agent's generative compliance step. (Pending claude-code-guide research.)
 

@@ -49,7 +49,7 @@ Configuration is markdown files. Methodology, identity, backlog state, hook poli
 - Backlog is hierarchical markdown: epics + modules + tasks at `wiki/backlog/{epics,modules,tasks}/`.
 - Architectural decisions are inlined in this file (DESIGN.md) and (when authored) in `wiki/decisions/`.
 
-**What it costs:** loss of structured-database affordances. There's no SQL query for "all tasks where readiness > 50 and parent_module = M005." Searching means grepping. The compensating mechanism is `pipeline post` (in the second brain) which builds indexes + manifest from frontmatter; the project as it exists at /root has not yet adopted that mechanism (it's available via the second-brain forwarders after M007 connect).
+**What it costs:** loss of structured-database affordances. There's no SQL query for "all tasks where readiness > 50 and parent_module = M005." Searching means grepping. The compensating mechanism is `pipeline post` (in the second brain) which builds indexes + manifest from frontmatter; the project as it exists at $HOME has not yet adopted that mechanism (it's available via the second-brain forwarders after M007 connect).
 
 **What it gains:** every artefact is human-readable + AI-readable + diff-able + version-controlled with no special tooling. The operator can edit any file with a text editor. The AI tools see the same data the operator sees. There is no opaque database where state can drift from the operator's view.
 
@@ -133,7 +133,7 @@ Cross-AI-tool consistency is structural, not coincidental. The agent-safety poli
 
 ### Sister-project registration with `auto_connect: false`
 
-**Choice:** root-ghostproxy is registered in the second brain's `sister-projects.yaml` with `auto_connect: false`. Connection requires explicit `--connect-project /root` invocation by the operator.
+**Choice:** root-ghostproxy is registered in the second brain's `sister-projects.yaml` with `auto_connect: false`. Connection requires explicit `--connect-project $HOME` invocation by the operator.
 
 **Alternatives considered:** `auto_connect: true` (auto-hookup on `tools.setup` runs); not registered at all (no integration, no methodology-driven cross-project flow).
 
@@ -144,7 +144,7 @@ Cross-AI-tool consistency is structural, not coincidental. The agent-safety poli
 
 **What it costs:** operator must run `--connect-project` explicitly per host. Multi-host deployments require N explicit runs (one per host). This is acceptable given root-ghostproxy is currently single-host.
 
-**What it gains:** explicit-authorization gate; consistent with the project's deny-by-default principle (the connection is a state change to /root, so it requires explicit operator input).
+**What it gains:** explicit-authorization gate; consistent with the project's deny-by-default principle (the connection is a state change to $HOME, so it requires explicit operator input).
 
 ### Wifi as outbound-only management
 
@@ -206,6 +206,32 @@ Picking the right mechanism is per cost-of-false-positive vs cost-of-false-negat
 ### Verbosity calibration discipline (anti-pendulum)
 
 Per cycles 41-43 statusline UX iterations + SB-082 (extremes pendulum recurring). When correcting an over-A behavior, agent default is over-correct to over-B. Counter-pattern: **render-and-measure-both-extremes-and-pick-middle** before shipping any calibration. Settled rule of thumb for this project: full-word labels, compact ratio values (e.g. `Bugs: 13/7` not `SB:13/6` and not `SystemicBugs: 13 open · 6 recurring`). Every future calibration re-reads this section first to verify intent.
+
+### End-of-cycle stamp delivery (Stop hook + systemMessage + ```ansi fence)
+
+**Choice:** Stop hook fires `python3 -m tools.cycle --ansi-horizontal` (or `--ansi-fence`), output wrapped in ```ansi-fenced ANSI escapes, delivered via top-level `{"systemMessage": stamp}` JSON.
+
+**Alternatives considered (all empirically rejected during SB-107 oscillation):** `hookSpecificOutput.additionalContext` for Stop event (rejected by Claude Code schema; renders as raw JSON-text); plain stdout no JSON (Stop stdout is dropped); `additionalContext` top-level (same JSON-text rendering); ```diff fence (operator-confirmed renders red/green only — limited palette); inline Bash `tools.cycle --color` output (works but only when agent generates a tool call; not "naturally" emitted by hook).
+
+**Why systemMessage + ```ansi fence:** systemMessage is the only valid display channel for Stop hook per Claude Code schema. ```ansi fence renders embedded ANSI escapes as actual colors in operator's UI (red/green/yellow/blue/magenta/cyan/dim/bold). Persisted-config-driven (per `tools/stamp.py` + 6 `/stamp-*` slash commands + `$HOME/.claude/stamp-config.json`) instead of prompt-marker (failed empirically — markers sometimes not detected by Stop hook because UserPromptSubmit didn't fire in time, per SB-115).
+
+**Default-hide-when-no-mode**: stamp.enabled=auto → render only when `$HOME/.claude/active-mode` is non-empty. When in no-mode state, operator must `/stamp-on` to opt in. Reflects operator's preference: stamp is autopilot-context tool, not always-on noise.
+
+**What it costs:** Stop hook output position is "start of next operator turn" not "end of current agent turn" — Claude Code platform constraint. Operator confirmed acceptable when /stamp-* config delivers expected layout.
+
+**What it gains:** persistent config (operator preference survives session restart); deterministic mechanism (slash-command writes to file, hook reads file — no race condition); /opt second-brain can inherit by consuming the same `tools/stamp.py` rather than maintaining a divergent copy (per SB-115 architectural correction — pending /opt-side propagation). DRAFT-quality per SB-116 UX redesign Epic placeholder.
+
+### Agent-discipline-gate detection (UserPromptSubmit hook for runtime SB-090/094 enforcement)
+
+**Choice:** combined `output-discipline-guard.sh` UserPromptSubmit hook detects high-confidence premise-construction-risk (SB-090 family) + operator-escalation (SB-094) patterns; emits single-line concise banner via `additionalContext` only when triggered; silent on routine prompts.
+
+**Alternatives considered:** rule-text-only fixes in `.claude/rules/*.md` (SB-113 meta showed they don't hold under load — patterns recur); two separate UserPromptSubmit hooks (premise-guard + output-discipline-guard); 24-line verbose banner per detection (operator complained as too noisy).
+
+**Why combined + single-line + high-confidence-only:** rule-text covers the discipline at design time, but runtime requires hook-detection layer. Multiple banners on same UserPromptSubmit would compete with each other. Single hook with two detection paths shares scaffolding. Single-line banner avoids visual noise. High-confidence-only triggers (enumerative observation, observational adjective, pronoun + state-adjective, ≥2 escalation markers) avoid false-positive fatigue (premise-guard's prior failure mode — fired on every "?").
+
+**What it costs:** ~85% generative compliance (agent reads banner; may or may not act on it). False negatives on ambiguous patterns (e.g. some pronoun-contractions still missed).
+
+**What it gains:** deterministic detection of the highest-recurrence patterns. Banner appears in operator's UI as visible alarm — operator catches non-compliance even if agent ignores the nudge. Closes the SB-113 meta gap for hook-detectable patterns.
 
 ## Trade-offs Taken (vs Alternatives)
 

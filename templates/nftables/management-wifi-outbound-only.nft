@@ -1,6 +1,6 @@
 # /etc/nftables.d/management-wifi-outbound-only.nft
 #
-# Deployed by /root/install.sh op_install_management_wifi.
+# Deployed by $HOME/install.sh op_install_management_wifi.
 # Loaded by main /etc/nftables.conf via `include "/etc/nftables.d/*.nft"`.
 #
 # Operator invariant 2026-05-04 (T013, M003): management wifi is outbound-only —

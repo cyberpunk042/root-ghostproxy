@@ -10,7 +10,7 @@
 # with context-correct info.
 #
 # Output examples:
-#   /root context       → ""  (empty; other widgets fill line 1)
+#   $HOME context       → ""  (empty; other widgets fill line 1)
 #   /opt second-brain   → "[ devops-solutions-information-hub · second-brain ]"
 #   other sister        → "[ <basename of CLAUDE_PROJECT_DIR> ]"
 
@@ -18,7 +18,7 @@ set -euo pipefail
 # shellcheck disable=SC1091
 source "$(dirname "$0")/_lib.sh"
 
-# In /root context: do nothing. The existing line-1 AIDLC widgets render here.
+# In $HOME context: do nothing. The existing line-1 AIDLC widgets render here.
 if rgp_is_in_root_context; then
     exit 0
 fi

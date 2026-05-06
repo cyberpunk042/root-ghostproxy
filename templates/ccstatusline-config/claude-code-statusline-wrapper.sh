@@ -15,7 +15,7 @@
 #   }
 #
 # Path policy: every path is $HOME-relative or env-var-overridable. No hardcoded
-# absolute paths to /root. The wrapper renders root-ghostproxy's statusline
+# absolute paths to $HOME. The wrapper renders root-ghostproxy's statusline
 # content unconditionally — when invoked from any session (including sister
 # project sessions where this wrapper is the user-level fallback), it shows
 # root-ghostproxy state. Sister projects that want their own statusLine should
@@ -77,13 +77,13 @@ dbg config "using profile=${profile} config=${config_file}"
 
 # === Invoke ccstatusline ======================================================
 # Path A collision (type=root, $HOME == project-root) means /opt second-brain
-# session falls through to /root user-level statusLine, which is THIS wrapper.
-# Claude Code's session JSON for that fall-through case reports cwd=/root
+# session falls through to $HOME user-level statusLine, which is THIS wrapper.
+# Claude Code's session JSON for that fall-through case reports cwd=$HOME
 # even though the agent's project is /opt second-brain. ccstatusline's cwd
-# widget then shows /root in the /opt session statusline — wrong context.
+# widget then shows $HOME in the /opt session statusline — wrong context.
 #
 # Fix: transform stdin JSON to override cwd with workspace.project_dir (the
-# session's actual project) before piping to ccstatusline. For /root sessions
+# session's actual project) before piping to ccstatusline. For $HOME sessions
 # the override is a no-op (project_dir == cwd). For /opt session, cwd becomes
 # /opt/devops-solutions-information-hub.
 

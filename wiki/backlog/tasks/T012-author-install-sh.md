@@ -6,7 +6,7 @@ priority: P0
 parent_module: "root-ghostproxy-m003-foundation-hardening"
 parent_epic: "sfif-rollout-and-second-brain-integration"
 current_stage: implement
-readiness: 95
+readiness: 98
 sfif_stage: Foundation
 created: 2026-05-04
 updated: 2026-05-06
@@ -55,7 +55,7 @@ Author the foundation's idempotent installer. Takes a fresh Linux host (target: 
 - [x] STUB: post-install verification — implemented 2026-05-06. `op_verify` runs 16+ comprehensive checks covering: settings.json parses; 3 hook scripts present + executable; integrity_check() runtime call; integrity baseline match (if --with-integrity); opencode bridge resolves (if --with-opencode); br0 UP (if --with-bridge); wpa_supplicant config + nftables ruleset deployed + ghp_mgmt_wifi table loaded in kernel + wpa_supplicant@mgmt0 enabled (if --with-wifi, with placeholder-aware service-status skip); rules/commands/agents/modes/skills deployed counts (if --with-hooks). `--check` mode now applies profile BEFORE running checks (was a bug — toggles were unset → all per-op checks skipped). Verified on dev host: 12/16 PASS (brain pieces all deployed), 4 expected FAIL (wifi+integrity not deployed on this dev host, confirms check correctly detects drift). Exit code 1 on any FAIL — caller integration with CI possible.
 - [ ] Idempotency invariant: re-run = no-op when state matches (T016 covers; verifies install_file's "unchanged" path)
 - [x] `bash -n install.sh` passes ✓ (verified 2026-05-06 after dep-check edit)
-- [ ] `shellcheck install.sh` passes (TBD; not yet run)
+- [x] `shellcheck install.sh` passes — verified 2026-05-06 (shellcheck 0.10.0 installed via apt). Initial run found 17 issues (5 real bugs `SC2178/2128` array-vs-scalar collision in `run_check` between `synced/drifted/missing` scalars and `require_dependencies`'s `missing` array; 2 `SC2034` unused VERBOSE + ASSUME_YES; 3 `SC2155` readonly+command-sub; 7 `SC2015` `&&||` cosmetic). All fixed: scalars renamed `synced_count/drifted_count/missing_count`, narrow shellcheck disable directives added for documented-but-unwired flags + readonly safe patterns + set-euo-pipefail-protected op-chain. Final result: shellcheck exit 0, no warnings.
 
 ## Dependencies
 

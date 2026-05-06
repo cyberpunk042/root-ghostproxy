@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # Regression tests for <project>/.claude/hooks/opt-write-block.sh
 #
-# Verifies SB-009/SB-010 fix: /root agent cannot write into <second-brain>/
+# Verifies SB-009/SB-010 fix: $HOME agent cannot write into <second-brain>/
 # directly (must use <project>/wiki/log/ for iteration directives, or `tools.gateway contribute`
-# after M007 connect). Hook is cwd-aware: only blocks when calling agent operates from /root
+# after M007 connect). Hook is cwd-aware: only blocks when calling agent operates from $HOME
 # (second-brain's own agent at /opt cwd legitimately writes its own dir).
 #
 # Run: <second-brain>/.venv/bin/python <project>/.claude/hooks/tests/test-opt-write-block.py

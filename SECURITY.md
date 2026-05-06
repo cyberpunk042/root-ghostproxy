@@ -86,7 +86,7 @@ The failopen choice is operator's threat-model decision and is part of M005 modu
 
 Per operator directive 2026-05-05: *"with the wifi client mode enabled with will not be in dhcp and we will make sure that we are in DNS over TLS and that we are not opening any leak, this is not for not reason I said no to ssh server setup"*.
 
-The /root host operates under these network constraints:
+The $HOME host operates under these network constraints:
 
 | Constraint | What it means | Why |
 |---|---|---|
@@ -131,7 +131,7 @@ These constraints inform M003 (Foundation hardening) install.sh authoring: insta
 | **PolarProxy decryption metadata** (when module installed) | TLS handshake metadata + flow timing + bypass-decision audit. PCAP files of the cleartext (fed to Suricata). | Operator-decided rotation policy |
 | **Operator directives + session logs** | `$HOME/wiki/log/YYYY-MM-DD-<slug>.md` — operator's verbatim directives, AI session logs, completion notes | Permanent (git-tracked when whitelisted) |
 | **Backlog + work-state evolution** | `$HOME/wiki/backlog/` epic + module + task pages with frontmatter state-machine fields (status, current_stage, readiness, progress, stages_completed) | Permanent (git-tracked) |
-| **Memory-layer auto-journals** | NOT used by this project. The `~/.claude/projects/-root/memory/` directory at /root from prior session is debris and not part of the project's authoritative state. | (n/a) |
+| **Memory-layer auto-journals** | NOT used by this project. The `~/.claude/projects/-root/memory/` directory at $HOME from prior session is debris and not part of the project's authoritative state. | (n/a) |
 
 ## Hardening Posture by SFIF Stage
 

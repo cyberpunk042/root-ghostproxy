@@ -16,7 +16,7 @@ The mechanisms differ in WHO fires the signal, HOW deterministic the action is, 
 
 ## The mechanisms compared
 
-| Mechanism | Signal source | Determinism | Composability | Where in /root |
+| Mechanism | Signal source | Determinism | Composability | Where in $HOME |
 |---|---|---|---|---|
 | **Hook** | Harness (Claude Code lifecycle: PreToolUse / PostToolUse / SessionStart / PreCompact / PostCompact / SessionEnd) | Logical (block + reason + remediation) | CAN call commands or tools via Bash from within | `$HOME/.claude/hooks/*.sh` (Python) |
 | **Slash command** | Operator types `/<name>` literally (or skill invokes via Skill tool) | 100% on invoke (harness executes) | CAN call tools, other commands, or invoke skills | `$HOME/.claude/commands/*.md` |

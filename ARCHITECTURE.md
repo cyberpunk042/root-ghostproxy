@@ -87,7 +87,7 @@ Specific device names (e.g. `enp2s0`, `enp4s0`, `wlp3s0`, or `eth0`/`eth1`/`wlan
 | **opencode bridge plugin** | Foundation | Maps opencode's tool names + plugin SDK envelope onto the canonical Claude Code envelope; spawns the same hook scripts so opencode obeys the same policy. | Pending Foundation IaC (M003) |
 | **Methodology engine** | Foundation | `wiki/config/methodology.yaml` + `sdlc-profile.yaml` + `domain-profile.yaml` + `methodology-profile.yaml`. Drives stage-gated work loop. | Complete (copied from second brain to `$HOME/wiki/config/`) |
 | **Backlog scaffold** | Foundation | `wiki/backlog/{epics,modules,tasks}/` with active rollout epic + 13 modules | Complete (in `$HOME/wiki/backlog/`) |
-| **Sister-project integration** | Foundation | Registration in second brain + `--connect-project` mechanism produces 4 artefacts in /root: `.mcp.json` `research-wiki` entry, `tools/gateway.py` forwarder, `tools/view.py` forwarder, `## Second Brain Connection` block in AGENTS.md (variant=ROOT_OS_SETUP) | Registration complete; --connect-project not yet run for real |
+| **Sister-project integration** | Foundation | Registration in second brain + `--connect-project` mechanism produces 4 artefacts in $HOME: `.mcp.json` `research-wiki` entry, `tools/gateway.py` forwarder, `tools/view.py` forwarder, `## Second Brain Connection` block in AGENTS.md (variant=ROOT_OS_SETUP) | Registration complete; --connect-project not yet run for real |
 | **Project-internal verifier** | Infrastructure | `tools/verify-policy.py` (or equivalent) — verifies safety envelope invariants programmatically | Pending Infrastructure tooling (M004) |
 | **Suricata module** | Features (facultative) | Inline IDS/IPS on bridge data path; eve.json structured output | Not installed |
 | **PolarProxy module** | Features (facultative) | TLS termination + cleartext PCAP-over-IP for downstream consumption (Suricata via dummy interface + tcpreplay) | Not installed |
@@ -205,10 +205,11 @@ Hook event types:
 | `PreToolUse` | Before a tool call executes | Tamper sentinel + policy decision |
 | `PostToolUse` | After tool output is captured | Leak detection + output redaction |
 | `SessionStart` | At session start | Banner + integrity self-check + project-priming (`session-orient.sh` directs agent to invoke `/orient`) |
-| `SessionEnd` / `SessionSummary` | At session end | Per-session deny/leak count + audit log entry |
-| `UserPromptSubmit` | When user submits a prompt | (Reserved for future; operator-decision content matching) |
+| `UserPromptSubmit` | When operator submits a prompt | `context-warning.sh` (% context remaining at thresholds 5/3/2/0); `output-discipline-guard.sh` (agent-discipline-gate per SB-108: high-confidence premise-risk + escalation detection, single-line banner via additionalContext when triggered) |
 | `PreCompact` | Before context compaction | `pre-compact.sh` writes deterministic state snapshot to `wiki/log/<ts>-pre-compact-handoff.md` (active mode + active task + cycle JSON + blockers JSON + recent logs + git state) so post-compact recovery has lossless reference |
 | `PostCompact` | After context compaction | `post-compact.sh` directs agent to invoke `/orient`; finds + references the most-recent pre-compact-handoff doc in additionalContext (closes the SB-078/SB-079 loop) |
+| `Stop` | At end of agent's turn | `end-of-cycle-stamp.sh` per SB-114/SB-115: emit end-of-turn status stamp via top-level `systemMessage` (the only valid display channel for Stop hook per Claude Code schema). Reads `$HOME/.claude/stamp-config.json` for layout (horizontal/vertical) + enabled (on/off/auto). Slash-command-driven config via `/stamp-*` commands + `tools/stamp.py`. DRAFT per SB-116 UX redesign Epic. |
+| `SessionEnd` / `SessionSummary` | At session end | Per-session deny/leak count + audit log entry |
 
 ### Project surfaces composing with hooks
 
@@ -319,7 +320,7 @@ The current architecture is **single-host single-segment**. Scale boundaries:
 | 2026-05-04 | Methodology layer copied from second brain (not pointer) | `$HOME/wiki/config/{methodology,sdlc-profile,domain-profile,methodology-profile}.yaml` — local copies. Adapt artifacts/protocols/gates per project; keep stage-name + ordering invariants. Per Adoption Guide step 1. |
 | 2026-05-04 | SDLC profile = `simplified` | Goldilocks: micro scale + solo execution + scaffold/foundation phase. Avoids ceremony that suits team-scale projects. |
 | 2026-05-04 | Methodology profile = `stage-gated` | OS-setup work has security cost on stage-leakage; hard ALLOWED/FORBIDDEN per stage suits the threat model. |
-| 2026-05-05 | Prior /root files (README, install.sh, hooks, integrity.py, opencode bridge plugin, memory folder) are AI-debris from prior session, not authoritative | Operator: *"I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST."* Project's authoritative implementation will be re-authored by methodology-driven flow. |
+| 2026-05-05 | Prior $HOME files (README, install.sh, hooks, integrity.py, opencode bridge plugin, memory folder) are AI-debris from prior session, not authoritative | Operator: *"I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST."* Project's authoritative implementation will be re-authored by methodology-driven flow. |
 | 2026-05-05 | Two-layer hook architecture is invariant | Machine-level (root-ghostproxy) fires before project-level (sister projects). Machine-level deny is final. Project-level can add restrictions but not subtract. |
 | 2026-05-05 | `auto_connect: false` permanent default for type=root | Type=root projects gate the security envelope; explicit-authorization gate via `--connect-project` is the friction-by-design. M010 may revisit per operator. |
 

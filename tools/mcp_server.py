@@ -1,11 +1,11 @@
 """root-ghostproxy MCP Server — exposes governance operations as native MCP tools.
 
 Read-only surface. Lets sub-agents, the second brain, and any AI tool consuming
-/root query the project's governance state (active mode, blockers, progress,
+$HOME query the project's governance state (active mode, blockers, progress,
 decisions) without invoking subprocess CLI.
 
 Run: python3 -m tools.mcp_server
-Or via .mcp.json in /root (stdio transport).
+Or via .mcp.json in $HOME (stdio transport).
 
 Per operator directive 2026-05-05: "MCP we must not overflow especially with
 things that are useless or confusing or useless or we dont even refer to
@@ -14,17 +14,17 @@ backed by a corresponding `tools.<module>` script that's already used by
 slash commands. Defensible scope: every MCP tool here has a downstream caller.
 
 Wiring (operator action):
-    Add to /root/.mcp.json (or ~/.claude.json):
+    Add to $HOME/.mcp.json (or ~/.claude.json):
         {
           "mcpServers": {
             "root-ghostproxy": {
               "command": "python3",
               "args": ["-m", "tools.mcp_server"],
-              "cwd": "/root"
+              "cwd": "$HOME"
             }
           }
         }
-    Then verify in a fresh /root session via Claude Code's MCP listing.
+    Then verify in a fresh $HOME session via Claude Code's MCP listing.
 """
 
 from __future__ import annotations
@@ -158,7 +158,7 @@ def root_orient() -> str:
 
     Equivalent to invoking root_state + root_blockers + root_progress and
     composing them. Use this if you need a single MCP call to understand
-    current /root state.
+    current $HOME state.
     """
     return json.dumps({
         "state": read_state(),

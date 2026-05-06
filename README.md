@@ -29,7 +29,7 @@ The project is **type=root** because what it configures is the operating system 
 
 The project is at present **barely started** (operator's verbatim framing, 2026-05-04). Neither capability half is operational yet:
 
-- **Endpoint AI agent safety:** the actual operator-authored Claude+opencode hardening config has not been written by this project's methodology-driven flow. The `/root` directory does contain prior-session AI artefacts (a README, an `install.sh`, hooks, `integrity.py`, an opencode bridge plugin) that attempted this scope, but the operator considers those artefacts AI debris from a prior session that is not authoritative — *"I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST"* — and they are not part of this project's authoritative state. The project's own authored implementation of the endpoint hardening is part of the future work.
+- **Endpoint AI agent safety:** the actual operator-authored Claude+opencode hardening config has not been written by this project's methodology-driven flow. The `$HOME` directory does contain prior-session AI artefacts (a README, an `install.sh`, hooks, `integrity.py`, an opencode bridge plugin) that attempted this scope, but the operator considers those artefacts AI debris from a prior session that is not authoritative — *"I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST"* — and they are not part of this project's authoritative state. The project's own authored implementation of the endpoint hardening is part of the future work.
 - **Network inspection (modules):** transparent bridge install path does not yet exist as IaC. Suricata module is not yet integrated. PolarProxy module is not yet integrated.
 
 What exists right now is the project's foundational scaffolding: identity registered with the second brain, methodology layer adopted from the second brain, backlog scaffolded with the active rollout epic + 14 modules, and the agent-context files (this README, plus CLAUDE.md, AGENTS.md, CONTEXT.md, and the secondary depth files) being authored. The actual implementation work — install scripts, systemd units, nftables rules, Claude+opencode hardening config (operator-authored from scratch, not extending the prior debris), Suricata configuration, PolarProxy deployment — is downstream of this foundation and most of it is operator-driven future-session work, not work this README's authoring conversation handles.
@@ -145,7 +145,7 @@ A type=root project's repo IS the user's home directory — the `.git` directory
 
 | Install user | Homedir | Repo root |
 |---|---|---|
-| `root` | `/root` | `/root` (this machine) |
+| `root` | `$HOME` | `$HOME` (this machine) |
 | `jfortin` | `/home/jfortin` | `/home/jfortin` (`.git` at `/home/jfortin/.git`) |
 | any user | `~` | `~` (the homedir itself is the repo root) |
 
@@ -229,14 +229,14 @@ Foundation responsibilities:
 
 | Responsibility | Description |
 |---|---|
-| **Endpoint AI agent safety (core)** | Configure Claude Code + opencode at the OS-root level with the safety controls operator wants for AI agents running on the host. Per operator's verbatim: *"secure an OS and configure claude code and opencode at the root with all the safety needed."* This is the endpoint half of system AI safety. The actual configuration (deny-set patterns, hook scripts, integrity check, opencode bridge mechanism) is authored by the project's methodology-driven flow, not extended from prior /root debris. |
+| **Endpoint AI agent safety (core)** | Configure Claude Code + opencode at the OS-root level with the safety controls operator wants for AI agents running on the host. Per operator's verbatim: *"secure an OS and configure claude code and opencode at the root with all the safety needed."* This is the endpoint half of system AI safety. The actual configuration (deny-set patterns, hook scripts, integrity check, opencode bridge mechanism) is authored by the project's methodology-driven flow, not extended from prior $HOME debris. |
 | **Network topology** | Configure the two ethernet interfaces as members of a Linux bridge (typically `br0`). Bring up the wifi as outbound-only management. Set the bridge MTU, disable hardware offloads (GRO/LRO/TSO) that interfere with downstream inspection, configure the wifi as a client to a known SSID. |
 | **Stealth posture** | The bridge has no IP on the inspected segment. The wifi has the only L3-visible IP. The host is L3-invisible to LAN endpoints; recovery in the worst case is via the local console. |
 | **System services** | systemd units for the bridge (auto-bringup at boot, auto-recovery on link flap), for the management wifi, for any post-install verification scripts, for the endpoint-safety integrity check. |
 | **Idempotent install** | A single install command takes a fresh Linux host and brings it to foundation-tier state (both endpoint safety + network topology). Re-running the install on an already-configured host is a no-op. Multi-host portability is a foundation requirement per operator: *"it will do this and it will also offer in the future to for instance we use this machine or another [new] one."* |
 | **Methodology layer** | The second brain's stage-gate methodology copied into `wiki/config/`. Adapted per the Adoption Guide: artifacts, gate commands, commit scope, directory paths are project-specific variables; stage names, ordering, readiness ranges, hierarchy rules are kept as ecosystem-wide invariants. |
 | **Backlog + log scaffold** | The directory structure for epics, modules, tasks, and operator log entries. Indexed and ready to receive work. |
-| **Sister-project integration capability** | The agent-context files (this README, CLAUDE.md, AGENTS.md, CONTEXT.md, ARCHITECTURE.md, TOOLS.md, DESIGN.md, SECURITY.md, SKILLS.md) populated with project-real content so the connection mechanism (`tools.setup --connect-project /root` from the second brain) finds a target it can integrate with. |
+| **Sister-project integration capability** | The agent-context files (this README, CLAUDE.md, AGENTS.md, CONTEXT.md, ARCHITECTURE.md, TOOLS.md, DESIGN.md, SECURITY.md, SKILLS.md) populated with project-real content so the connection mechanism (`tools.setup --connect-project $HOME` from the second brain) finds a target it can integrate with. |
 | **Identity declaration** | `<second-brain>/wiki/config/sister-projects.yaml` has the entry. `<second-brain>/wiki/ecosystem/project_profiles/root-ghostproxy/identity-profile.md` has the full Goldilocks profile. The project is registered with the second brain. |
 
 What the foundation does **not** include (and what is therefore not part of the always-required base):
@@ -303,7 +303,7 @@ These are not committed work; they are the kind of extensibility the modular arc
 
 The project is at the **scaffold + partial-implement** SFIF stage. Concretely, this means:
 
-> **Note (added cycle 62, 2026-05-05)**: the "barely started" framing comes from operator's verbatim 2026-05-04 directive (preserved sacrosanct in section "Operator Directives Captured This Session"). Substantial scaffolding has landed since: 14 modules + 66 atomic tasks + 8 brain files + 25 decisions logbook entries + install.sh dry-run-passing + 11 hooks (incl. PreCompact lifecycle) + 9 custom statusline widgets (operator visually verified) + 3 brain-loaded subagents + trigger-model.md unified rule + ccstatusline integration + deployment scripts at $HOME/scripts/ + hook regression tests at .claude/hooks/tests/. The project-lifecycle macro stage is still scaffold (foundation gate met for install.sh dry-run; advance to implement-stage is operator-decision).
+> **Note (added cycle 62, 2026-05-05; refreshed 2026-05-06)**: the "barely started" framing comes from operator's verbatim 2026-05-04 directive (preserved sacrosanct in section "Operator Directives Captured This Session"). Substantial scaffolding has landed since: 14 modules + 66 atomic tasks + 8 brain files + 26 decisions logbook entries (latest D026 captures today's audit + Phase A/B/C deliverables) + install.sh dry-run-passing + 12 hooks across 8 events (PreToolUse, PostToolUse, SessionStart, UserPromptSubmit, PreCompact, PostCompact, Stop, SessionEnd) + 9 custom statusline widgets (operator visually verified) + 3 brain-loaded subagents + trigger-model.md unified rule + ccstatusline integration + deployment scripts at $HOME/scripts/ + hook regression tests at .claude/hooks/tests/ + 22 slash commands (incl. /stamp-* config + /install-agent-brain) + 7 deterministic Python tools (state/blockers/progress/decisions/cycle/tasks/stamp) + 118-row systemic-bugs tracker (post-2026-05-06 audit: 17 verified, 13 recurring, 4 open, 76 structurally-fixed, 5 partial, 3 in-progress). The project-lifecycle macro stage is still scaffold (foundation gate met for install.sh dry-run; advance to implement-stage is operator-decision).
 
 ### What exists right now (after this conversation)
 
@@ -362,7 +362,7 @@ This translates to a specific ordering of work. The methodology layer + sister-p
 
 3. **Modules will be operator-driven, not AI-authored.** The operator handles module integration in a future session. The agent-context files (CLAUDE.md, AGENTS.md, CONTEXT.md, etc.) need to be in place so that future session has clear operating rules and routing, otherwise it crashes the way prior sessions did.
 
-4. **The foundation has to not crash.** The operator's exact phrase: "when its ready and will not drop/crash in my hands." The methodology layer + agent-context + foundation IaC need to be solid enough that a future session in `/root` doesn't immediately fall apart — which means the IaC needs to be idempotent, the methodology needs to be adopted not just copied, and the agent-context needs to be authoritative for that future session.
+4. **The foundation has to not crash.** The operator's exact phrase: "when its ready and will not drop/crash in my hands." The methodology layer + agent-context + foundation IaC need to be solid enough that a future session in `$HOME` doesn't immediately fall apart — which means the IaC needs to be idempotent, the methodology needs to be adopted not just copied, and the agent-context needs to be authoritative for that future session.
 
 So the work this session has been doing — methodology adoption, sister-project registration, agent-context authoring — is the **load-bearing precondition** for module work. Modules layer on top of a stable foundation. They cannot be built before the foundation is in place.
 
@@ -426,7 +426,7 @@ This project is registered as a sister of the research-wiki second brain located
 | `auto_connect` | `false` (operator-authorized manual connection only) |
 | `type` | `root` |
 | `group` | `operating-system-setup` |
-| Path | `~/` (repo root is the home dir; on root user `~/` = `/root`; on jfortin `~/` = `/home/jfortin`) |
+| Path | `~/` (repo root is the home dir; on root user `~/` = `$HOME`; on jfortin `~/` = `/home/jfortin`) |
 | `wiki_dir` | `wiki` |
 
 ### Connection mechanism
@@ -434,20 +434,20 @@ This project is registered as a sister of the research-wiki second brain located
 ```bash
 # Preview what would be written, no files modified:
 cd <second-brain>/
-python3 -m tools.setup --connect-project /root --dry-run
+python3 -m tools.setup --connect-project $HOME --dry-run
 
 # Apply connection (requires operator authorization since auto_connect=false):
-python3 -m tools.setup --connect-project /root
+python3 -m tools.setup --connect-project $HOME
 ```
 
-When the connection runs, four artefacts land in `/root`:
+When the connection runs, four artefacts land in `$HOME`:
 
 | Artefact | What it does |
 |---|---|
 | `$HOME/.mcp.json` `mcpServers.research-wiki` entry | Programmatic access to the second brain via MCP. Available tools include `wiki_gateway_orient`, `wiki_gateway_query`, `wiki_search`, `wiki_read_page`, `wiki_status`, `wiki_methodology_guide`, `wiki_gateway_contribute`, ~28 total. |
 | `$HOME/tools/gateway.py` (forwarder) | CLI access. `python3 -m tools.gateway orient`, `query`, `compliance`, `health`, `template`, `flow`, `contribute`. Dispatches with `cwd=<second-brain>/` and the sister's CWD passed as `--wiki-root`. |
 | `$HOME/tools/view.py` (forwarder) | CLI access. `python3 -m tools.view spine`, `model <name>`, `lessons`, `standards`, `search <query>`. |
-| `## Second Brain Connection` block in `AGENTS.md` (or `CLAUDE.md`) | Documents the connection so a fresh agent in /root finds it on first load. Variant per `type`/`group` resolution: this project gets the `ROOT_OS_SETUP` variant (OS-setup-tier framing — methodology + verification source emphasis). |
+| `## Second Brain Connection` block in `AGENTS.md` (or `CLAUDE.md`) | Documents the connection so a fresh agent in $HOME finds it on first load. Variant per `type`/`group` resolution: this project gets the `ROOT_OS_SETUP` variant (OS-setup-tier framing — methodology + verification source emphasis). |
 
 ### Bidirectional flow
 
@@ -460,7 +460,7 @@ The second brain does not push runtime configuration into root-ghostproxy. Root-
 
 ### `auto_connect: false` rationale
 
-A type=root + group=operating-system-setup project gates the security envelope of the host. Auto-connecting it from `tools.setup` (which is the default behavior for `auto_connect: true` sisters) would bypass the operator's explicit-authorization step. The friction-by-design of `auto_connect: false` is that integration requires a deliberate `--connect-project /root` call. After M008 smoke test proves the connection is stable end-to-end, the operator may flip `auto_connect: true` (this is M010's decision) — or keep it false permanently as a security-tier signal.
+A type=root + group=operating-system-setup project gates the security envelope of the host. Auto-connecting it from `tools.setup` (which is the default behavior for `auto_connect: true` sisters) would bypass the operator's explicit-authorization step. The friction-by-design of `auto_connect: false` is that integration requires a deliberate `--connect-project $HOME` call. After M008 smoke test proves the connection is stable end-to-end, the operator may flip `auto_connect: true` (this is M010's decision) — or keep it false permanently as a security-tier signal.
 
 ## Backlog + Active Work
 
@@ -483,8 +483,8 @@ The epic decomposes the project's foundation work into 14 modules organized into
 | Module | Focus |
 |---|---|
 | **[M006 — Pre-connect verification](wiki/backlog/modules/root-ghostproxy-m006-pre-connect-verification.md)** | Verify Stream 2 M001 (AGENTS.md) is complete; verify root-ghostproxy is at a clean state; verify operator authorizes; dry-run the connect script. |
-| **[M007 — Connect to second brain](wiki/backlog/modules/root-ghostproxy-m007-connect-second-brain.md)** | Run `python3 -m tools.setup --connect-project /root` from second brain. Inspect each of the 4 written artefacts. Commit /root mutations atomically. |
-| **[M008 — Smoke test from inside](wiki/backlog/modules/root-ghostproxy-m008-smoke-test-from-inside.md)** | Open fresh Claude Code session in /root. Verify gateway orient + view spine + research-wiki MCP tool invocation work end-to-end. Time-to-orient ≤ 60 seconds. |
+| **[M007 — Connect to second brain](wiki/backlog/modules/root-ghostproxy-m007-connect-second-brain.md)** | Run `python3 -m tools.setup --connect-project $HOME` from second brain. Inspect each of the 4 written artefacts. Commit $HOME mutations atomically. |
+| **[M008 — Smoke test from inside](wiki/backlog/modules/root-ghostproxy-m008-smoke-test-from-inside.md)** | Open fresh Claude Code session in $HOME. Verify gateway orient + view spine + research-wiki MCP tool invocation work end-to-end. Time-to-orient ≤ 60 seconds. |
 | **[M009 — Worked example](wiki/backlog/modules/root-ghostproxy-m009-worked-example-readme-ingest.md)** | Bidirectional flow proof. The second brain's representation of root-ghostproxy is queryable + current; root-ghostproxy can contribute lessons back. |
 | **[M010 — sister-projects.yaml auto_connect decision](wiki/backlog/modules/root-ghostproxy-m010-sister-projects-yaml-flip.md)** | Operator-decision after M009 stability proven: keep auto_connect=false (security-tier signal) or flip to true (auto-hookup convenience). |
 
@@ -500,7 +500,7 @@ Module pages live at [wiki/backlog/modules/](wiki/backlog/modules/). Atomic task
 | Stream 2 M004 (Infrastructure tooling) | AI authoring with operator approval | Verifier scripts authored by AI; integrated into pre-commit / CI per operator direction. |
 | Stream 2 M005 (First feature module) | **Operator-driven future-session work** | Operator stated explicitly: "the modules you are not going to do, I am going to do In a session in a the root project when its ready and will not drop/crash in my hands." |
 | Stream 1 M006 (Pre-connect verification) | AI executes checks; operator authorizes | Mechanical pre-conditions; operator gates the actual connect. |
-| Stream 1 M007 (Connect) | Operator runs the command from second brain | The connect command mutates /root; operator-authorized only. |
+| Stream 1 M007 (Connect) | Operator runs the command from second brain | The connect command mutates $HOME; operator-authorized only. |
 | Stream 1 M008 (Smoke test from inside) | Operator-driven; AI assists | Operator opens fresh session; AI participates in smoke testing. |
 | Stream 1 M009 (Worked example) | AI verifies; operator confirms | Bidirectional flow checks; AI runs them, operator confirms results. |
 | Stream 1 M010 (auto_connect flip) | Operator-decision | Pure decision, no implementation lift. |
@@ -651,11 +651,11 @@ ip addr show <management-wifi>    # management wifi has the host's management IP
 # 4. Connect to second brain (operator-authorized; auto_connect=false):
 #    Run from the second brain side:
 cd <second-brain>/
-python3 -m tools.setup --connect-project /root --dry-run    # preview
-python3 -m tools.setup --connect-project /root              # apply
+python3 -m tools.setup --connect-project $HOME --dry-run    # preview
+python3 -m tools.setup --connect-project $HOME              # apply
 
-# 5. Verify connection from inside /root:
-cd /root
+# 5. Verify connection from inside $HOME:
+cd $HOME
 python3 -m tools.gateway orient                              # second-brain orientation
 python3 -m tools.view spine                                  # browse second-brain knowledge
 ```
@@ -737,7 +737,7 @@ curl http://testmynids.org/uid/index.html
 |---|---|
 | **README.md** (this file) | Project overview, vision, identity, layered architecture, modules, current state, build order, methodology, sister-project integration, backlog, SFIF stages, principles, setup path, verification, status, glossary. The front door. |
 | **[AGENTS.md](AGENTS.md)** | Universal cross-tool agent context. Tight + pointer-based — references canonical sources rather than re-stating their content. Identity at-a-glance + pointer table to canonical sources + project-specific hard rules + working contract + mission verbatim. |
-| **[CLAUDE.md](CLAUDE.md)** | Claude Code-specific operating context. Operator-intent → tool/command routing table for THIS project's actual operations. Methodology pointer per Adoption Guide step 5. Hard rules specific to operating in /root. |
+| **[CLAUDE.md](CLAUDE.md)** | Claude Code-specific operating context. Operator-intent → tool/command routing table for THIS project's actual operations. Methodology pointer per Adoption Guide step 5. Hard rules specific to operating in $HOME. |
 | **[CONTEXT.md](CONTEXT.md)** | Current operational state — active SFIF stage, active modules, recent operator directives, next-best moves. Changes turn-to-turn. Distinct from CLAUDE.md (rules) and README.md (description). |
 | **[ARCHITECTURE.md](ARCHITECTURE.md)** | Deep system topology — bridge configuration, interface roles, hook flow, integrity check sentinel, module integration interfaces, failure modes + recovery. Distinct from README's architecture summary. |
 | **[TOOLS.md](TOOLS.md)** | Per-script reference — install.sh (when it exists), foundation verification scripts, project-internal verifier (M004 tooling), module install scripts. Concrete invocations + invariants. |
@@ -787,21 +787,21 @@ After connection (M007) lands, also:
 
 ## Operator Directives Captured This Session
 
-The directives below are operator-stated, verbatim, captured during this README's authoring session and the preparation work that preceded it. They define the project's intent + the build order + the stop conditions. Future sessions in /root should treat these as authoritative.
+The directives below are operator-stated, verbatim, captured during this README's authoring session and the preparation work that preceded it. They define the project's intent + the build order + the stop conditions. Future sessions in $HOME should treat these as authoritative.
 
 | Date | Directive (verbatim) | Implication |
 |---|---|---|
-| 2026-05-04 | "this is a new machine with a new root project /root but first we need to load into context this project knowledge" | The project is new on a new machine; prior /root content is debris from a prior session, not authoritative. |
+| 2026-05-04 | "this is a new machine with a new root project $HOME but first we need to load into context this project knowledge" | The project is new on a new machine; prior $HOME content is debris from a prior session, not authoritative. |
 | 2026-05-04 | "we need to prepare to work on the new root project and make sure we can install to it as a sister project and as a project of type root and group operating-system-setup. WHy root ? since it could have been jfortin install too.. since its an operating system IaC project, even in a user such as jfortin it would remain a root-type project" | type=root because OS-level scope, not install-path. group=operating-system-setup. Sister-project of second brain. |
 | 2026-05-04 | "the project is barely started... we will need to build everything inside of it so that a future session in its context can work properly. not only the full second-brain integration but just pure sfif project base. Remember SFIF and what it is part of?" | Project is barely started. Build everything inside. SFIF is part of the project-lifecycle macro model in the second brain's methodology. |
-| 2026-05-04 | "I am able to start a session in the /root project and am able to start working on the two vendors & modules integrations and following the methodology with the wiki LLM and everything" | Mission: future session works on Suricata + PolarProxy modules, following methodology, with the second brain integrated. |
-| 2026-05-04 | "you can work in /root for now for whatever we need to reach that point or to read the current state" | Authorized to work in /root for foundation prep. |
+| 2026-05-04 | "I am able to start a session in the $HOME project and am able to start working on the two vendors & modules integrations and following the methodology with the wiki LLM and everything" | Mission: future session works on Suricata + PolarProxy modules, following methodology, with the second brain integrated. |
+| 2026-05-04 | "you can work in $HOME for now for whatever we need to reach that point or to read the current state" | Authorized to work in $HOME for foundation prep. |
 | 2026-05-04 | "its IAC and its basically a IPS sitting in between the Edge firewall (OPNSense) and the first switch / the local network... So its not just an IPS its a system AI safety setup project and the IPS tools (suricata and [polarproxy]) as modules" | Project = system AI safety setup. Position = IPS between OPNsense and LAN. Suricata + PolarProxy = modules. |
 | 2026-05-04 | "first there is no modules then 1 then 2 and later more but they are all facultative as much as if I do a full install they would all be installed" | Modules are facultative. Layered architecture. Full install adds them all. |
 | 2026-05-04 | "do not forget the root task that is to shape and prepare the root-ghostproxy project... you mostly prepared and did the knowledge part but there is still much progress to do... including the second-brain integration when we reach this point... all this and the wiki LLM and methodology goes before the modules since the modules you are not going to do, I am going to do In a session in a the root project when its ready and will not drop/crash in my hands" | Order: methodology + integration FIRST, modules SECOND. Modules are operator-driven future-session work. |
 | 2026-05-04 | "you make the change to setup.py and keep or any tools that needs it and keep moving toward the target solution / requests" | Authorized to extend setup.py and other second-brain tooling that needs to support the integration. |
-| 2026-05-05 | "I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST" | Prior /root content (README, install.sh, hooks, integrity.py, opencode bridge, memory folder) is not operator-authored, not authoritative, not part of the project. Forget it exists. |
-| 2026-05-05 | "imagine there is no fucking root-GHOSTPROXY project righT NOW.. this whole system is virgIN" | Treat the system as virgin. Build the project from scratch from the operator's verbatim definitions, not from existing /root content. |
+| 2026-05-05 | "I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST" | Prior $HOME content (README, install.sh, hooks, integrity.py, opencode bridge, memory folder) is not operator-authored, not authoritative, not part of the project. Forget it exists. |
+| 2026-05-05 | "imagine there is no fucking root-GHOSTPROXY project righT NOW.. this whole system is virgIN" | Treat the system as virgin. Build the project from scratch from the operator's verbatim definitions, not from existing $HOME content. |
 | 2026-05-05 | "WE NEED TO BUILD IT FROM THE BOTTOM-UP" | Bottom-up: foundation first, then layers. Not top-down comprehensive vision before grounding. |
 | 2026-05-05 | "STOP FUCKING WORKING IN REVERSE" | Don't reverse-engineer the project from existing artefacts. Build forward from definition. |
 | 2026-05-05 | "THE MAIN FUCKING TASK OF THIS WHOLE CONVERSTAION IS TO CREATE THE FUCKING 3 main MD files and then the 3-7+ secondary MD files" | This conversation's deliverable: 3 main MD files (README, CLAUDE.md, AGENTS.md) + 3-7+ secondary (CONTEXT, ARCHITECTURE, TOOLS, DESIGN, SECURITY, SKILLS, etc.). |
@@ -944,7 +944,7 @@ Each project is an instance of the second brain's methodology framework; root-gh
 
 ## Recent Work in This Conversation
 
-This README is being authored as part of a multi-day work block focused on root-ghostproxy's foundation. The work blocks completed (in the second brain + initial /root scaffolding) include:
+This README is being authored as part of a multi-day work block focused on root-ghostproxy's foundation. The work blocks completed (in the second brain + initial $HOME scaffolding) include:
 
 | Date | Work block | Artefacts |
 |---|---|---|
@@ -955,7 +955,7 @@ This README is being authored as part of a multi-day work block focused on root-
 | 2026-05-04 | 10 module pages (M001–M010 across Stream 2 + Stream 1) | `wiki/backlog/modules/root-ghostproxy-m{001..010}-*.md` in second brain |
 | 2026-05-04 | `tools.setup --connect-project --dry-run` flag + type/group-aware brain-pointer block | `tools/setup.py` patched in second brain (variant=ROOT_OS_SETUP renders for this project) |
 | 2026-05-04 | Two template lists in the wiki | `wiki/config/templates/sister-project-preparation/` (manifest + 7 file templates) + `wiki/config/templates/second-brain-integration/` (manifest + 5 overlay templates) |
-| 2026-05-05 | Backlog scaffolding + methodology copy in /root | `$HOME/wiki/{config,backlog,log}/` populated; epic + 10 modules ported; methodology yaml + 3 profile yamls copied |
+| 2026-05-05 | Backlog scaffolding + methodology copy in $HOME | `$HOME/wiki/{config,backlog,log}/` populated; epic + 10 modules ported; methodology yaml + 3 profile yamls copied |
 | 2026-05-05 | This README + companion MD files (CLAUDE.md, AGENTS.md, CONTEXT.md, ARCHITECTURE.md, TOOLS.md, DESIGN.md, SECURITY.md, SKILLS.md) | `$HOME/*.md` |
 
 Session logs detailing the conversation's progression live at `<second-brain>/raw/notes/2026-05-04-*.md` and (going forward) at `$HOME/wiki/log/`.

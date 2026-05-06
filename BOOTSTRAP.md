@@ -1,6 +1,6 @@
 # BOOTSTRAP.md — first-time-here cold-pickup guide
 
-> One page. Get a fresh Claude Code session in `/root` from "barely started" to "ready to start operator-driven module work without crashing." Read this BEFORE acting. CLAUDE.md auto-loads; everything else is on-demand.
+> One page. Get a fresh Claude Code session in `$HOME` from "barely started" to "ready to start operator-driven module work without crashing." Read this BEFORE acting. CLAUDE.md auto-loads; everything else is on-demand.
 
 ## Operating doctrine — read this first
 
@@ -27,20 +27,20 @@ Read [ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN.md](DESIGN.md), [TOOLS.md](TOOL
 Rules (loaded on demand from `$HOME/.claude/rules/`):
 - [routing.md](.claude/rules/routing.md) — operator-intent → tool routing for this project
 - [methodology.md](.claude/rules/methodology.md) — engine pointer + 5 stages with project-specific gates
-- [hook-architecture.md](.claude/rules/hook-architecture.md) — 2-layer hook design + the 7 wired machine-level hook events
+- [hook-architecture.md](.claude/rules/hook-architecture.md) — 2-layer hook design + the 12 wired machine-level hook fires across 8 events
 - [work-mode.md](.claude/rules/work-mode.md) — solo session pattern + PO approval boundary + status-claim discipline
-- [self-reference.md](.claude/rules/self-reference.md) — what /root IS + how it relates to the second brain
+- [self-reference.md](.claude/rules/self-reference.md) — what $HOME IS + how it relates to the second brain
 - [words-are-sacrosanct.md](.claude/rules/words-are-sacrosanct.md) — verbatim quoting rule (operator's own statement)
 
 ## Architecture surfaces (the agent layer)
 
 | Surface | Path | Determinism | Purpose |
 |---|---|---|---|
-| **Slash commands** (15) | `.claude/commands/*.md` | 100% on invoke | Operator-driven workflows. `/orient`, `/cycle`, `/mode-{pm,architect,dual,status,clear}`, `/blockers`, `/progress`, `/decisions`, `/log`, `/audit`, `/sync-progress`, `/help-root`, `/handoff` |
+| **Slash commands** (22) | `.claude/commands/*.md` | 100% on invoke | Operator-driven workflows. `/orient`, `/cycle`, `/mode-{pm,architect,dual,status,clear}`, `/blockers`, `/progress`, `/decisions`, `/log`, `/audit`, `/sync-progress`, `/help-root`, `/handoff`, `/stamp-{horizontal,vertical,on,off,auto,status}` (SB-115 stamp config), `/install-agent-brain` |
 | **Modes** (3) | `.claude/modes/*.md` | Operator-enabled persona overlay | PM Scrum Master / DevOps Architect / Dual Expert. Combine with `/loop /cycle` for autopilot. Mode-entry is operator-choice; agent surfaces the option, never auto-enables. |
-| **Hooks** (9 wired across 6 events) | `.claude/hooks/*.{sh,py}` | ~85% (`additionalContext` JSON) | PreToolUse (3: policy-block, malware-block, opt-write-block) + PostToolUse (1: leak-detector) + SessionStart (2: session-start, session-orient) + PreCompact (1: writes handoff doc) + PostCompact (1: directs /orient + references handoff) + SessionEnd (1: summary). Regression tests at `.claude/hooks/tests/*.py`. |
+| **Hooks** (12 wired across 8 events) | `.claude/hooks/*.{sh,py}` | ~85% (`additionalContext` JSON) | PreToolUse (3: policy-block, malware-block, opt-write-block) + PostToolUse (1: leak-detector) + SessionStart (2: session-start, session-orient) + UserPromptSubmit (2: context-warning, output-discipline-guard agent-discipline-gate per SB-108) + PreCompact (1: writes handoff doc) + PostCompact (1: directs /orient + references handoff) + Stop (1: end-of-cycle-stamp per SB-114/115 DRAFT) + SessionEnd (1: summary). Regression tests at `.claude/hooks/tests/*.py`. |
 | **Sub-agents** (3 brain-loaded) | `.claude/agents/*.md` | Cold-context | `root-explorer` (research), `root-architect` (design lens), `root-pm-scoper` (PM scoping) — each starts with mandatory "load brain first" prompts naming CLAUDE.md / rules / state files. Custom subagents NOT discovered until session restart (cycle 47 finding). |
-| **Tools** (4 + MCP server) | `tools/*.py` | 100% deterministic non-LLM | `state.py`, `blockers.py`, `progress.py`, `decisions.py` — invoked by commands; also exposed via `tools/mcp_server.py` (FastMCP, 6 tools) for MCP-aware consumers |
+| **Tools** (9 + MCP server) | `tools/*.py` | 100% deterministic non-LLM | `state.py`, `blockers.py`, `progress.py`, `decisions.py`, `cycle.py`, `tasks.py`, `stamp.py` (SB-115) — invoked by commands; also exposed via `tools/mcp_server.py` (FastMCP, 6 tools) for MCP-aware consumers |
 | **Skills** (2) | `.claude/skills/<name>/SKILL.md` | ~90-95% description-match auto-trigger | `surface-state` + `surface-blockers` — handle natural-prose equivalents of `/orient` + `/blockers` |
 | **Governance** (3 SRP docs) | `wiki/governance/*.md` | Read-only views | Operator-facing perspective layer. Refresh via `/sync-progress` + `/decisions append`. |
 | **Rules files** (10) | `.claude/rules/*.md` | Load-on-demand | Topic-specific guidance. Includes `trigger-model.md` (unified signal→action→recovery model across all 8 mechanism types — see DESIGN.md). |
@@ -88,7 +88,7 @@ As of 2026-05-05 end of preparation, the 40 not-started tasks have implicit gate
 | M003 (Foundation) | 6 | Operator decides T011 (greenfield vs extend) first |
 | M004 (Infra tooling) | 5 | Operator approves T018 (verifier scope) first |
 | M005 (First feature) | 5 | Operator picks T024 (Suricata vs PolarProxy first) first |
-| M006 (Pre-connect) | 5 | `/root` must be git-init'd (operator T006-territory) |
+| M006 (Pre-connect) | 5 | `$HOME` must be git-init'd (operator T006-territory) |
 | M007 (Connect) | 4 | M006 done first |
 | M008 (Smoke) | 7 | M007 done first |
 | M009 (Worked example) | 4 | Operator decides T051 (reframe) first |
@@ -100,7 +100,7 @@ As of 2026-05-05 end of preparation, the 40 not-started tasks have implicit gate
 
 | ID | Priority | What operator decides |
 |---|---|---|
-| [T006](wiki/backlog/tasks/T006-prior-debris-reconciliation.md) | P1 | Reconciliation policy for prior /root debris (delete / leave / partial preserve) |
+| [T006](wiki/backlog/tasks/T006-prior-debris-reconciliation.md) | P1 | Reconciliation policy for prior $HOME debris (delete / leave / partial preserve) |
 | [T011](wiki/backlog/tasks/T011-foundation-iac-authoring-approach.md) | P0 | Foundation IaC approach (greenfield vs extend prior debris) |
 | [T018](wiki/backlog/tasks/T018-operator-approve-verifier-scope.md) | P0 | Verifier scope (which checks, which strictness) |
 | [T024](wiki/backlog/tasks/T024-operator-picks-first-module.md) | P0 | First feature module (Suricata-first vs PolarProxy-first) |

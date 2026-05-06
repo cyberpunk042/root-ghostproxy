@@ -11,7 +11,7 @@
 # at the end of the agent's response.
 #
 # Self-gates via BOOTSTRAP.md + CLAUDE_PROJECT_DIR so this fires only for
-# /root sessions (not /opt second-brain or other sister-project sessions).
+# $HOME sessions (not /opt second-brain or other sister-project sessions).
 
 import json
 import os
@@ -65,7 +65,7 @@ def main() -> None:
     except Exception:
         pass
 
-    # Self-gate: only fire for /root sessions
+    # Self-gate: only fire for $HOME sessions
     if not (PROJECT_ROOT / "BOOTSTRAP.md").exists():
         _trace("exit-bootstrap-missing")
         sys.exit(0)
@@ -73,7 +73,7 @@ def main() -> None:
     project_dir = os.environ.get("CLAUDE_PROJECT_DIR", "").strip()
     home_str = str(PROJECT_ROOT).rstrip("/")
     if project_dir:
-        # Positive evidence: must be /root or under /root
+        # Positive evidence: must be $HOME or under $HOME
         if not (project_dir.rstrip("/") == home_str or project_dir.startswith(home_str + "/")):
             _trace(f"exit-suppress-on-mismatch:{project_dir}")
             sys.exit(0)

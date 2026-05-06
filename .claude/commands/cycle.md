@@ -64,7 +64,7 @@ Run one cycle of the active mode's autopilot sequence.
      - First priority: any `open` bug with available structural fix path → highest-leverage one
      - Else: any `structurally-fixed` bug awaiting verification → propose verification approach
      - Else: any `recurring` bug → flag for operator-attention (rules don't auto-fix runtime; operator's catching is the verification)
-   - Apply the structural fix (rule edit, hook script, code change in /root) OR surface the verification ask.
+   - Apply the structural fix (rule edit, hook script, code change in $HOME) OR surface the verification ask.
    - Update tracker: status field + evidence column entry.
    - Surface in cycle report: "This cycle's SB pick: SB-XXX. Action: <what>. New status: <status>."
    - **This step is the work-doing step.** Per operating-principles.md #11, the cycle does the systemic-fix work between cycles; this is where the work names itself.

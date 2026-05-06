@@ -1,8 +1,8 @@
-Log an operator directive verbatim to $HOME/wiki/log/ (sacrosanct primary source for /root iteration).
+Log an operator directive verbatim to $HOME/wiki/log/ (sacrosanct primary source for $HOME iteration).
 
 > Slash-invoked. Operator types `/log <directive content or quote>` literally. Or `/log` alone to be prompted.
 >
-> **Path: `$HOME/wiki/log/<YYYY-MM-DD>-<slug>.md`. NOT `/opt/.../raw/notes/`.** The second-brain has its own authoring layer + its own contribute channel (`tools.gateway contribute`, gated on M007). /root iteration directives stay in /root. Operator's binding rule 2026-05-05: *"LET THE SECOND-BRAIN BE ITS OWN."*
+> **Path: `$HOME/wiki/log/<YYYY-MM-DD>-<slug>.md`. NOT `/opt/.../raw/notes/`.** The second-brain has its own authoring layer + its own contribute channel (`tools.gateway contribute`, gated on M007). $HOME iteration directives stay in $HOME. Operator's binding rule 2026-05-05: *"LET THE SECOND-BRAIN BE ITS OWN."*
 >
 > Specifically for operator-verbatim quotes that need to land BEFORE acting (per AGENTS.md Hard Rule #4 — operator words are sacrosanct, log first).
 
@@ -25,7 +25,7 @@ Log an operator directive verbatim to $HOME/wiki/log/ (sacrosanct primary source
 
 Per operator directive 2026-05-05 (severe correction): *"THE ONLY WAY TO SEND TO THE SECOND-BRAIN IS TO USE THE CONTRIBUTE FEATURE... THIS HAD NOTHING TO DO WITH THE SECOND-BRAIN... LET THE SECOND-BRAIN BE ITS OWN."*
 
-The /log command writes to /root only. If a directive is intended for the second-brain's audit trail (rare, second-brain-specific), the channel is `tools.gateway contribute` (gated on M007 connect), not direct write to /opt.
+The /log command writes to $HOME only. If a directive is intended for the second-brain's audit trail (rare, second-brain-specific), the channel is `tools.gateway contribute` (gated on M007 connect), not direct write to /opt.
 
 ## What `/log` is NOT
 

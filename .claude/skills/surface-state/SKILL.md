@@ -28,7 +28,7 @@ Examples that should NOT fire this (use the slash command directly):
 When triggered:
 
 1. Run `/orient` (deterministic 21-step intel-gathering chain) — this loads the brain + emits the structured ORIENT REPORT.
-2. If the user wants more specifically the journey view (where + headed + how got here), follow up by reading `/root/wiki/governance/progress.md` (or invoking `/progress` slash command).
+2. If the user wants more specifically the journey view (where + headed + how got here), follow up by reading `$HOME/wiki/governance/progress.md` (or invoking `/progress` slash command).
 3. If active mode is set (per `/orient` step 19-21), reflect that in the response — "you're in PM Scrum Master mode; here's the cycle's view of state."
 4. End the response with a one-line "what's next" that's grounded in the 6 pending operator decisions OR the active mode's cycle-next-action — NOT a generic "what would you like to work on?" question.
 

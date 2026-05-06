@@ -28,7 +28,7 @@ def is_project_context() -> bool:
 
     Machine-level hooks fire for ALL sessions on the host — including
     second-brain (/opt) sessions. Without cwd-gating, this hook would
-    cross-fire and pollute /opt agent sessions with /root project-priming
+    cross-fire and pollute /opt agent sessions with $HOME project-priming
     directives. SB-010 pattern.
 
     Detection (priority order):
@@ -94,7 +94,7 @@ Conversation was just compacted. Behavioral state may have degraded:
 INVOKE /orient NOW.
 
   /orient is the deterministic 21-step intel-gathering chain at
-  /root/.claude/commands/orient.md. Re-running it after compaction
+  $HOME/.claude/commands/orient.md. Re-running it after compaction
   restores the brain (BOOTSTRAP, CONTEXT, 6 rules files, latest log,
   latest operator-verbatim raw notes) and re-emits the structured ORIENT
   REPORT — so post-compact you have the same project awareness as a

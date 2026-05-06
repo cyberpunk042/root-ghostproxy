@@ -19,7 +19,7 @@ if [[ -n "${task}" ]] && [[ -d ${TOOLS_DIR}/wiki/backlog/tasks ]]; then
     fi
 fi
 
-# Fallback path 1: tools.progress (works for /root)
+# Fallback path 1: tools.progress (works for $HOME)
 if [[ -x "${TOOLS_PYTHON}" ]] && [[ -f "${TOOLS_DIR}/tools/progress.py" ]]; then
     cd "${TOOLS_DIR}" || exit 0
     pct=$("${TOOLS_PYTHON}" -m tools.progress --json 2>/dev/null | "${TOOLS_PYTHON}" -c "import json,sys

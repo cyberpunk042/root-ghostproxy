@@ -32,7 +32,7 @@ Surface the blockers register — items requiring operator input, with full cont
 Per operator directive 2026-05-05, `tools.blockers` exposes operations beyond reading:
 
 ```bash
-cd /root
+cd $HOME
 python3 -m tools.blockers list                              # IDs only
 python3 -m tools.blockers get B001                          # full body
 python3 -m tools.blockers next-id                           # next B###

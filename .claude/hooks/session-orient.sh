@@ -78,7 +78,7 @@ def main() -> None:
         pass
 
     # Cross-firing prevention via stdin (fail-OPEN: when uncertain, fire,
-    # so /root sessions never get silenced. Suppress only on positive
+    # so $HOME sessions never get silenced. Suppress only on positive
     # evidence that calling project != PROJECT_ROOT).
     project_root_str = str(PROJECT_ROOT).rstrip("/")
     workspace = payload.get("workspace", {}) or {}
@@ -117,7 +117,7 @@ Each Claude Code session starts cold. Therefore:
 
 INVOKE /orient NOW. THIS IS YOUR FIRST ACTION.
 
-  /orient is at /root/.claude/commands/orient.md — a deterministic
+  /orient is at $HOME/.claude/commands/orient.md — a deterministic
   21-step chain: Read brain (BOOTSTRAP, CONTEXT, 6 rules), Read backlog
   index, Read most-recent <project>/wiki/log/ + <second-brain>/raw/notes/, verify
   methodology engine + second-brain reachability + sister-projects.yaml

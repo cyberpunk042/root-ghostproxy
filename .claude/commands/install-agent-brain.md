@@ -67,6 +67,6 @@ The command is a thin operator-facing wrapper over install.sh's project profile.
 
 ## Cross-references
 
-- install.sh project profile: `apply_profile()` at `/root/install.sh`
+- install.sh project profile: `apply_profile()` at `$HOME/install.sh`
 - Operator directive: 2026-05-06 (this session) on cross-project install capability
 - Operating principle #9 refinement: knowledge-vs-operational-config distinction (this command writes operational config to a sister project — explicit operator-invoked, not auto)

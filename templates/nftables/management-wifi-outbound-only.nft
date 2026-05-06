@@ -1,0 +1,92 @@
+# /etc/nftables.d/management-wifi-outbound-only.nft
+#
+# Deployed by /root/install.sh op_install_management_wifi.
+# Loaded by main /etc/nftables.conf via `include "/etc/nftables.d/*.nft"`.
+#
+# Operator invariant 2026-05-04 (T013, M003): management wifi is outbound-only —
+# host can REACH the wifi network for ops/SSH-out/updates, but the wifi network
+# CANNOT initiate connections inward. INPUT chain on the wifi interface drops
+# everything except return traffic for connections we initiated.
+#
+# Why: type=root install on a machine whose primary purpose is L2 inspection
+# (bridge mode) MUST NOT expose services to the management wifi. The wifi is
+# the operator's existing network — treated as untrusted edge, not a service
+# bind point.
+#
+# Interface name: defaults to mgmt0 (operator-renamable via systemd link rule
+# or wpa_supplicant config). Override at install time if the host uses a
+# different name (most distros default to wlan0; some use wlp*s* or wlx*).
+#
+# Idempotency: this file is named with a unique prefix (`ghp-`) so install
+# can detect prior deploys + re-deploy without dup-table collisions.
+#
+# Deployment sequence (per op_install_management_wifi):
+#   1. install.sh writes this file → /etc/nftables.d/
+#   2. install.sh runs `nft -c -f /etc/nftables.d/management-wifi-outbound-only.nft`
+#      to syntax-check (no commit).
+#   3. install.sh reloads main nftables: `systemctl reload nftables` OR
+#      `nft -f /etc/nftables.conf` (operator's choice — both work).
+
+# Use a dedicated table so we don't collide with the bridge config (which
+# operates in `bridge` family on FORWARD chain) or any pre-existing
+# `inet filter` table from the distro.
+table inet ghp_mgmt_wifi {
+
+    # Set: management wifi interface(s). Operator may add multiple if they
+    # have a primary + backup wifi (e.g., 5GHz + 2.4GHz on different ifaces).
+    # Default to mgmt0 — install.sh substitutes if operator runs with a
+    # different `--mgmt-iface <name>` flag (future enhancement).
+    set mgmt_ifaces {
+        type ifname
+        elements = { "mgmt0" }
+    }
+
+    # INPUT chain — applies to traffic destined for THIS host arriving on
+    # the wifi interface. Default policy: drop. Allow only:
+    #   - Loopback (lo) traffic — required for local services.
+    #   - Established/related — return traffic for connections we initiated.
+    #   - ICMP echo-reply — so the host can receive ping replies on outbound
+    #     pings; harmless. Operator may tighten further if desired.
+    chain wifi_input {
+        type filter hook input priority filter; policy accept;
+
+        # Only apply this chain's logic to packets arriving on management wifi.
+        # Other interfaces (bridge members, lo) bypass this filter.
+        iifname @mgmt_ifaces jump wifi_input_filter
+    }
+
+    chain wifi_input_filter {
+        # Established/related — return path for outbound connections.
+        ct state { established, related } accept
+        # ICMPv4/v6 reply types — return path for our outbound pings.
+        meta l4proto icmp icmp type echo-reply accept
+        meta l4proto icmpv6 icmpv6 type echo-reply accept
+        # Block ICMP redirect (security) + invalid state.
+        ct state invalid drop
+        meta l4proto icmp icmp type redirect drop
+        # Drop everything else inbound on wifi.
+        log prefix "ghp-wifi-drop-input: " level info
+        drop
+    }
+
+    # OUTPUT chain — host-originated traffic OUT to wifi. Default: accept.
+    # The point of management wifi is to allow outbound (SSH-out, apt-get,
+    # status push to monitoring, etc.). No filtering here unless operator
+    # explicitly tightens (out of foundation scope; that's a later module).
+    chain wifi_output {
+        type filter hook output priority filter; policy accept;
+        # No restrictive rules at foundation tier.
+    }
+
+    # FORWARD chain — wifi-to-bridge / bridge-to-wifi forwarding. Default: drop.
+    # Foundation invariant: management wifi MUST NOT be a forwarding path. The
+    # bridge handles inspected segment forwarding (separate `bridge` family
+    # table); wifi is endpoint-only for this host.
+    chain wifi_forward {
+        type filter hook forward priority filter; policy accept;
+
+        # If either interface in the forward path is wifi, drop.
+        iifname @mgmt_ifaces drop
+        oifname @mgmt_ifaces drop
+    }
+}

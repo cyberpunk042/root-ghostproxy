@@ -1,0 +1,20 @@
+# /etc/systemd/network/40-ghostproxy-bridge-members.network
+# root-ghostproxy bridge MEMBER assignment — assigns 2 ethernet interfaces to gpbr0.
+# Deployed by /root/install.sh op_install_network_bridge (T013).
+#
+# IMPORTANT: this template uses MATCH PLACEHOLDERS that operator-customizes
+# OR install.sh substitutes via --bridge-member1 / --bridge-member2 flags.
+# Default match: any interface starting with "en" (typical ethernet naming).
+# Operator can override for hosts with different naming (e.g., eth0/eth1, ens33).
+
+[Match]
+# Match all "en*" ethernet interfaces by default; restrict via Name=<list>
+# in the install.sh substitution step (--bridge-member1 / --bridge-member2).
+Name=en*
+
+[Network]
+Bridge=gpbr0
+# Member interfaces have no IP — all traffic crosses through bridge
+LinkLocalAddressing=no
+DHCP=no
+IPv6AcceptRA=no

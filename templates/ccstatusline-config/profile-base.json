@@ -1,0 +1,28 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {"id": "B1-model",   "type": "model",               "color": "cyan", "bold": true},
+      {"id": "B1-sep1",    "type": "separator",           "character": "  ·  "},
+      {"id": "B1-ctxbar",  "type": "context-bar",         "color": "blue"},
+      {"id": "B1-sep2",    "type": "separator",           "character": "  "},
+      {"id": "B1-ctxpct",  "type": "context-percentage",  "color": "yellow"},
+      {"id": "B1-sep3",    "type": "separator",           "character": "  ·  "},
+      {"id": "B1-speed",   "type": "total-speed",         "color": "green"}
+    ],
+    [
+      {"id": "B2-sesusage",   "type": "session-usage",       "color": "magenta"},
+      {"id": "B2-sep1",       "type": "separator",           "character": "  ·  "},
+      {"id": "B2-weeklyusage","type": "weekly-usage",        "color": "magenta"},
+      {"id": "B2-sep2",       "type": "separator",           "character": "  ·  "},
+      {"id": "B2-blockreset", "type": "block-reset-timer",   "color": "brightBlack"},
+      {"id": "B2-sep3",       "type": "separator",           "character": "  ·  "},
+      {"id": "B2-weeklyreset","type": "weekly-reset-timer",  "color": "brightBlack"}
+    ]
+  ],
+  "flexMode": "full-minus-40",
+  "colorLevel": 2,
+  "globalBold": false,
+  "minimalistMode": false,
+  "powerline": {"enabled": false, "separators": [""], "separatorInvertBackground": [false], "startCaps": [], "endCaps": [], "autoAlign": false, "continueThemeAcrossLines": false}
+}

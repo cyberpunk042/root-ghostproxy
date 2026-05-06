@@ -1,0 +1,45 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {"id": "I1-mode",      "type": "custom-command", "color": "magenta",    "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-mode.sh",      "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "I1-sep1",      "type": "separator",      "character": "  ·  "},
+      {"id": "I1-task",      "type": "custom-command", "color": "brightCyan", "commandPath": "$HOME/.local/share/ccstatusline-widgets/selected-task.sh",  "rawValue": true, "timeout": 1000},
+      {"id": "I1-flex1",     "type": "flex-separator"},
+      {"id": "I1-stage",     "type": "custom-command", "color": "blue",       "commandPath": "$HOME/.local/share/ccstatusline-widgets/stage.sh",          "rawValue": true, "timeout": 1000},
+      {"id": "I1-sep2",      "type": "separator",      "character": "  ·  "},
+      {"id": "I1-readiness", "type": "custom-command", "color": "green",      "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-readiness.sh","rawValue": true, "timeout": 1000},
+      {"id": "I1-sep3",      "type": "separator",      "character": "  ·  "},
+      {"id": "I1-blockers",  "type": "custom-command", "color": "red",        "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-blockers.sh", "rawValue": true, "timeout": 1000}
+    ],
+    [
+      {"id": "I2-model",       "type": "model",              "color": "cyan", "bold": true},
+      {"id": "I2-sep1",        "type": "separator",          "character": "  ·  "},
+      {"id": "I2-ctxbar",      "type": "context-bar",        "color": "blue"},
+      {"id": "I2-sep2",        "type": "separator",          "character": "  "},
+      {"id": "I2-ctxpct",      "type": "context-percentage", "color": "yellow"},
+      {"id": "I2-flex1",       "type": "flex-separator"},
+      {"id": "I2-sesusage",    "type": "session-usage",      "color": "magenta"},
+      {"id": "I2-sep3",        "type": "separator",          "character": "  ·  "},
+      {"id": "I2-weeklyusage", "type": "weekly-usage",       "color": "magenta"},
+      {"id": "I2-sep4",        "type": "separator",          "character": "  ·  "},
+      {"id": "I2-blockreset",  "type": "block-reset-timer",  "color": "brightBlack"}
+    ],
+    [
+      {"id": "I3-branch",     "type": "git-branch",        "color": "magenta", "bold": true},
+      {"id": "I3-sep1",       "type": "separator",         "character": "  "},
+      {"id": "I3-status",     "type": "git-status",        "color": "yellow"},
+      {"id": "I3-sep2",       "type": "separator",         "character": "  "},
+      {"id": "I3-changes",    "type": "git-changes",       "color": "yellow"},
+      {"id": "I3-flex1",      "type": "flex-separator"},
+      {"id": "I3-compact",    "type": "compaction-counter","color": "yellow"},
+      {"id": "I3-sep3",       "type": "separator",         "character": "  ·  "},
+      {"id": "I3-cwd",        "type": "current-working-dir","color": "brightBlack"}
+    ]
+  ],
+  "flexMode": "full",
+  "colorLevel": 2,
+  "globalBold": false,
+  "minimalistMode": false,
+  "powerline": {"enabled": false, "separators": [""], "separatorInvertBackground": [false], "startCaps": [], "endCaps": [], "autoAlign": false, "continueThemeAcrossLines": false}
+}

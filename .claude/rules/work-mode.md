@@ -121,6 +121,21 @@ If the lifecycle component cannot be tested in real-session yet (e.g., session r
 
 This rule closes the meta-pattern that produced SB-091, the 12-iteration statusline cascade (2026-05-05): each iteration was "verified" against synthetic test inputs that the agent had constructed to match its (wrong) model of how Claude Code invokes statusLine, missing that real Claude Code behavior differed in env-var propagation, stdin shape, and cwd inheritance.
 
+### Post-operator-fix re-read requirement (extension — closes SB-112, 2026-05-06)
+
+When the operator **manually edits** files (settings.json, hook scripts, code) AND says it works ("finally", "good", operator-empirical confirmation), the agent's "fix landed" acknowledgment is **insufficient on its own**. The operator's confirmation establishes that the fix works; it does NOT establish that the agent UNDERSTANDS the working config. Without that understanding, future edits may break the working state because the agent doesn't know which fields/values are load-bearing.
+
+Required after any operator-manual-fix on shared config:
+
+1. **Re-read the post-fix files** to observe the actual ground-truth state.
+2. **Identify load-bearing details** — which fields/values are critical vs decorative, what differs from prior attempts, why the operator's choice works.
+3. **Document briefly** (in conversation or in tracker) so the working config is captured as ground truth.
+4. Only THEN claim closure or proceed to downstream edits.
+
+Pattern observed 2026-05-06: operator manually edited `settings.json` + `end-of-cycle-stamp.sh` for the Stop hook; agent acknowledged "fix landed. Standing by." without re-reading. Operator's correction surfaced the gap. Cousin to SB-091 (synthetic-as-verified) — both stem from "claim closure on internal model state, not on external evidence."
+
+The operator-empirical confirmation is one half of verification (the WHAT-works); the agent-re-read is the other half (the WHY-it-works). Both are needed before treating the fix as durable knowledge.
+
 ## Cross-references
 
 - Universal work-mode (canonical, second brain): `<second-brain>/.claude/rules/work-mode.md`

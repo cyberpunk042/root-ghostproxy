@@ -1,0 +1,15 @@
+# /etc/systemd/network/30-ghostproxy-bridge.network
+# root-ghostproxy bridge interface — no IP, just L2 forwarding.
+# Deployed by /root/install.sh op_install_network_bridge (T013).
+
+[Match]
+Name=gpbr0
+
+[Network]
+# Bridge is purely L2 — no IP address. Management IP lives on management
+# interface (e.g., wifi), not the bridge.
+LinkLocalAddressing=no
+DHCP=no
+# IPv6 router solicitations off — passive bridge does not advertise
+IPv6AcceptRA=no
+ConfigureWithoutCarrier=yes

@@ -1,0 +1,30 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {"id": "1", "type": "custom-command", "color": "cyan", "commandPath": "$HOME/.local/share/ccstatusline-widgets/selected-task.sh", "rawValue": true, "timeout": 1000},
+      {"id": "2", "type": "separator", "character": " · "},
+      {"id": "3", "type": "custom-command", "color": "blue", "commandPath": "$HOME/.local/share/ccstatusline-widgets/stage.sh", "rawValue": true, "timeout": 1000},
+      {"id": "4", "type": "separator", "character": " · "},
+      {"id": "5", "type": "custom-command", "color": "green", "commandPath": "$HOME/.local/share/ccstatusline-widgets/progress.sh", "rawValue": true, "timeout": 1000},
+      {"id": "6", "type": "separator", "character": " │ "},
+      {"id": "7", "type": "model", "color": "cyan"},
+      {"id": "8", "type": "separator", "character": " "},
+      {"id": "9", "type": "context-percentage", "color": "yellow"}
+    ],
+    [
+      {"id": "20", "type": "git-branch", "color": "magenta"},
+      {"id": "21", "type": "separator", "character": " "},
+      {"id": "22", "type": "git-status", "color": "yellow"},
+      {"id": "23", "type": "separator", "character": " │ "},
+      {"id": "24", "type": "block-reset-timer", "color": "brightBlack"},
+      {"id": "25", "type": "separator", "character": " · "},
+      {"id": "26", "type": "weekly-reset-timer", "color": "brightBlack"}
+    ]
+  ],
+  "flexMode": "full-minus-40",
+  "colorLevel": 2,
+  "globalBold": false,
+  "minimalistMode": false,
+  "powerline": {"enabled": false, "separators": [""], "separatorInvertBackground": [false], "startCaps": [], "endCaps": [], "autoAlign": false, "continueThemeAcrossLines": false}
+}

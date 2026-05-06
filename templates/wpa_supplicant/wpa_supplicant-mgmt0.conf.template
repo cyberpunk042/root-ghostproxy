@@ -1,0 +1,53 @@
+# /etc/wpa_supplicant/wpa_supplicant-mgmt0.conf — TEMPLATE, operator-fills
+#
+# Deployed by /root/install.sh op_install_management_wifi.
+# Activated by `wpa_supplicant@mgmt0.service` (systemd template unit).
+#
+# Operator-config required: SSID + PSK MUST be filled in by operator BEFORE
+# wpa_supplicant starts. install.sh deploys this template with placeholders;
+# operator edits in place OR provides values via env/flag (future enhancement).
+#
+# Reference (Debian-style template service):
+#   systemctl enable wpa_supplicant@mgmt0.service
+#   systemctl start wpa_supplicant@mgmt0.service
+#
+# The interface name `mgmt0` is conventional but renames are allowed. If the
+# host's wifi adapter is e.g. wlan0, the operator can either:
+#   (a) Rename the interface via systemd .link file
+#       (/etc/systemd/network/10-mgmt0.link — sets MAC-based predictable name),
+#   (b) Or re-deploy this file as wpa_supplicant-wlan0.conf and update the
+#       systemd service instance accordingly.
+#
+# Outbound-only constraint is enforced at the firewall layer (nftables —
+# /etc/nftables.d/management-wifi-outbound-only.nft), not in wpa_supplicant
+# itself. wpa_supplicant just establishes the L2 association; layer 3+
+# inbound restrictions are nftables' job.
+
+ctrl_interface=DIR=/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=__COUNTRY_CODE__   # ISO 3166-1 alpha-2 (e.g., US, FR, DE) — operator fills
+ap_scan=1
+
+network={
+    # OPERATOR-FILL: replace placeholders below with the management network's
+    # SSID and PSK. PSK can be a passphrase (8-63 chars) or a 64-hex-digit
+    # pre-shared key. Use `wpa_passphrase <ssid> <passphrase>` to compute the
+    # hex-PSK form (recommended — passphrase isn't stored on disk in cleartext).
+    ssid="__OPERATOR_SSID__"
+    psk="__OPERATOR_PSK_OR_HEX__"
+
+    # Security parameters — sane modern defaults. Operator may need to relax
+    # for legacy networks (rare — most modern wifi is WPA2 or WPA3).
+    key_mgmt=WPA-PSK WPA-PSK-SHA256 SAE
+    pairwise=CCMP
+    group=CCMP
+    proto=RSN
+
+    # Connection priority — higher number wins when multiple `network={}`
+    # blocks are configured. This template is a single-network base; operator
+    # may add additional blocks (e.g., backup SSID) with different priorities.
+    priority=10
+
+    # Auto-connect on driver up.
+    disabled=0
+}

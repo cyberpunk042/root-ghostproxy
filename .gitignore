@@ -258,7 +258,40 @@ id_dsa.*
 !/tools/*.py
 
 # ---------------------------------------------------------------------------
-# Whitelist /templates/ — config + widget templates referenced by modules.
+# Whitelist /templates/ — config + widget templates referenced by install.sh
+# operations + modules. Whitelist files explicitly per subdir (deny-then-allow
+# per the .gitignore convention used elsewhere in this file). Bug fix
+# 2026-05-06: prior `!/templates/ + /templates/**` blanket-denied all contents,
+# resulting in zero tracked template files — install.sh would fail on fresh
+# checkout because referenced templates didn't exist.
 # ---------------------------------------------------------------------------
 !/templates/
-/templates/**
+/templates/*
+
+# ccstatusline config (profile JSONs + wrapper + switcher)
+!/templates/ccstatusline-config/
+/templates/ccstatusline-config/*
+!/templates/ccstatusline-config/*.json
+!/templates/ccstatusline-config/*.sh
+
+# ccstatusline custom widgets
+!/templates/ccstatusline-widgets/
+/templates/ccstatusline-widgets/*
+!/templates/ccstatusline-widgets/*.sh
+
+# systemd-networkd bridge config (.netdev, .network units)
+!/templates/systemd-networkd/
+/templates/systemd-networkd/*
+!/templates/systemd-networkd/*.netdev
+!/templates/systemd-networkd/*.network
+
+# nftables rulesets (.nft)
+!/templates/nftables/
+/templates/nftables/*
+!/templates/nftables/*.nft
+
+# wpa_supplicant config templates (*.template — operator-fills SSID/PSK)
+!/templates/wpa_supplicant/
+/templates/wpa_supplicant/*
+!/templates/wpa_supplicant/*.template
+!/templates/wpa_supplicant/*.conf

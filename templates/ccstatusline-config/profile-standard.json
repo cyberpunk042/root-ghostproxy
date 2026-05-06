@@ -1,0 +1,26 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {"id": "1", "type": "model", "color": "cyan"},
+      {"id": "2", "type": "separator", "character": " │ "},
+      {"id": "3", "type": "context-bar", "color": "blue"},
+      {"id": "4", "type": "separator", "character": " "},
+      {"id": "5", "type": "context-percentage", "color": "yellow"},
+      {"id": "6", "type": "separator", "character": " │ "},
+      {"id": "7", "type": "total-speed", "color": "green"}
+    ],
+    [
+      {"id": "10", "type": "session-usage", "color": "magenta"},
+      {"id": "11", "type": "separator", "character": " · "},
+      {"id": "12", "type": "weekly-usage", "color": "magenta"},
+      {"id": "13", "type": "separator", "character": " │ "},
+      {"id": "14", "type": "block-reset-timer", "color": "brightBlack"}
+    ]
+  ],
+  "flexMode": "full-minus-40",
+  "colorLevel": 2,
+  "globalBold": false,
+  "minimalistMode": false,
+  "powerline": {"enabled": false, "separators": [""], "separatorInvertBackground": [false], "startCaps": [], "endCaps": [], "autoAlign": false, "continueThemeAcrossLines": false}
+}

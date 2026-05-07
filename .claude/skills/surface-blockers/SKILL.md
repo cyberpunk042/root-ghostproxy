@@ -45,3 +45,19 @@ When triggered:
 ## Composition
 
 This skill primarily INVOKES `/blockers`. The slash command is the deterministic surface; this skill is the natural-language shim that handles when the operator phrases the request as prose.
+
+## Cross-references
+
+- **Canonical skills index**: [`.claude/skills/README.md`](../README.md) (DRAFT v1, agent-authored 2026-05-06; 2 skills committed in this project)
+- **Trigger mechanism**: description-match auto-trigger (~70-95% determinism per [`.claude/rules/trigger-model.md`](../../rules/trigger-model.md)); harness analyzes operator prose, selects this skill when description-match wins, invokes the body via the Skill tool dispatch
+- **Routes to deterministic**: this skill INVOKES [`/blockers`](../../commands/blockers.md) (100% deterministic on invoke; reads `wiki/governance/blockers.md` + cross-checks via `tools.blockers`); skill provides the auto-trigger layer atop the deterministic command
+- **Operator-verbatim sacrosanct directive 2026-05-05** (preserved at Discipline section line 41): *"I dont receive dumb questions too"* — the discipline rule is binding: surface blockers WITH FULL CONTEXT (decision-package format per SB-071), not bare "there are 6 pending decisions"
+- **Decision-package format dependency**: [`/blockers`](../../commands/blockers.md) emits CONTEXT + GUIDANCE + RECOMMEND + ALTERNATIVES + TO-ANSWER per SB-071; this skill must surface ENOUGH context that operator can answer without follow-up clarification
+- **Sacrosanct quoting**: per [`.claude/rules/words-are-sacrosanct.md`](../../rules/words-are-sacrosanct.md) — quote blockers.md content faithfully; never paraphrase the substance of operator-pending decisions
+- **Companion skill**: [`surface-state`](../surface-state/SKILL.md) (auto-trigger on "where are we" / "current state" prose; routes to [`/orient`](../../commands/orient.md))
+- **Companion governance commands** (sister mechanisms): [`/blockers`](../../commands/blockers.md) (the deterministic target) · [`/decisions`](../../commands/decisions.md) (audit trail of resolutions) · [`/progress`](../../commands/progress.md) (journey view)
+- **PM mode parallel**: [`/.claude/modes/pm-scrum-master.md`](../../modes/pm-scrum-master.md) — PM mode `/cycle` step 3 surfaces blockers in DECISION PACKAGE format; this skill is the prose-friendly auto-trigger equivalent
+- **Description-match contract**: the description field is LOAD-BEARING; the explicit Do-NOT-trigger list (`/blockers` literal · "what is T011" · "what's blocking T032") prevents conflation with task-page lookups vs governance register
+- **`/install-agent-brain` propagation**: this skill deploys to sister projects via [`/install-agent-brain`](../../commands/install-agent-brain.md) per operator-opt-in
+- **M-E001-1 productive-cycle action vocabulary**: this skill's downstream `/blockers` emits **`blocker-surface`** action type per Hard Rule 14
+- **Brain-improvement mandate**: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

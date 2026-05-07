@@ -42,3 +42,16 @@ When triggered:
 ## Composition
 
 This skill primarily INVOKES `/orient` then layers the prose-friendly answer on top. The slash command is the deterministic load; this skill is the natural-language shim.
+
+## Cross-references
+
+- **Canonical skills index**: [`.claude/skills/README.md`](../README.md) (DRAFT v1, agent-authored 2026-05-06; 2 skills committed in this project)
+- **Trigger mechanism**: description-match auto-trigger (~70-95% determinism per [`.claude/rules/trigger-model.md`](../../rules/trigger-model.md)); harness analyzes operator prose, selects this skill when description-match wins, invokes the body via the Skill tool dispatch
+- **Routes to deterministic**: this skill INVOKES [`/orient`](../../commands/orient.md) (100% deterministic 21-step intel-gathering chain); skill provides the auto-trigger layer atop the deterministic command
+- **Conflation lesson** (sacrosanct discipline): bare prose `continue` / `resume` / `where are we` is conversational language; the deterministic chain at the end of /orient should NOT be re-run on bare prose if /orient already loaded fresh recently — use the prose-friendly summary from already-loaded context. See `<second-brain>/raw/notes/2026-05-04-rename-continue-conflation-bug-and-similar-conflations.md`.
+- **Companion skill**: [`surface-blockers`](../surface-blockers/SKILL.md) (auto-trigger on "what's blocking" / "what needs my input" prose; routes to [`/blockers`](../../commands/blockers.md))
+- **Description-match contract**: the description field is LOAD-BEARING per Claude Code's description-match dispatch — vague descriptions produce false-positives (auto-fires too often) or false-negatives (never fires). The 8 example trigger phrases + the explicit Do-NOT-trigger list are the contract; modify only with operator approval.
+- **Companion modes** (parallel mechanism for state-surfacing): [`/.claude/modes/pm-scrum-master.md`](../../modes/pm-scrum-master.md) — mode-set-durable persona shifts the agent's lens; this skill is ephemeral auto-trigger
+- **`/install-agent-brain` propagation**: this skill deploys to sister projects via [`/install-agent-brain`](../../commands/install-agent-brain.md) per operator-opt-in
+- **M-E001-1 productive-cycle action vocabulary**: this skill's downstream `/orient` emits **`read-only-audit`** action type per Hard Rule 14
+- **Brain-improvement mandate**: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

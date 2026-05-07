@@ -1,13 +1,13 @@
 ---
 title: "T067 — Highlight changed rows in stamp render when state-delta detected (extends SB-136 hash-based diff suppression)"
 type: task
-status: not-started
+status: in-progress
 priority: P3
 parent_blocker: "SB-116"
-current_stage: document
-readiness: 0
+current_stage: implement
+readiness: 83
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-07
 tags: [agent-drafted, m-e002-1-create-verb]
 ---
 
@@ -41,11 +41,11 @@ Suggested default: **(a) + (b)** — per-row hash cache + opt-in flag. (c) is a 
 
 ## Done When
 
-- [ ] Per-row hash cache wired in `end-of-cycle-stamp.sh` (extends `/tmp/.end-of-cycle-stamp-last-hash` to JSON-keyed)
-- [ ] `tools.cycle --highlight-deltas` flag added; reads cache + emits per-row delta markers
-- [ ] Stamp config schema extended: `highlight_deltas` field (bool, default false)
-- [ ] `/stamp-deltas-on` / `/stamp-deltas-off` slash commands (parallel to existing /stamp-* pattern)
-- [ ] Regression tests added to `test-end-of-cycle-stamp-diff-suppression.py`: cache write + per-row diff detection + delta-marker render
+- [x] Per-row hash cache wired in `end-of-cycle-stamp.sh` (extends `/tmp/.end-of-cycle-stamp-last-hash` to JSON-keyed) — landed prior session
+- [x] `tools.cycle --highlight-deltas` flag added; reads cache + emits per-row delta markers — landed prior session
+- [x] Stamp config schema extended: `highlight_deltas` field (bool, default false) — **landed 2026-05-07 (autopilot fire 28)**: `~/.claude/stamp-config.json` gained `"highlight_deltas": false` + `tools/stamp.py` extended with `--highlight-deltas {true,false}` flag in `configure` verb; round-trip smoke-test PASS
+- [x] `/stamp-deltas-on` / `/stamp-deltas-off` slash commands (parallel to existing /stamp-* pattern) — **landed 2026-05-07 (autopilot fire 29)**: both .md command files authored at `.claude/commands/`; both visible in Claude Code skill discovery
+- [x] Regression tests added to `test-end-of-cycle-stamp-diff-suppression.py`: cache write + per-row diff detection + delta-marker render — landed prior session (22/22 PASS)
 - [ ] Operator-empirical: real session run shows changed rows visibly highlighted on next-fire after state mutation
 
 ## Dependencies

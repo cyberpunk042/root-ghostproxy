@@ -1072,7 +1072,7 @@ op_install_integrity_sentinel() {
     # Build a JSON object of {path: sha256} pairs. Use python3 if available
     # (handles JSON quoting cleanly); fall back to manual jq-free emit.
     local tmp; tmp=$(mktemp -t rgp-integrity.XXXXXX.json)
-    trap 'rm -f "${tmp}"' RETURN
+    trap 'rm -f "${tmp:-}"' RETURN
 
     if command -v python3 >/dev/null 2>&1; then
         python3 - "${files_to_hash[@]}" >"${tmp}" <<'PYEOF'
@@ -1901,7 +1901,11 @@ main() {
     [[ "${WITH_CCSTATUSLINE}" == "1" ]] && op_install_ccstatusline           || log_info "skip: ccstatusline (per profile/toggle — Features tier)"
     op_verify
 
-    log_info "${SCRIPT_NAME} done${DRY_RUN:+ (dry-run; no state changes)}"
+    if [[ "${DRY_RUN:-0}" -eq 1 ]]; then
+        log_info "${SCRIPT_NAME} done (dry-run; no state changes)"
+    else
+        log_info "${SCRIPT_NAME} done"
+    fi
 }
 
 main "$@"

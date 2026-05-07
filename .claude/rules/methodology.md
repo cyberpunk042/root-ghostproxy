@@ -54,7 +54,7 @@ Per [tools/README.md](../../tools/README.md) the 15 Python tools at `$HOME/tools
 - `tools.progress` refreshes `wiki/governance/progress.md` callout from live state
 - `tools.decisions` manages logbook (40 entries D001-D040)
 - `tools.blockers` surfaces operator-decision-pending in DECISION PACKAGE format (per SB-071)
-- `tools.run-tests` is the **canonical verifier for `verified-edit` action type** (per Hard Rule 14 / M-E001-1 vocabulary type 2) — 13 test files / 215/234 aggregate as of 2026-05-06 evening
+- `tools.run-tests` is the **canonical verifier for `verified-edit` action type** (per Hard Rule 14 / M-E001-1 vocabulary type 2) — 14 test files / 305/305 aggregate (empirically verified 2026-05-07; growth from 215/234 across 13 files 2026-05-06 evening reflects test-agent-output-scan.py addition + 3 prior partial-failures closed)
 
 ## Cross-references
 

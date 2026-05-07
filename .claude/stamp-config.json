@@ -1,5 +1,6 @@
 {
   "layout": "horizontal",
   "enabled": "auto",
-  "density": "standard"
+  "density": "standard",
+  "highlight_deltas": false
 }

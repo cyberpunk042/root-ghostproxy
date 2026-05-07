@@ -283,6 +283,11 @@
             "type": "command",
             "command": "python3 $HOME/.claude/hooks/end-of-cycle-stamp.sh",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/agent-output-scan.sh",
+            "timeout": 5
           }
         ]
       }

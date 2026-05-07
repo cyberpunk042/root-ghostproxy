@@ -49,11 +49,13 @@ DEFAULT_CONFIG: dict = {
     "layout": "vertical",
     "enabled": "auto",
     "density": "standard",
+    "highlight_deltas": False,
 }
 
 VALID_LAYOUTS = {"horizontal", "vertical"}
 VALID_ENABLED = {"on", "off", "auto"}
 VALID_DENSITY = {"minified", "standard", "extended"}
+VALID_HIGHLIGHT_DELTAS = {"true", "false"}  # CLI string form; coerced to bool in cmd_set
 
 
 def load_config() -> dict:
@@ -104,6 +106,14 @@ def cmd_set(args: argparse.Namespace) -> int:
         if cfg.get("density") != args.density:
             cfg["density"] = args.density
             changed.append(f"density → {args.density}")
+    if getattr(args, "highlight_deltas", None) is not None:
+        if args.highlight_deltas not in VALID_HIGHLIGHT_DELTAS:
+            print(f"ERROR: --highlight-deltas must be one of {sorted(VALID_HIGHLIGHT_DELTAS)}", file=sys.stderr)
+            return 2
+        new_val = args.highlight_deltas == "true"
+        if cfg.get("highlight_deltas") != new_val:
+            cfg["highlight_deltas"] = new_val
+            changed.append(f"highlight_deltas → {new_val}")
     save_config(cfg)
     if changed:
         print(f"OK: stamp config updated ({', '.join(changed)}) at {CONFIG_PATH}")
@@ -142,6 +152,7 @@ def main() -> int:
     p_set.add_argument("--layout", choices=sorted(VALID_LAYOUTS))
     p_set.add_argument("--enabled", choices=sorted(VALID_ENABLED))
     p_set.add_argument("--density", choices=sorted(VALID_DENSITY))
+    p_set.add_argument("--highlight-deltas", choices=sorted(VALID_HIGHLIGHT_DELTAS), help="enable per-row delta highlighting (T067)")
     p_set.set_defaults(func=cmd_set)
 
     p_show = sub.add_parser("show", help="show current config")

@@ -40,7 +40,7 @@ Per [`.claude/rules/trigger-model.md`](trigger-model.md) the unified signal→ac
 | `"per-project install"` / `"deploy agent brain"` | Sister-project agent-brain deploy | `install.sh --profile project --dest <path>` OR `/install-agent-brain <path>` |
 | `"verify state"` / `"verify install"` | Read-only drift detection (16+ checks) | `install.sh --check` |
 | `"audit"` / `"10-step integrity check"` | yamls + hooks + blockers + decisions + state files | `/audit` |
-| `"run regression tests"` / `"verified-edit"` (Hard Rule 14) | Unified runner across 13 test files | `python3 -m tools.run-tests` (215/234 aggregate) |
+| `"run regression tests"` / `"verified-edit"` (Hard Rule 14) | Unified runner across 14 test files (empirically verified 2026-05-07) | `python3 -m tools.run-tests` (305/305 aggregate; was 215/234 across 13 files 2026-05-06 evening) |
 | `"status"` / `"what's next"` | Show SFIF stage + active mission/focus/impediment + priorities + pending-decision tasks | CONTEXT.md (Active Objective Layer + SFIF + Operator-Pending Decisions tables) |
 | `"add Suricata"` / `"PolarProxy"` | M005 territory; check ordering against ccstatusline (M011 ordered before M005) | M005 / M011 module pages |
 | `"connect to second brain"` | M007 — `tools.setup --connect-project $HOME --dry-run` first | M007 task pages T038-T043 |

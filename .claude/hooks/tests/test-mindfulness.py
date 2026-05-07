@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # Regression tests for $HOME/.claude/hooks/mindfulness.sh
 #
-# Per SB-126 (mindfulness baseline hook). Verifies: 4-clause reminder
-# (one-notch / confirm-don't-construct / artifacts-flagged / forward-not-freeze),
-# silence when no active-mode, cross-fire prevention.
+# Per SB-126 (mindfulness baseline hook). DRAFT v5 per SB-140+SB-141+SB-142.
+# 10-clause reminder (1 one-notch / 2 premise / 3 artifacts / 4 forward / 5 priority
+# / 6 substance / 7 not-blocked-when-unblocked / 8 no-self-imposed-false-gates /
+# 9 verification-appropriate / 10 phantom-invocation-verification).
+# Silence when no active-mode; cross-fire prevention.
 #
 # Run: python3 $HOME/.claude/hooks/tests/test-mindfulness.py
 
@@ -70,15 +72,24 @@ if out.strip():
         expect("clause 6 — substance-per-cycle", "substance" in ctx)
         expect("clause 7 — not-blocked-when-unblocked + chain-operations (SB-131)",
                "not-blocked-when-unblocked" in ctx and "chain" in ctx)
+        expect("clause 8 — no-self-imposed-false-gates (SB-140)",
+               "no-self-imposed-false-gates" in ctx and "PROJECT-LAYER" in ctx)
+        expect("clause 9 — verification-appropriate per edit-type (SB-141)",
+               "verification-appropriate" in ctx and "edit type" in ctx)
+        expect("clause 10 — phantom-invocation-verification (SB-142)",
+               "phantom-invocation-verification" in ctx and "skill-block" in ctx)
         # MUST/MUST NOT binary format per second-brain context-engineering standard
-        expect("uses MUST format (≥6 occurrences)", ctx.count("MUST ") >= 6)
-        expect("uses MUST NOT format (≥3 occurrences)", ctx.count("MUST NOT") >= 3)
+        expect("uses MUST format (≥9 occurrences — 10 clauses)", ctx.count("MUST ") >= 9)
+        expect("uses MUST NOT format (≥6 occurrences)", ctx.count("MUST NOT") >= 6)
         # SB cross-references
         expect("references SB-082/093 (pendulum)", "SB-082" in ctx or "SB-093" in ctx)
         expect("references SB-090 (premise)", "SB-090" in ctx)
         expect("references SB-095 (artifacts)", "SB-095" in ctx)
         expect("references SB-099 (freeze)", "SB-099" in ctx)
         expect("references SB-128 (priority/substance)", "SB-128" in ctx)
+        expect("references SB-140 (frozen-loop)", "SB-140" in ctx)
+        expect("references SB-141 (verification-appropriate)", "SB-141" in ctx)
+        expect("references SB-142 (phantom-invocation)", "SB-142" in ctx)
     except json.JSONDecodeError as e:
         expect("valid JSON parse", False, repr(e))
 

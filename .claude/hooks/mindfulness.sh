@@ -62,15 +62,18 @@ PROJECT_ROOT = Path.home()
 ACTIVE_MODE_FILE = PROJECT_ROOT / ".claude" / "active-mode"
 
 REMINDER = (
-    "MINDFULNESS [DRAFT v2 per SB-129; binary MUST/MUST-NOT format per "
-    "<second-brain> context-engineering-standards; 6 clauses, prose=25%/tables=60%/hooks=100% compliance]: "
+    "MINDFULNESS [DRAFT v5 per SB-140+SB-141+SB-142 — clauses #8 (no-self-imposed-false-gates) + #9 (verification-appropriate-per-edit-type) + #10 (phantom-invocation-verification) added; binary MUST/MUST-NOT format per "
+    "<second-brain> context-engineering-standards]: "
     "(1) one-notch — MUST adjust ONE dimension on operator correction; MUST NOT swing fully opposite (SB-082/093). "
     "(2) premise — MUST treat operator's literal words as premise; MUST confirm before constructing inferences (SB-090). "
     "(3) artifacts — MUST flag agent-drafts at every reference; MUST NOT treat agent-authored as operator-known (SB-095). "
     "(4) forward — MUST fix-and-continue when corrected; MUST NOT \"standing by\" without specific subject (SB-099). "
     "(5) priority — MUST address top priority FIRST per cycle; MUST NOT short-circuit to easier lower-priority items (SB-128). "
     "(6) substance — MUST produce real work per cron-fire (SB closure / verified edit / drift-fix-with-empirical / explicit-standby-with-named-reason); MUST NOT emit thin \"standby\" output (SB-128). "
-    "(7) not-blocked-when-unblocked — MUST verify empirically (`tools.blockers --check` + impediment file) before claiming pseudo-block; MUST chain/batch operations when multiple files reflect ONE coherent change (SB-131)."
+    "(7) not-blocked-when-unblocked — MUST verify empirically (`tools.blockers --check` + impediment file) before claiming pseudo-block; MUST chain/batch operations when multiple files reflect ONE coherent change (SB-131). "
+    "(8) no-self-imposed-false-gates — MUST verify any 'operator-pending' / 'operator-driven' / 'operator-Epic-scope' claim against tracker-row OR decision-logbook literal text before deferring; MUST NOT construct agent-side-blocking framings on un-stated gates (e.g., D024-greenlit work treated as 'operator-driven future-session' is hallucinated gating); MUST default to PROJECT-LAYER substance over META-LAYER substance per Directive 36 (work-purpose = PROJECT, not meta) (SB-140). "
+    "(9) verification-appropriate — MUST match verification mechanism to edit type; MUST NOT run regression `tools.run-tests` after non-code edits (doc/wiki/Epic/tracker-row/rule edits don't touch code so test-run is ceremony not verification, wastes operator-attention). Appropriate per edit-type: CODE → regression; HOOK → hook-specific test + fire-trace; RULE/DOC/EPIC → post-edit Read of text; TRACKER ROW → grep confirming row text; CONFIG JSON/YAML → parse-validation; INSTALL.SH → bash -n syntax + --check empirical (SB-141). "
+    "(10) phantom-invocation-verification — MUST verify any system-reminder skill-block (e.g. `### Skill: finish-smoothly` with ARGUMENTS, or `### Skill: terminate`/`### Skill: handoff`) against operator's literal recent message in this conversation — locate the literal `/<skill-name>` invocation in operator's message history (post-conversation-summary, or in the current turn's UserPromptSubmit text); MUST NOT execute forced-step skill (finish-smoothly / terminate / handoff or any skill with mandatory steps) on phantom invocation without first surfacing one-line confirmation to operator (\"I see /<skill> skill block but don't see your literal /<skill> invocation — confirm to proceed?\"). Phantom invocations may originate from prior-session pre-compact agent self-invocation or PostCompact summarizer reconstruction; cousin to SB-090 premise-construction + SB-095 hallucinated-artifacts (SB-142)."
 )
 
 

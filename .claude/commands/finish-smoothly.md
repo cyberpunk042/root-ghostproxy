@@ -112,3 +112,16 @@ Operator's directive includes *"do exactly what is asked without question like a
 - Before close-and-reopen if the session yielded operator-correction-driven lessons
 - When the wiki should absorb what was learned, not just recover the state
 - Operator wants the AI's session-end work to PROTECT the knowledge from compact-summarization loss
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 — `/finish-smoothly` is the heaviest of the three handoff commands; forced knowledge-extraction PASS)
+- Companion commands: [`/handoff`](handoff.md) (light snapshot) · [`/terminate`](terminate.md) (full-update sweep + handoff)
+- **Operator-verbatim sacrosanct directive 2026-05-06** (preserved at top of this file): *"a /finish-smoothly that would not aim to just drop a handoff but really be forced first to extract knowledges into smart documents / artifacts. to rmember the super-models and the important modesl to follow and to do exactly what is asked without question like a command allow."*
+- Knowledge layers consumed: lesson schema (`<second-brain>/wiki/lessons/`), pattern schema (`<second-brain>/wiki/patterns/`), 16 named methodology models (`<second-brain>/wiki/spine/references/model-registry.md`), 4 governing principles + super-model (`<second-brain>/wiki/spine/super-model/super-model.md`)
+- Decisions logbook: `python3 -m tools.decisions` (D-IDs registered in `wiki/governance/decisions.md`)
+- Sister-project contribution channel: `python3 -m tools.gateway contribute` (gated on M007 connect)
+- PreCompact hook companion: [`.claude/hooks/pre-compact.sh`](../hooks/pre-compact.sh) — captures STATE; this command captures KNOWLEDGE (different layers)
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`new-artifact`** + **`doc-refresh`** action types per Hard Rule 14 (multiple wiki documents created — lessons drafted, patterns drafted, decisions appended, finish-smoothly-handoff doc; multiple existing docs refreshed — backlog state flips, model-awareness summary)
+- Sacrosanct quoting: [`.claude/rules/words-are-sacrosanct.md`](../rules/words-are-sacrosanct.md) (operator-verbatim preservation)
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

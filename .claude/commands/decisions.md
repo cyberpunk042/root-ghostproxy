@@ -43,3 +43,15 @@ When operator asks to record a new decision (e.g., "/decisions append: I picked 
 - When asked "what was the rationale for X" — find the D### + present the rationale + operator-verbatim
 - When asked "is X reversible" — find the D### + present the reversibility field
 - When asked "what depends on D###" — search `decisions.md` for downstream chains + `progress.md` for active state
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 governance — `/decisions` is the audit-trail surface)
+- Companion governance commands: [`/blockers`](blockers.md) (decision queue) · [`/progress`](progress.md) (journey view) · [`/log`](log.md) (verbatim operator-directive log; precedes a decision)
+- Backed by tool: [`tools/decisions.py`](../../tools/decisions.py) — list / get / append / verify subcommands
+- Register file: [`wiki/governance/decisions.md`](../../wiki/governance/decisions.md) — sole source of truth for D### IDs (D001-D040 active 2026-05-06)
+- Sister-tool linkage: every D### typically links a B### via `--linked-blocker B001`; resolving B003 should NOT happen without appending the corresponding D### per governance discipline
+- Sacrosanct quoting: [`.claude/rules/words-are-sacrosanct.md`](../rules/words-are-sacrosanct.md) — operator-verbatim field per D### entry is binding
+- Reversibility tier (locked / partial / fully-reversible) per [`.claude/rules/operating-principles.md`](../rules/operating-principles.md) #2 (always flexible — most decisions fully-reversible by default)
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`read-only-audit`** action type (default invocation) OR **`operator-directive-register`** action type (`/decisions append <decision>` invocation) per Hard Rule 14
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

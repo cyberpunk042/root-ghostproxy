@@ -21,3 +21,11 @@ Tier mapping reference (current naming → use-case):
 - `intermediary` — t3 work tier (3 lines, mid-AIDLC)
 - `full-aidlc` — t4 planning tier (3 lines, full AIDLC)
 - `aidlc-stamp-full` — t5 review tier (4 lines, full + objective + audit)
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 — `/statusline-list` is the read-only profile-enumerator)
+- Companion statusline commands: 7 profile-switch + 2 narrow variants per tier ladder; meta commands [`/statusline-status`](statusline-status.md) (read active) · [`/statusline-switch`](statusline-switch.md) (named-tier dispatch)
+- Backed by script: `/root/.config/ccstatusline/switch-profile.sh list`
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`read-only-audit`** action type per Hard Rule 14
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

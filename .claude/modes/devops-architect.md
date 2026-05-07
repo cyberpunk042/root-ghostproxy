@@ -125,3 +125,21 @@ Architect mode loop self-evaluates each cycle for autonomous cancellation/pause 
 - **L7 — Pre-compact**: pause around compaction events.
 
 Architect mode is generally LESS prone to autonomous cancellation than PM mode because design + spec + scaffold work can proceed in parallel with PM-pending decisions (you can author a design even while waiting for the operator's "Suricata-first vs PolarProxy-first" decision; just don't ship implementation that depends on the choice).
+
+## Cross-references
+
+- **Canonical mode index**: [`.claude/modes/README.md`](README.md) — 3 modes with cycle-sequence comparison + persona-voice-table runtime-parse contract
+- **Mode entry/exit commands**: [`/mode-architect`](../commands/mode-architect.md) (this mode) · [`/mode-pm`](../commands/mode-pm.md) (PM lens) · [`/mode-dual`](../commands/mode-dual.md) (both lenses) · [`/mode-clear`](../commands/mode-clear.md) · [`/mode-status`](../commands/mode-status.md)
+- **Cycle composition**: [`/cycle`](../commands/cycle.md) — reads `$HOME/.claude/active-mode` each fire; dispatches the Architect cycle sequence (steps 1-7 above per SB-066 top-down + bottom-up)
+- **Mode-enforcement hook** (runtime injection): [`.claude/hooks/mode-enforcement.sh`](../hooks/mode-enforcement.sh) — UserPromptSubmit; dynamic parser extracts persona + voice table + cycle sequence + state into per-prompt banner
+- **Mindfulness baseline hook**: [`.claude/hooks/mindfulness.sh`](../hooks/mindfulness.sh) — clause #6 substance-per-cycle gate (Architect cycle's step 7 wait must emit one of 6 categories)
+- **Companion modes**: [`pm-scrum-master.md`](pm-scrum-master.md) (PM lens — switch when decision-tracking dominates) · [`dual-expert.md`](dual-expert.md) (both lenses simultaneously)
+- **Methodology engine** (read each cycle for stage-gate awareness): [`.claude/rules/methodology.md`](../rules/methodology.md) + [`wiki/config/methodology.yaml`](../../wiki/config/methodology.yaml) — 5 stages × ALLOWED/FORBIDDEN per stage; Architect cycle MUST honor stage boundaries
+- **Hook architecture**: [`.claude/rules/hook-architecture.md`](../rules/hook-architecture.md) — Architect mode owns hook authoring + refinement (M003 T-M003-7); 3-component design pattern (insertion + reason + remediation) is binding
+- **Backing tools**: [`tools/run-tests.py`](../../tools/run-tests.py) (canonical verifier for `verified-edit` action type per Hard Rule 14 — 13 test files / 215/234 aggregate as of 2026-05-06) · [`tools/progress.py`](../../tools/progress.py) (stage readiness) · [`tools/cycle.py`](../../tools/cycle.py)
+- **Audit gate**: [`/audit`](../commands/audit.md) — 12-step deterministic check; Architect mode reads its output to drive bottom-up bug-fix work
+- **Persona-voice DRAFT v1** (SB-129): structural-engineering compliance per `<second-brain>/wiki/spine/standards/model-standards/model-context-engineering-standards.md`
+- **Architect-cycle action vocabulary subset** per Hard Rule 14: Architect cycle most commonly emits `verified-edit` (step 3 bottom-up code changes + tests) · `sb-closure` (step 3 hook-refinement / parser bugs) · `drift-fix-with-empirical` (step 6 reconciliation) · `new-artifact` (step 2 ADR / design-doc authoring) · `doc-refresh` (architecture-staleness fix) · `explicit-standby-with-named-reason` (step 7 when stage-gate blocks)
+- **Iterative evolution pathway** (per `.claude/rules/iterative-evolution-pathway.md`): Architect lens drives Dimension 2 (stage-gate progression) + Dimension 3 (lens synergy with PM hand-off)
+- **Brain-inheritance**: per [`.claude/rules/self-reference.md`](../rules/self-reference.md) — Architect-authored operational tooling (hooks, install.sh patterns, tools/) is candidate for sister-project inheritance via `/install-agent-brain`
+- **Brain-improvement mandate**: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

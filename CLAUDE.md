@@ -176,7 +176,7 @@ For high-impact changes (anything touching the foundation, the modules, the meth
 | Slash commands (43 commands by category — empirically verified 2026-05-06) | [.claude/commands/README.md](.claude/commands/README.md) |
 | Hooks (18 hook scripts; 10 wired + archive) | [.claude/hooks/README.md](.claude/hooks/README.md) |
 | Modes (3 modes + cycle-sequence comparison) | [.claude/modes/README.md](.claude/modes/README.md) |
-| Rules (11 rules + strictness-tier matrix) | [.claude/rules/README.md](.claude/rules/README.md) |
+| Rules (12 rules + strictness-tier matrix — empirically verified 2026-05-06) | [.claude/rules/README.md](.claude/rules/README.md) |
 | Subagents (3 brain-loaded subagents) | [.claude/agents/README.md](.claude/agents/README.md) |
 | Skills (2 skills + mechanism-choice context) | [.claude/skills/README.md](.claude/skills/README.md) |
 | Templates (5 install template categories) | [templates/README.md](templates/README.md) |
@@ -234,6 +234,7 @@ Topic-specific rules loaded when work touches their domain. Per Claude Code conv
 | [.claude/rules/context-engineering.md](.claude/rules/context-engineering.md) | Designing how an agent gets context (auto/pre/on-demand/facultative injection); enriching frontmatter for tool empowerment |
 | [.claude/rules/trigger-model.md](.claude/rules/trigger-model.md) | Designing or debugging anything that fires on a signal: hooks, slash commands, skills, modes, tools, MCP, scheduled tasks, sub-agents — unified signal→action→recovery model |
 | [.claude/rules/compound-and-waterfall.md](.claude/rules/compound-and-waterfall.md) | Designing how state, context, hooks, or directives layer (compound axis = additive coexistence) or flow event-to-event (waterfall axis = sequential cascade); pairs with trigger-model.md + context-engineering.md |
+| [.claude/rules/iterative-evolution-pathway.md](.claude/rules/iterative-evolution-pathway.md) | Designing or evaluating multi-step engineering passes: backlog evolution (when to create/update Epic/Task/Module/Milestone), stage-gate progression triggers, PM + Architect/SE lens synergy, governance integration, self-evaluation discipline, priorities-as-guide pattern; pairs with methodology.md + compound-and-waterfall.md (DRAFT v1 — D044 2026-05-06 evening per operator delegation) |
 
 ## Project Surfaces (the agent's operating layers)
 

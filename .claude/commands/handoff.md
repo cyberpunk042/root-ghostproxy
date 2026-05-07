@@ -114,3 +114,12 @@ The PreCompact hook (`$HOME/.claude/hooks/pre-compact.sh`) auto-fires on compact
 - Before context approaches compaction (operator awareness; agent can't see context-%)
 - After a substantive batch of work, to capture for audit + future cold-pickup
 - When the loop has accumulated several cycles' findings — checkpoint moment
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 Orient + handoff category — operator-facing distinction between /handoff (light snapshot) ≪ /terminate (full sweep) ≪ /finish-smoothly (knowledge-extraction PASS forced))
+- Companion commands: [`/terminate`](terminate.md) · [`/finish-smoothly`](finish-smoothly.md)
+- PreCompact hook: [`.claude/hooks/pre-compact.sh`](../hooks/pre-compact.sh) — the operator-on-demand handoff equivalent at lifecycle event boundary; SB-133 envelope schema fix (top-level systemMessage)
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`new-artifact`** action type (handoff doc written to `wiki/log/<ts>-handoff.md`) per Hard Rule 14
+- Active Objective Layer state files (mission/focus/impediment/priorities/task) read for handoff snapshot — see [CONTEXT.md](../../CONTEXT.md) Active Objective Layer section
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

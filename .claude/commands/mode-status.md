@@ -16,3 +16,13 @@ Show the active mode (or report none) + summarize.
    - Read `$HOME/.claude/modes/<name>.md` and summarize: persona, in-scope, out-of-scope, /cycle sequence.
    - Mention how to switch (`/mode-<other>`) or clear (`/mode-clear`).
 4. If the file contains an unknown name: report the discrepancy and offer to clear it.
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 — `/mode-status` is the read-only mode reporter)
+- Companion mode commands: [`/mode-pm`](mode-pm.md) · [`/mode-architect`](mode-architect.md) · [`/mode-dual`](mode-dual.md) · [`/mode-clear`](mode-clear.md)
+- State file read: `$HOME/.claude/active-mode`
+- Mode files: [`.claude/modes/pm-scrum-master.md`](../modes/pm-scrum-master.md) · [`.claude/modes/devops-architect.md`](../modes/devops-architect.md) · [`.claude/modes/dual-expert.md`](../modes/dual-expert.md)
+- Auto-enable forbidden: per directive 2026-05-05 mode-entry is operator-choice; this command surfaces options but does NOT pick one
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`read-only-audit`** action type per Hard Rule 14
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

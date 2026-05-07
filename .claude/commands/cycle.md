@@ -69,6 +69,18 @@ Run one cycle of the active mode's autopilot sequence.
    - Surface in cycle report: "This cycle's SB pick: SB-XXX. Action: <what>. New status: <status>."
    - **This step is the work-doing step.** Per operating-principles.md #11, the cycle does the systemic-fix work between cycles; this is where the work names itself.
 
+10. **Backlog-evolution awareness** (per `.claude/rules/iterative-evolution-pathway.md` Dimensions 1+2 — operator directive 2026-05-06 *"where and when we need to create Epic Task or Module or even Milestones we do or do update things"*):
+    - When step 9 SB iteration OR steps 4-6 lens scans surface a **new work-item** that doesn't fit existing backlog hierarchy (Milestone → Epic → Module → Task), apply pathway Dimension 1 decision logic:
+      - Spans multiple Epics + multi-week horizon + needs operator-named theme → **Milestone** at `wiki/backlog/milestones/v<N>-<slug>.md`
+      - Spans multiple Modules + days/weeks horizon + cross-cutting theme → **Epic** at `wiki/backlog/epics/epic-<id>-<slug>.md`
+      - Coherent multi-task delivery within a Stream + days horizon + 3-10 tasks → **Module** at `wiki/backlog/modules/<project>-m<NNN>-<slug>.md`
+      - Atomic completion within a Module + hours horizon + single done-when checklist → **Task** via `tools.tasks create under-epic/under-task/from-blocker`
+      - Less than atomic / a fragment / piece of information → **artifact-segment** appended to existing page OR `wiki/log/<ts>-<slug>.md`
+    - Default to **one level finer-grained** than instinct (start with Task; promote to Module if scope expands; per Hard Rule 11 demoting is harder than promoting).
+    - Co-determine stage gate per pathway Dimension 2 (document → design → scaffold → implement → test); each work-item starts at appropriate stage.
+    - Surface in cycle report when a hierarchy/stage-gate decision was made: "Pathway D1 applied: <work-item> classified as <Task/Module/Epic/Milestone>; D2 applied: starts at <stage>."
+    - This step is OPT-IN per cycle (skip when no new work-item surfaced); pathway is Advisory tier.
+
 ## Productive cycle taxonomy (SB-128 — closes thin-output pattern)
 
 Per operator directive 2026-05-06: *"I am talking about the fact it bugs.. that it does a little thing sometimes even noting and do a weird statement and stop"*. Each cycle fire must produce one of the following productive outputs. **Naming which category was produced is mandatory in the cycle report**; if none applies, the cycle is THIN (the bug operator named) — name it as such instead of dressing it up.
@@ -100,3 +112,14 @@ The cycle report's **last line** must end with: `Productive output: <category> �
 ## Discipline
 
 `/cycle` surfaces, reports, drives the systemic-bugs tracker, and waits. The mode-specific cycle steps (4-6) survey; step 9 actively does the systemic work. The productive-cycle taxonomy (above) is the cycle's quality gate — every fire names its output category. Forward feature-action remains operator's call (per principle #11).
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (DRAFT v1, agent-authored 2026-05-06 evening)
+- Mode files (per-mode cycle definitions): [`.claude/modes/README.md`](../modes/README.md) (3 modes + cycle-sequence comparison)
+- **M-E001-1 productive-cycle action vocabulary** (Hard Rule 14): [`wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md`](../../wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md) — 9 canonical action types; mandatory cycle-report last-line `Productive output: <type> — <one-line specific>`
+- Loop-cron lifecycle: [`.claude/rules/loop-cron-lifecycle.md`](../rules/loop-cron-lifecycle.md) (autonomous-management permission with refined triggers)
+- Trigger model unified 8-mechanism: [`.claude/rules/trigger-model.md`](../rules/trigger-model.md) (action layer = M-E001-1 vocabulary)
+- Mindfulness baseline (clause #6 substance-per-cycle is the cycle's content-validity gate): [`.claude/hooks/mindfulness.sh`](../hooks/mindfulness.sh)
+- **Iterative-evolution pathway** (D044, DRAFT v1 — referenced by step 10 backlog-evolution-awareness): [`.claude/rules/iterative-evolution-pathway.md`](../rules/iterative-evolution-pathway.md) — 7 dimensions (backlog hierarchy decision logic / stage-gate progression / PM + Architect/SE lens synergy / governance integration / self-evaluation discipline / priorities-as-guide / artifact-preparation triggers); operationalized into cycle skill via step 10
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

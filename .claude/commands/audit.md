@@ -102,3 +102,15 @@ Aggregated pass/fail report; flag any FAILs with the corrective action; end with
 - Before a fresh session test (so the operator knows the project is in expected state)
 - After a substantive change (mode addition, hook update, settings.json modification)
 - When debugging a "broken-and-idle" type symptom — first run /audit to rule out drift
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 — `/audit` is the deterministic integrity-check chain)
+- Hook architecture (audited per step 3): [`.claude/rules/hook-architecture.md`](../rules/hook-architecture.md) — 14-hook lifecycle inventory
+- Settings.json (audited per step 2): [`.claude/settings.json`](../settings.json)
+- Methodology engine (audited per step 1): [`wiki/config/methodology.yaml`](../../wiki/config/methodology.yaml) + 6 sister yamls per D041
+- Tools used in audit chain: `tools.progress`, `tools.blockers`, `tools.state`, `tools.decisions`, `tools.objective`, `tools.priorities`
+- Active Objective Layer state files (audited per step 11): SB-118 + SB-127 — `$HOME/.claude/active-{mode,mission,focus,impediment,priorities}` (absent OR present both valid)
+- Compound + waterfall coverage check (step 12): [`.claude/rules/compound-and-waterfall.md`](../rules/compound-and-waterfall.md) — every objective layer must surface in ≥3 channels (hook + command + tool)
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`read-only-audit`** action type per Hard Rule 14 (no mutations; aggregates pass/fail across 12 deterministic checks)
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

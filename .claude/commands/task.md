@@ -57,3 +57,9 @@ Then briefly confirm to the operator what was done.
 - `$HOME/.claude/commands/mission.md` / `focus.md` / `impediment.md` (objective layer — per-cycle/multi-cycle objectives, NOT the same as the backlog cursor)
 - `$HOME/.claude/commands/priorities.md` (imminent-work tier — operator's hot-queue, NOT the backlog cursor)
 - SB-124d audit (commands-at-all-levels): every logical state file should have a slash command equivalent.
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 — `/task` is the active backlog cursor; distinct layer from objective + priorities)
+- 4-level backlog hierarchy: Milestone (v0.2 ai-natural-task-management) → Epic (sfif-rollout, E001 auto-pilot, E002 piling-tasks, E003 compound-retention) → Module (M001-M013) → Task (T###); `create under-epic|under-task|from-blocker` per M-E002-1 piling-tasks vocabulary
+- Companion governance: [`/blockers`](blockers.md) (a `from-blocker` task-create resolves SB-NNN/B### into a T###)
+- State file: `$HOME/.claude/active-task` (one task ID, e.g. `T012`)
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`new-artifact`** action type (`create under-*` / `from-blocker`) OR **`operator-directive-register`** action type (set/clear) OR **`read-only-audit`** action type (show) per Hard Rule 14
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

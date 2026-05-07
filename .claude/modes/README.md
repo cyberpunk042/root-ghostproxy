@@ -111,6 +111,28 @@ The voice table is the **structured canonical** (SB-129 stage c) — parsed by `
 
 Same surface as Relationships above; kept for cold-pickup agents searching for "Cross-references".
 
+### Operator-facing mode commands (the 5 entry/exit/inspect surfaces)
+
+- [`/mode-pm`](../commands/mode-pm.md) — enable PM Scrum Master
+- [`/mode-architect`](../commands/mode-architect.md) — enable DevOps Architect
+- [`/mode-dual`](../commands/mode-dual.md) — enable Dual Expert (both lenses)
+- [`/mode-clear`](../commands/mode-clear.md) — return to no-mode default
+- [`/mode-status`](../commands/mode-status.md) — read current mode
+
+### Action emission per Hard Rule 14
+
+Each mode's `/cycle` emits one of 9 canonical M-E001-1 productive-cycle action types per fire (mandatory cycle-report last-line `Productive output: <type> — <one-line specific>`). Per-mode subset preferences:
+
+- **PM**: `blocker-surface` · `sb-closure` · `drift-fix-with-empirical` · `explicit-standby-with-named-reason`
+- **Architect**: `verified-edit` · `sb-closure` · `drift-fix-with-empirical` · `new-artifact` · `doc-refresh` · `explicit-standby-with-named-reason`
+- **Dual**: ANY of the 9 (cycle is broadest)
+
+See [`wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md`](../../wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md) for the canonical vocabulary spec.
+
+### Iterative evolution pathway
+
+Mode selection is Dimension 9 (mode-alternance + hybrid + repeat patterns) per [`.claude/rules/iterative-evolution-pathway.md`](../rules/iterative-evolution-pathway.md). 3 cadence patterns recognized: single-mode-sustained · hybrid-sustained (dual default) · alternance (operator-coordinated mode-switching mid-work-item).
+
 ## Extending — adding a new mode
 
 Future modes are operator-decision. To author one:

@@ -46,3 +46,14 @@ python3 -m tools.blockers resolve B001 \\
 Operations write to `wiki/governance/blockers.md`. After resolving, ALSO append the corresponding D### entry via `tools.decisions append --linked-blocker B001 ...` (different SRP per the governance design).
 
 When operator says: "log a new blocker that ..." or "update B001's status" or "resolve B003 — operator picked X" — agent invokes the appropriate `tools.blockers` subcommand.
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 governance — `/blockers` surfaces the operator-decision queue)
+- Companion governance commands: [`/decisions`](decisions.md) (audit trail) · [`/progress`](progress.md) (journey view) · [`/sync-progress`](sync-progress.md) (live-state refresh)
+- Backed by tool: [`tools/blockers.py`](../../tools/blockers.py) — list / get / next-id / add / update / resolve subcommands
+- Register file: [`wiki/governance/blockers.md`](../../wiki/governance/blockers.md) — sole source of truth for B### IDs
+- Sister-tool linkage: every resolved B### appends a D### via [`tools/decisions.py`](../../tools/decisions.py) (`--linked-blocker B001`) — different SRP per the governance design
+- PM Scrum Master mode: [`.claude/modes/pm-scrum-master.md`](../modes/pm-scrum-master.md) — `/cycle` calls `/blockers` as step 2
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`blocker-surface`** action type per Hard Rule 14 (read-only when invoked alone; when paired with operator decision → `operator-directive-register`)
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

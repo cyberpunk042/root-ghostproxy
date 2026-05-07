@@ -75,3 +75,11 @@ After completion, operator decides next: `/compact`, switch context, close sessi
 - Before context approaches compact + you want richer-than-PreCompact-snapshot state
 - After a major-deliverable batch — checkpoint with full role + artifact attribution
 - When the operator wants to capture "where the AI was" comprehensively, not just "what state is in flight"
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 — `/terminate` is the full-sweep middle tier between /handoff (light) and /finish-smoothly (forced knowledge-extraction))
+- Companion commands: [`/handoff`](handoff.md) (light snapshot) · [`/finish-smoothly`](finish-smoothly.md) (forced knowledge-extraction PASS)
+- **Operator-verbatim sacrosanct directive 2026-05-06** (preserved at top of this file): *"a strong and high standard handoff objective and critical documents / artifacts..."*
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`new-artifact`** action type (terminate-handoff doc written to `wiki/log/<ts>-terminate-handoff.md` with full role/responsibility + artifacts inventory + decisions inventory + SBs touched) per Hard Rule 14
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

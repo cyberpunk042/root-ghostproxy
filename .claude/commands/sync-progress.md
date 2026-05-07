@@ -37,3 +37,14 @@ In any mode, `/cycle` includes `/progress` as a step. If progress.md is stale, t
 - After a git commit
 - After an SFIF stage transition
 - Before sharing the journey view with someone (operator's audience or future session)
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 governance — `/sync-progress` is the live-state-refresh surface)
+- Companion governance commands: [`/blockers`](blockers.md) · [`/decisions`](decisions.md) · [`/progress`](progress.md) · [`/log`](log.md)
+- Backed by tool: [`tools/progress.py`](../../tools/progress.py) — `--callout` mode emits derived snapshot block; consumed here for diff
+- Register file: [`wiki/governance/progress.md`](../../wiki/governance/progress.md) — Current-position callout block is the only mutated section
+- Composes into: [`/cycle`](cycle.md) — every active mode's `/cycle` includes a `/progress` step that surfaces stale-callout drift; operator runs `/sync-progress` to apply
+- Drift-fix discipline: [`.claude/rules/work-mode.md`](../rules/work-mode.md) "Verify status claims" — re-derive from live state, don't trust cached
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`drift-fix-with-empirical`** action type per Hard Rule 14 (when drift detected + applied) OR **`read-only-audit`** action type (when in-sync confirmed)
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

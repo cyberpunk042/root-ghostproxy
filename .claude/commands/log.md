@@ -39,3 +39,14 @@ The /log command writes to $HOME only. If a directive is intended for the second
 - Before acting on the directive (Hard Rule #4 — log first, act second)
 - When the directive is verbose enough that paraphrasing would lose substance
 - When the operator explicitly says "log this" or `/log <X>`
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 governance — `/log` is the sacrosanct primary-source authoring surface for $HOME iteration)
+- Companion governance commands: [`/decisions`](decisions.md) (a `/log` directive that implies a decision triggers D### append) · [`/blockers`](blockers.md) · [`/progress`](progress.md)
+- **Sacrosanct rule**: [`.claude/rules/words-are-sacrosanct.md`](../rules/words-are-sacrosanct.md) — verbatim quoting is binding; never paraphrase, compress, or summarize
+- $HOME scope discipline: [`.claude/rules/operating-principles.md`](../rules/operating-principles.md) principle #9 — second-brain has its own authoring layer; channel for cross-project knowledge is `tools.gateway contribute` (gated on M007), NEVER direct write to /opt
+- Register destination: `$HOME/wiki/log/<YYYY-MM-DD>-<slug>.md` (sister directory: `<second-brain>/raw/notes/` is for prior-session $HOME directives — read-only citation source, do NOT write back)
+- AGENTS.md Hard Rule #4 (log first, act second): [`AGENTS.md`](../../AGENTS.md)
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`operator-directive-register`** action type per Hard Rule 14 (sacrosanct primary-source preservation, BEFORE any acting on the directive)
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

@@ -125,3 +125,24 @@ Dual mode loop has the LOWEST sensitivity to autonomous cancellation among the t
 - **L7 — Pre-compact**: pause around compaction.
 
 Dual mode's cycle output is naturally larger per fire (both lenses processed). If autopilot output becomes too verbose, that's a signal to switch to focused mode rather than autocancel.
+
+## Cross-references
+
+- **Canonical mode index**: [`.claude/modes/README.md`](README.md) — 3 modes with cycle-sequence comparison + persona-voice-table runtime-parse contract
+- **Mode entry/exit commands**: [`/mode-dual`](../commands/mode-dual.md) (this mode — broadest scope) · [`/mode-pm`](../commands/mode-pm.md) (PM lens only) · [`/mode-architect`](../commands/mode-architect.md) (engineering lens only) · [`/mode-clear`](../commands/mode-clear.md) · [`/mode-status`](../commands/mode-status.md)
+- **Cycle composition**: [`/cycle`](../commands/cycle.md) — reads `$HOME/.claude/active-mode` each fire; dispatches the Dual cycle sequence (steps 1-7 above; combines PM step 2-3 + Architect step 3-6 + cross-cutting + SB-tracker iteration + substance-gate)
+- **Mode-enforcement hook** (runtime injection): [`.claude/hooks/mode-enforcement.sh`](../hooks/mode-enforcement.sh) — UserPromptSubmit; dynamic parser extracts persona + voice table + cycle sequence + state into per-prompt banner; per SB-122 closure no length cap (operator-explicit content sacrosanct at injection moment)
+- **Mindfulness baseline hook** (compounds with mode-enforcement per SB-126 4-hook UserPromptSubmit stack): [`.claude/hooks/mindfulness.sh`](../hooks/mindfulness.sh) — clauses 1-6 (one-notch · confirm-don't-construct · agent-DRAFT-flagged · forward-not-freeze · P1-first · substance-per-cycle); dual cycle's step 6 substance gate consumes this baseline
+- **Output-discipline-guard hook** (compounds, per SB-090/094/120): [`.claude/hooks/output-discipline-guard.sh`](../hooks/output-discipline-guard.sh) — premise-construction + escalation-detection + conditional-clause grammar; dual lens-switching cycle MUST not collapse conditional into current-state (closes SB-120)
+- **Companion modes**: [`pm-scrum-master.md`](pm-scrum-master.md) (PM lens deep-dive) · [`devops-architect.md`](devops-architect.md) (Architect lens deep-dive) — dual cycle DELEGATES to each via `see <file> /cycle steps N` for full algorithm
+- **Backing tools (PM lens)**: [`tools/blockers.py`](../../tools/blockers.py) · [`tools/decisions.py`](../../tools/decisions.py) · [`tools/progress.py`](../../tools/progress.py)
+- **Backing tools (Architect lens)**: [`tools/run-tests.py`](../../tools/run-tests.py) (verified-edit gate) · [`tools/cycle.py`](../../tools/cycle.py) (--json state) · [`tools/objective.py`](../../tools/objective.py) · [`tools/priorities.py`](../../tools/priorities.py) · [`tools/questions.py`](../../tools/questions.py)
+- **Governance commands the dual cycle invokes**: [`/orient`](../commands/orient.md) (step 1) · [`/blockers`](../commands/blockers.md) (PM lens step 2) · [`/progress`](../commands/progress.md) (state surface) · [`/decisions`](../commands/decisions.md)
+- **Operator-pending Q1 (filter strictness)**: PM lens carries the SB-065 warn-only-vs-auto-apply pending decision into dual mode unchanged
+- **Operator-stated F-eval-12 self-critique** (preserved at line ~104 above): surface-without-act failure mode → corrective is end-of-cycle NEXT-ACTION list split into operator-batch vs unilateral
+- **Persona-voice DRAFT v1 + DRAFT v2 forward-anchor** (SB-129 — preserved at lines 13-17 above): v2 should add MUST/MUST NOT format, validate against operator-empirical recurrence rate
+- **Productive-cycle action vocabulary** per Hard Rule 14: dual cycle emits ANY of the 9 canonical types per fire (most commonly `sb-closure` from step 5 + `verified-edit` from step 3 Architect-lens + `blocker-surface` from step 2 PM-lens + `explicit-standby-with-named-reason` when both lenses idle); cycle-report last line MUST end with `Productive output: <type> — <one-line specific>`
+- **Iterative evolution pathway** (per `.claude/rules/iterative-evolution-pathway.md`): dual mode is the canonical example of Dimension 3 (lens synergy — PARALLEL within a single fire, SEQUENTIAL within a work-item lifecycle)
+- **Compound + waterfall** (per `.claude/rules/compound-and-waterfall.md`): dual mode's cycle output IS a compound stack at-a-moment (PM-lens findings + Architect-lens findings + cross-cutting + SB-iteration); MUST not let one lens REPLACE the other
+- **Brain-inheritance**: per [`.claude/rules/self-reference.md`](../rules/self-reference.md)
+- **Brain-improvement mandate**: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

@@ -70,3 +70,13 @@ The command is a thin operator-facing wrapper over install.sh's project profile.
 - install.sh project profile: `apply_profile()` at `$HOME/install.sh`
 - Operator directive: 2026-05-06 (this session) on cross-project install capability
 - Operating principle #9 refinement: knowledge-vs-operational-config distinction (this command writes operational config to a sister project — explicit operator-invoked, not auto)
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 utility — `/install-agent-brain` is the cross-project deploy trigger; complement to install.sh `--profile project` invocation)
+- Brain-inheritance pattern: [`.claude/rules/self-reference.md`](../rules/self-reference.md) "Bidirectional inheritance" — $HOME authors operational tooling; sister projects (incl. /opt second-brain) inherit/adapt
+- Hooks deployed: 14-hook lifecycle per [`.claude/rules/hook-architecture.md`](../rules/hook-architecture.md)
+- Commands deployed: 42 commands per [`.claude/commands/README.md`](README.md)
+- Rules deployed: 11 active rules per [`.claude/rules/`](../rules/)
+- Modes deployed: 3 personae per [`.claude/modes/`](../modes/)
+- Tools deployed: 15 Python modules per [`tools/`](../../tools/)
+- Idempotency invariant: install.sh's project profile must be re-runnable without breaking existing target state
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`new-artifact`** action type (real install — files deployed) OR **`read-only-audit`** action type (`--dry-run`) per Hard Rule 14
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

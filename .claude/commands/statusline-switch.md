@@ -22,3 +22,13 @@ Available profiles (run `/statusline-list` to confirm):
 - `aidlc-stamp-full` — full + objective + audit 4-line review
 
 After switching, briefly confirm the new active profile to the operator. If the named profile doesn't exist, the underlying script prints an error + lists available profiles — relay that to the operator.
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 — `/statusline-switch` is the named-tier-dispatch trigger; alternative to per-tier `/statusline-<name>` shortcuts)
+- Per-tier shortcuts: [`/statusline-focus`](statusline-focus.md) · [`/statusline-base`](statusline-base.md) · [`/statusline-standard`](statusline-standard.md) · [`/statusline-project`](statusline-project.md) · [`/statusline-intermediary`](statusline-intermediary.md) · [`/statusline-full-aidlc`](statusline-full-aidlc.md) · [`/statusline-full-aidlc-narrow`](statusline-full-aidlc-narrow.md) · [`/statusline-aidlc-stamp-full`](statusline-aidlc-stamp-full.md) · [`/statusline-aidlc-stamp-full-narrow`](statusline-aidlc-stamp-full-narrow.md)
+- Meta commands: [`/statusline-list`](statusline-list.md) (enumerate) · [`/statusline-status`](statusline-status.md) (read active)
+- State file mutated: `~/.config/ccstatusline/active-profile`
+- Backed by script: `/root/.config/ccstatusline/switch-profile.sh`
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`operator-directive-register`** action type per Hard Rule 14
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

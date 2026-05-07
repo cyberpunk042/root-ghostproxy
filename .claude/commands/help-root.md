@@ -135,3 +135,13 @@ MCP server (when wired via .mcp.json):
 - Not the harness `/help` (that's Claude Code's built-in)
 - Not a substitute for reading the per-command file when implementing
 - Not deterministic execution — it's a discovery surface
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 utility — `/help-root` is the human-readable cheatsheet; README.md is the agent-readable categorized index)
+- All 42 commands referenced inline in the cheatsheet body
+- Skills referenced: [`.claude/skills/`](../skills/) (surface-state, surface-blockers — auto-trigger via natural prose)
+- Tools referenced: [`tools/`](../../tools/) (state, blockers, progress, decisions, cycle, tasks, stamp, objective, priorities, questions, ...)
+- MCP server: [`tools/mcp_server.py`](../../tools/mcp_server.py) — 10 root_* tools surfaced via `.mcp.json` wiring (per SB-124d)
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`read-only-audit`** action type per Hard Rule 14 (discovery surface; no state mutation)
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

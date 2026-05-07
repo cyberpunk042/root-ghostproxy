@@ -135,3 +135,19 @@ PM mode loop self-evaluates each cycle for autonomous cancellation/pause per the
 - **L7 — Pre-compact**: pause around compaction events.
 
 Cancellation is reported per the protocol in the rule file (what + why + evidence + mode + recovery + log path).
+
+## Cross-references
+
+- **Canonical mode index**: [`.claude/modes/README.md`](README.md) — 3 modes with cycle-sequence comparison + persona-voice-table runtime-parse contract
+- **Mode entry/exit commands**: [`/mode-pm`](../commands/mode-pm.md) (this mode) · [`/mode-architect`](../commands/mode-architect.md) (engineering lens) · [`/mode-dual`](../commands/mode-dual.md) (both lenses) · [`/mode-clear`](../commands/mode-clear.md) (no-mode default) · [`/mode-status`](../commands/mode-status.md) (read current)
+- **Cycle composition**: [`/cycle`](../commands/cycle.md) — reads `$HOME/.claude/active-mode` each fire; dispatches the PM cycle sequence (steps 1-6 above)
+- **Mode-enforcement hook** (runtime injection): [`.claude/hooks/mode-enforcement.sh`](../hooks/mode-enforcement.sh) — UserPromptSubmit; per SB-056 dynamic mode-file parser extracts Persona + Persona-voice-table + /cycle sequence + cross-references live-state into per-prompt banner; per SB-122 closure no length cap
+- **Mindfulness baseline hook** (compounds with mode-enforcement): [`.claude/hooks/mindfulness.sh`](../hooks/mindfulness.sh) — clause #5 P1-first + clause #6 substance-per-cycle gate keep PM cycle from short-circuiting (SB-128 family)
+- **Companion modes**: [`devops-architect.md`](devops-architect.md) (engineering lens — switch when implementation work surfaces) · [`dual-expert.md`](dual-expert.md) (both lenses simultaneously)
+- **Governance commands the cycle invokes**: [`/orient`](../commands/orient.md) (step 1) · [`/blockers`](../commands/blockers.md) · [`/decisions`](../commands/decisions.md) · [`/progress`](../commands/progress.md) (step 4) · [`/sync-progress`](../commands/sync-progress.md)
+- **Backing tools**: [`tools/blockers.py`](../../tools/blockers.py) (`--check` exit code drives L1 trigger) · [`tools/progress.py`](../../tools/progress.py) (`--callout` for journey snapshot) · [`tools/decisions.py`](../../tools/decisions.py) (verify + append) · [`tools/cycle.py`](../../tools/cycle.py) (`--json` for state surface)
+- **Persona-voice DRAFT v1** (SB-129): structural-engineering compliance per [`<second-brain>/wiki/spine/standards/model-standards/model-context-engineering-standards.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md) — single-table for hook-parser runtime extraction; DRAFT v2 should validate row coverage against operator-empirical recurrence
+- **PM-cycle action vocabulary subset** per Hard Rule 14: PM cycle most commonly emits `blocker-surface` (step 3 decision packages) · `sb-closure` (step 2 decumulate-resolves) · `drift-fix-with-empirical` (step 4 backlog-status reconciliation) · `explicit-standby-with-named-reason` (step 6 wait when no PM-actionable input)
+- **Operator-pending Q1**: filter strictness (warn-only vs auto-apply) — SB-065 design pending operator confirmation; preserved at line ~113 above
+- **Brain-inheritance**: per [`.claude/rules/self-reference.md`](../rules/self-reference.md) — modes are $HOME-authored operational tooling; sister projects may inherit/adapt via `/install-agent-brain`
+- **Brain-improvement mandate**: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

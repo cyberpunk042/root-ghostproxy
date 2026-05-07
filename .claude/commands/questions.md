@@ -54,3 +54,11 @@ esac
 - `tools/questions.py` (backing tool)
 - `wiki/backlog/epics/epic-e003-compound-retention-and-multi-group.md` (parent Epic for retention layers)
 - `.claude/commands/priorities.md` (parallel pattern: /priorities is operator-authored hot-queue; /questions is agent-authored input-needed queue)
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 — `/questions` is the SB-134 agent-pending-questions retention layer; complements operator-authored objective layer)
+- Operator directive 2026-05-06 (sacrosanct): *"if there is question and I dont see them its about the same as if there was no question"* — preserved at top of this file
+- Companion objective-layer commands: [`/mission`](mission.md) · [`/focus`](focus.md) · [`/impediment`](impediment.md) · [`/priorities`](priorities.md) · [`/task`](task.md)
+- E003 compound-retention Epic: agent-pending-questions parallel to operator-pending-decisions (B###)
+- State files: `$HOME/.claude/active-questions` (queue) + `$HOME/.claude/active-questions-detail/Q<N>.md` (per-question SRP detail companions; presweep enrichment pattern)
+- Surfaces in: mode-enforcement banner (every-prompt agent-question visibility) · end-of-cycle-stamp · /handoff and /terminate handoff docs · pre-compact.sh handoff
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`new-artifact`** action type (add/insert/detail) OR **`operator-directive-register`** action type (clear/remove/answer/promote/demote/set/update) OR **`read-only-audit`** action type (show/solve) per Hard Rule 14
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

@@ -105,8 +105,11 @@ If a Claude Code mechanism exists for hook-direct-invokes-command, this same cha
 
 ## Cross-references
 
-- SessionStart hook: `$HOME/.claude/hooks/session-orient.sh`
-- PostCompact hook: `$HOME/.claude/hooks/post-compact.sh`
-- Hook architecture rule: `$HOME/.claude/rules/hook-architecture.md`
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (DRAFT v1, agent-authored 2026-05-06 evening — categorizes 42 commands by tier)
+- SessionStart hook: `$HOME/.claude/hooks/session-orient.sh` (this command's invocation directive — see [`.claude/hooks/README.md`](../hooks/README.md))
+- PostCompact hook: `$HOME/.claude/hooks/post-compact.sh` (post-compact orientation)
+- Hook architecture rule: [`.claude/rules/hook-architecture.md`](../rules/hook-architecture.md)
 - Second-brain command pattern: `<second-brain>/.claude/commands/checkin.md`
 - M003 T-M003-7: queued refinement of policy-block + malware-block hook false-positives
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`read-only-audit`** action type (per Hard Rule 14 in CLAUDE.md/AGENTS.md). Mandatory cycle-report last-line `Productive output: read-only-audit — orient report emitted; <N> Read calls + <M> Bash calls`.
+- **Brain-improvement mandate**: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md) — sacrosanct verbatim directive governing the brain-quality passes that surface in /orient's intel chain.

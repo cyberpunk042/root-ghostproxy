@@ -32,3 +32,14 @@ Show the journey view — current position + planning + path traveled.
 - Not the decisions audit (use `/decisions`)
 - Not a real-time dashboard — it's a markdown doc that needs refresh discipline
 - Not a substitute for reading wiki/log/<date>-*.md when full session context needed
+
+## Cross-references
+
+- **Canonical command index**: [`.claude/commands/README.md`](README.md) (Tier 1 governance — `/progress` is the journey-view surface)
+- Companion governance commands: [`/blockers`](blockers.md) (decision queue) · [`/decisions`](decisions.md) (audit trail) · [`/sync-progress`](sync-progress.md) (drift refresh) · [`/log`](log.md) (verbatim primary source)
+- Backed by tool: [`tools/progress.py`](../../tools/progress.py) — `--callout` mode for live-derived snapshot
+- Register file: [`wiki/governance/progress.md`](../../wiki/governance/progress.md)
+- Companion `/sync-progress` applies operator-confirmed refresh when drift surfaces
+- Composes into: [`/cycle`](cycle.md) — both PM and Architect cycle sequences invoke `/progress` step
+- **M-E001-1 productive-cycle action vocabulary**: this command emits **`read-only-audit`** action type per Hard Rule 14 (drift surfacing only — no mutation; mutation routes through `/sync-progress`)
+- Brain-improvement mandate: [`wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md`](../../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)

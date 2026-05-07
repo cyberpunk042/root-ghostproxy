@@ -1,4 +1,24 @@
 #!/usr/bin/env python3
+# ============================================================================
+# ARCHIVED — UNWIRED 2026-05-06 — superseded by policy-block.sh
+# ----------------------------------------------------------------------------
+# This is the predecessor credential-exposure hook. The currently-wired hook
+# (.claude/hooks/policy-block.sh) covers the same defense-in-depth patterns
+# and is referenced by settings.json PreToolUse. This file is kept for
+# reference only.
+#
+# Kept per operator directive 2026-05-06:
+# "label them as archive if they are not usefull anymore. dont necessarily
+#  delete them. they remind me of something."
+#
+# Cross-refs: .claude/hooks/README.md (DRAFT v1 — WIRED-vs-ARCHIVE labels) ·
+#             .claude/hooks/policy-block.sh (active successor with broader matcher) ·
+#             .claude/hooks/tests/test-policy-block.py (10/10 regression tests) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#
+# Original purpose preserved below for historical reference.
+# ============================================================================
+#
 # Pre-tool-use hook: hard-block credential exposure across the full tool ecosystem.
 # Defense-in-depth on top of permissions.deny rules in settings.json.
 # False positives are acceptable; false negatives are not.

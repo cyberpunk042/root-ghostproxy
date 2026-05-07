@@ -90,12 +90,37 @@ Operator observation cycle 41: *"somehow its a bit like the hook start and such 
 
 Pattern recognized: signal-source × action-determinism × composability matrix. All 8 mechanisms compose along the SIGNAL → ACTION → RECOVERY axis. F-eval-11 in-progress (since cycle 14 design sketch); SB-070 in-progress (scalable signal-pattern direction); both close with this rule.
 
+## Action layer — M-E001-1 productive-cycle vocabulary (the unified ACTION the 8 mechanisms emit)
+
+The signal→action→recovery model has 3 phases. SIGNAL is mechanism-specific (8 mechanisms documented above). RECOVERY is mechanism-specific (per-mechanism failure modes). **ACTION is universal** — every mechanism's action emission maps to one of 9 canonical action types from the **M-E001-1 productive-cycle vocabulary** (DRAFT v2 at `wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md`):
+
+| # | Action type | Emitted-by examples |
+|---|---|---|
+| 1 | `sb-closure` | Cycle skill / commands updating tracker |
+| 2 | `verified-edit` | `tools.run-tests` confirms edit + inline regression output |
+| 3 | `drift-fix-with-empirical` | Doc/state alignment with grep/Read evidence inline |
+| 4 | `explicit-standby-with-named-reason` | Loop self-cancel per L4-refined trigger (`loop-cron-lifecycle.md`); cycle reports concrete blocker |
+| 5 | `new-artifact` | Slash command authors new file (flagged agent-DRAFT per SB-095) |
+| 6 | `doc-refresh` | Brain-file count refresh with empirically-verified-YYYY-MM-DD timestamp |
+| 7 | `blocker-surface` | `/blockers` command emits decision-package format (per SB-071) |
+| 8 | `operator-directive-register` | `/log` command writes verbatim to `wiki/log/` |
+| 9 | `read-only-audit` | `/audit` command runs 10-step integrity check; `/orient` emits orient report |
+
+**Universal cross-tool framing** (per AGENTS.md Hard Rule 14): every AI tool's cycle skill (Claude Code, opencode, Codex, Cursor, Gemini, etc.) MUST emit one canonical action type per fire. Mandatory cycle-report last-line: `Productive output: <type> — <one-line specific>`. THIN standby without named subject is the SB-128 bug.
+
+This action layer **closes the unified trigger model loop** — the 8 mechanisms differ in SIGNAL but converge on the same ACTION vocabulary. Cross-mechanism consistency is structural.
+
 ## Cross-references
 
 - Hooks: `.claude/rules/hook-architecture.md` (2-layer, 3-component pattern: insertion+reason+remediation)
 - Routing: `.claude/rules/routing.md` (operator-intent → mechanism pick)
-- Loop lifecycle: `.claude/rules/loop-cron-lifecycle.md` (when self-paced loops cancel/update)
+- Loop lifecycle: `.claude/rules/loop-cron-lifecycle.md` (when self-paced loops cancel/update; cycle content shifts but always emits one action type)
 - Methodology: `.claude/rules/methodology.md` (stage-gates use commands + hooks + tools jointly)
 - Operating principles: `.claude/rules/operating-principles.md` (strictness graduation per mechanism)
 - Context engineering: `.claude/rules/context-engineering.md` (auto/pre/on-demand/facultative injection — applies to mechanism choice too)
 - Compound + waterfall: `.claude/rules/compound-and-waterfall.md` (orthogonal axes — what layers ADDITIVELY at-a-moment vs how state flows event-to-event; the trigger model is one mechanism within the compound stack)
+- [`.claude/rules/README.md`](README.md) — 11 rules with strictness-tier matrix
+- [`.claude/hooks/README.md`](../hooks/README.md) · [`.claude/commands/README.md`](../commands/README.md) · [`.claude/skills/README.md`](../skills/README.md) · [`.claude/modes/README.md`](../modes/README.md) · [`.claude/agents/README.md`](../agents/README.md) · [`tools/README.md`](../../tools/README.md) — per-mechanism canonical indexes (DRAFT v1 — agent-authored 2026-05-06 evening)
+- `wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md` — sacrosanct verbatim directive governing this rule's edit pass
+- **`wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md`** — M-E001-1 action vocabulary (the unified ACTION layer documented above)
+- CLAUDE.md / AGENTS.md **Hard Rule 14** — productive-cycle taxonomy (mandatory cycle-report last-line `Productive output: <type>`)

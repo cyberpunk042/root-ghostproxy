@@ -148,14 +148,45 @@ Operator's affirmation 2026-05-06: *"it should be compounding"*. This is the des
 
 Compounding is the structural answer to *"never lose track or forget to deliver anything within a focus and/or a task"* — every layer remains visible/accessible; nothing falls out as new things land.
 
+## Chain / group / tree triggers (E003 multi-group component — Q3 resolved 2026-05-06)
+
+Operator directive 2026-05-06: *"you shouold in those case naturally use the tool to compound"* + *"NOT binary, multiple things"*. Three trigger surfaces resolve when "naturally" applies — agent should chain operations (per SB-131 chain-batched pattern) when ANY trigger fires. Cheapest-first sequenced:
+
+### Trigger (b) — agent-self-detection (rule layer, lightest)
+
+When agent's pending operations within a single turn touch ≥2 files reflecting ONE coherent change, batch them. This rule layer (b) lives here; operationally:
+
+- ≥2 governance-doc updates traceable to ONE SB closure (tracker + decisions + progress.md + log) → chain
+- One operator-stated requirement implies updates across ≥2 SRP files → chain
+- Active-task transition implies cascade of state updates (cursor + handoff + decisions) → chain
+
+The agent's job per turn: BEFORE shipping the first edit, scan pending operations + chain when ≥2 are coherent. SB-131 already governs the WHAT; this trigger surface governs the WHEN-DETECT.
+
+### Trigger (a) — operator-statement detection (hook layer, medium effort)
+
+When operator's prompt names ≥2 files / state-layers / stage transitions, the agent should detect + chain. Lives in `output-discipline-guard.sh` (precedent for detection-layer hooks). Concrete signals: connectors ("X and Y and Z"), cascade language ("group effect / cascade call"), stage-transition language ("passing through the stage of one document for specs"). Forward-anchor: extension TBD.
+
+### Trigger (c) — cycle-driven (cycle-step layer, biggest)
+
+`/cycle` skill includes a "compound-sync" step that scans pending state-deltas across SRP files + executes batched operations. Forward-anchor: gated on Q1's Layer A primitive (`tools/group.py` or equivalent) landing first; cycle-step is the consumer.
+
+### Composition
+
+All 3 triggers are additive (not exclusive) — operator's *"NOT binary"* pattern. Each catches different scenarios; redundancy is feature (cron-fire vs operator-typed-prompt have different signal-shapes). Cousins to compound axis itself: each trigger surface populates the compound stack at-a-moment.
+
 ## Cross-references
 
-- `trigger-model.md` — signal→action→recovery composition (the mechanism axis: hooks, commands, skills, modes, tools, scheduled tasks)
+- `trigger-model.md` — signal→action→recovery composition (the mechanism axis: 8 mechanisms — hooks, commands, skills, modes, tools, MCP, scheduled tasks, sub-agents)
 - `context-engineering.md` — auto/pre/on-demand/facultative context-injection modes (the timing axis)
-- `hook-architecture.md` — 14-hook lifecycle (the waterfall topology)
+- `hook-architecture.md` — 10 wired hook matchers across 8 events (the waterfall topology); UserPromptSubmit 4-hook compound stack populates the compound axis per-prompt
 - `loop-cron-lifecycle.md` — when self-paced loops cancel/update (compound + waterfall both hold across cron-fires)
 - `operating-principles.md` principle #11 — systemic-fix priority within the loop (the loop is itself a compound discipline)
 - `words-are-sacrosanct.md` — premise-confirmation gate (operator-words are the seed of compound layers; never displaced by agent-construction)
+- [`.claude/rules/README.md`](README.md) — 11 rules with strictness-tier matrix
+- [`.claude/hooks/README.md`](../hooks/README.md) — canonical per-hook inventory; UserPromptSubmit 4-hook compound stack documented
+- [`.claude/modes/README.md`](../modes/README.md) — 3 modes; mode-enforcement banner is a canonical compound-stack example
+- `wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md` — sacrosanct verbatim directive governing this rule's edit pass
+- **`wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md`** — M-E001-1 productive-cycle action vocabulary (9 types). The action vocabulary IS the per-fire emission along the compound axis: each cycle-fire's compound stack must emit one canonical action type (Hard Rule 14 in CLAUDE.md/AGENTS.md). `Productive output: <type> — <one-line specific>` last-line discipline closes the compound-emit loop.
 
 ## Operator-verbatim primary source
 

@@ -6,7 +6,7 @@
       {"id": "B1-sep1",    "type": "separator",           "character": "  ·  "},
       {"id": "B1-ctxbar",  "type": "context-bar",         "color": "blue"},
       {"id": "B1-sep2",    "type": "separator",           "character": "  "},
-      {"id": "B1-ctxpct",  "type": "context-percentage",  "color": "yellow"},
+      {"id": "B1-ctxpct",  "type": "context-percentage",  "color": "brightYellow"},
       {"id": "B1-sep3",    "type": "separator",           "character": "  ·  "},
       {"id": "B1-speed",   "type": "total-speed",         "color": "green"}
     ],

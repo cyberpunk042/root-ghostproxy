@@ -4,6 +4,8 @@
 >
 > **Cold pickup?** Read [BOOTSTRAP.md](BOOTSTRAP.md) first — one-page first-time-here guide with read-order, state-verification commands, gotchas.
 
+> **Agent doc-update discipline (operator directive 2026-05-06, sacrosanct)**: when improving CLAUDE.md / AGENTS.md / sister docs, **adding ≠ discarding**. Layer new content onto prior content; refresh inline values where empirically drifted (with empirical-verification command output inline); do NOT replace existing sections wholesale unless the operator explicitly directs. Going-to-extremes (SB-082/093 family) recurs when an agent rewrites instead of revises. Cycle taxonomy: see `$HOME/.claude/commands/cycle.md` "Productive cycle taxonomy" + `wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md` (M-E001-1 DRAFT v2 — 9 action types) + `.claude/hooks/mindfulness.sh` clause #6 (4 canonical types).
+
 This file is auto-loaded by Claude Code at session start. It defines the operator-intent routing table for THIS project, the methodology layer pointer (per Adoption Guide step 5), and the Claude-Code-specific hard rules. It does **not** re-state content that belongs in AGENTS.md (universal cross-tool rules) or in README.md (project description) or in the methodology engine (`wiki/config/methodology.yaml`). It points at those, then adds Claude-specific delta.
 
 ## Identity (Goldilocks — abbreviated)
@@ -49,9 +51,17 @@ This project uses the second brain's stage-gate methodology, copied + adapted pe
 - ALLOWED/FORBIDDEN are hard constraints, not suggestions.
 - Stage boundaries are enforced by the methodology engine + (when M004 lands) the project-internal verifier.
 
-**Backlog hierarchy:** Epic → Module → Task. Readiness flows up. Status flows up. You work on tasks, not epics directly.
+**Backlog hierarchy:** **Milestone → Epic → Module → Task** (4-level since 2026-05-06; previously Epic → Module → Task). Readiness flows up. Status flows up. You work on tasks, not epics directly.
 
-**Active epic:** [SFIF Rollout + Second-Brain Integration](wiki/backlog/epics/sfif-rollout-and-second-brain-integration.md). Modules M001–M014 (incl. M011 ccstatusline, M012 vendor mapping, M014 pipelock preliminary). See [README.md](README.md) Backlog section for the full Stream 1 / Stream 2 breakdown.
+**Active milestone:** v0.2 ai-natural-task-management (introduced 2026-05-06; runs alongside v0.1).
+
+**Active epics**:
+- [SFIF Rollout + Second-Brain Integration](wiki/backlog/epics/sfif-rollout-and-second-brain-integration.md) — foundational (Modules M001–M014 incl. M011 ccstatusline, M012 vendor mapping, M014 pipelock preliminary)
+- E001 auto-pilot rework (M-E001-1 vocabulary DRAFT v2 — 9 action types)
+- E002 piling-tasks (M-E002-2 schema extension — parent_task / parent_blocker / parent_milestone optional fields)
+- E003 compound-retention-and-multi-group
+
+See [README.md](README.md) Backlog section for the full Stream 1 / Stream 2 breakdown.
 
 ## Operator-Intent Routing Table (Claude-Code-specific)
 
@@ -130,6 +140,11 @@ These rules apply on top of the universal rules in [AGENTS.md](AGENTS.md) and th
 | 8 | **Don't confuse the prior $HOME debris with the project's authoritative state.** The $HOME directory contains AI-debris from a prior session (a README, install.sh, hooks, integrity.py, opencode bridge plugin). The operator considers them not authoritative — *"I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST."* The project's own implementation will be authored by the methodology-driven flow. Don't read those files for project intent; consult the operator-verbatim sources (raw notes + this README + sister-projects.yaml entry + identity-profile). | Conflating prior debris with authoritative state has produced multiple wasted iterations. |
 | 9 | **The forwarders + .mcp.json land via `--connect-project` from the second brain side.** Don't author them by hand at $HOME. The connection mechanism is `python3 -m tools.setup --connect-project $HOME` from the second brain. Run it from there, not at $HOME. The connect script supports `--dry-run` for preview. | Single source of truth for the connection logic. Hand-authored forwarders drift from the canonical implementation. |
 | 10 | **Auto-memory at `~/.claude/projects/-root/memory/` (if it exists from a prior session) is debris.** Operator verbatim: *"I DO NOT WANT TO USE THE FUCKING MEMORY FOLDER... I NEVER FUCKING TALKED ABOUT IT."* Do NOT reference it. Do NOT load anything from it. The project's authoritative content is in `$HOME/wiki/`, `$HOME/*.md`, and the second-brain references. | Operator-stated rejection of an artefact a prior AI session created without authorization. |
+| 11 | **Adding ≠ discarding** (work-mode Hard Rule 4a applied to agent's own doc-update work). When improving CLAUDE.md / AGENTS.md / sister docs, layer new content onto prior content; refresh inline values where empirically drifted; do NOT replace existing sections wholesale unless the operator explicitly directs. Going-to-extremes (SB-082/093 family) recurs when an agent rewrites instead of revises. Codified in admonition near the top of this file + sister doc README.md. | Operator-corrected this exact pattern in 2026-05-06 evening session ("Why are you not able to just do normal improvements instead of causing regression"). The lesson: deletion-because-newer-canonical-exists is regression; addition-of-pointer-to-newer-canonical is improvement. |
+| 12 | **Brain-inheritance pattern** ($HOME source-of-truth → /opt second-brain inherits, NOT peer-to-peer). $HOME is the source-of-truth for **operational tooling** (hooks, slash commands, tools/*.py, settings.json wiring conventions, ANSI-fence rendering patterns, statusline widgets, mode-enforcement banner shape). /opt second-brain INHERITS / adapts these patterns. When $HOME's hook evolves (e.g., SB-115 redesign of stamp config from prompt-marker to slash-command + persistent JSON), /opt's parallel hook should track the improvement, not maintain a divergent copy. **Knowledge** flows the OTHER direction (root-ghostproxy → second brain via `gateway contribute` after M007 connect). | SB-115 closure (operator-corrected agent's "/opt has its own hook, separate from $HOME's" framing). Operator verbatim: *"WTF WHY WOULD YOU SAY second-brain is different ?? you are the root retart... second-brain take everything from you...."* See `.claude/rules/self-reference.md` "Bidirectional inheritance" section. |
+| 13 | **Chain operations per fire** (per SB-131 + operator's "30+ operations" directive). Coherent multi-edit per cron-fire is the substance pattern; single-edit-per-cron-fire is the THIN-output anti-pattern (SB-128 family). A SB closure typically pulls along (1) tracker row update + (2) structural fix (rule/hook/code/test) + (3) regression-test addition + (4) cross-reference in related docs + (5) decisions-logbook entry. Treating these as 5 cycles is wasteful; treating them as 1 chain-fire is the operator's stated pattern. | Operator directive 2026-05-06 verbatim: *"sometimes we should also have chain operations and groups calls with potentially chains which make tree of operations.. like updating multiple thing like project file and cursor / ecosystem files and such and whatnot"*. Closes SB-131. |
+| 14 | **Productive cycle taxonomy** (M-E001-1 vocabulary). Each `/cycle` fire MUST emit one of the 9 canonical action types (sb-closure / verified-edit / drift-fix-with-empirical / explicit-standby-with-named-reason / new-artifact / doc-refresh / blocker-surface / operator-directive-register / read-only-audit). Mandatory: cycle report's last line ends with `Productive output: <type> — <one-line specific>`. THIN standby without named subject is the SB-128 bug. Canonical sources: `.claude/hooks/mindfulness.sh` clause #6 (4 operator-canonical) + `wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md` (M-E001-1 DRAFT v2 with 5 agent-extension types). | Operator directive 2026-05-06 verbatim: *"I am talking about the fact it bugs.. that it does a little thing sometimes even noting and do a weird statement and stop... thats what I was talking about, not the cron feature itself"*. Closes SB-128(b)+(c). |
+| 15 | **Empirical-count-verification before drift-claim.** Before refreshing counts (decisions / SBs / tools / commands / hooks / rules / tests / modules / tasks) in any brain file, run a Python walk + parse the source-of-truth files; do NOT compound prior counts with current cycle's deltas. Compounding errors is a recurring drift source. Inline an "empirically verified YYYY-MM-DD" timestamp next to refreshed values so future readers know the freshness window. | This session's empirical-verification pass surfaced 6 distinct count drifts in CLAUDE.md alone (line 179 hooks, line 193 commands, line 195 hooks, line 196 tools + MCP + tests). Codified to prevent recurrence. |
 
 ## Working Contract (with the operator)
 
@@ -156,6 +171,40 @@ For high-impact changes (anything touching the foundation, the modules, the meth
 | Operator directives + session logs | [wiki/log/](wiki/log/) |
 | Source-syntheses for Suricata + PolarProxy + Hanke integration (in second brain) | `<second-brain>/wiki/sources/src-suricata*.md`, `src-polarproxy.md`, `src-hanke-honeypot-polarproxy-suricata-integration.md` |
 | Adoption Guide (the strictly-defined sister-project adoption process) | `<second-brain>/wiki/spine/references/adoption-guide.md` |
+| **Subdirectory READMEs** (DRAFT v1 — agent-authored 2026-05-06 evening per brain-improvement mandate) | One per indexed subdir, each wiki-schema 9-field compliant + Summary + Relationships sections |
+| Tools (15 Python modules) | [tools/README.md](tools/README.md) |
+| Slash commands (43 commands by category — empirically verified 2026-05-06) | [.claude/commands/README.md](.claude/commands/README.md) |
+| Hooks (18 hook scripts; 10 wired + archive) | [.claude/hooks/README.md](.claude/hooks/README.md) |
+| Modes (3 modes + cycle-sequence comparison) | [.claude/modes/README.md](.claude/modes/README.md) |
+| Rules (11 rules + strictness-tier matrix) | [.claude/rules/README.md](.claude/rules/README.md) |
+| Subagents (3 brain-loaded subagents) | [.claude/agents/README.md](.claude/agents/README.md) |
+| Skills (2 skills + mechanism-choice context) | [.claude/skills/README.md](.claude/skills/README.md) |
+| Templates (5 install template categories) | [templates/README.md](templates/README.md) |
+| Scripts (deployment + maintenance toolkit) | [scripts/README.md](scripts/README.md) |
+| **Brain-improvement mandate log** (sacrosanct verbatim directive) | [wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md](wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md) |
+| **Productive-cycle action vocabulary** (M-E001-1 DRAFT v2 — 9 types) | [wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md](wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md) |
+
+## Agent personal-learning notes (operator-allowed, per directive 2026-05-06)
+
+> **Operator directive 2026-05-06 (sacrosanct)**: *"you can take notes of your personal learnings progress here, there is such a room for system project even a root one"*. The notes below are **agent-authored** (per SB-095 — flagged as agent-DRAFT, not operator-stated content). Operator may revise / promote / remove. Each entry timestamped + initialed `[agent]`. Mirror copy of the section in [README.md](README.md) — those entries are the authoritative source; this file shows Claude-Code-specific lessons distilled for the Claude-Code agent's benefit.
+
+### 2026-05-06 evening — auto-loaded brain hot-path discipline
+
+`[agent]` CLAUDE.md is auto-loaded at session-start AND its content is part of every prompt's context budget. That means: every line in CLAUDE.md costs context-tokens × every-prompt-of-the-session. Discipline implication: **CLAUDE.md is NOT the place to dump everything**. Topic-specific rules go in `.claude/rules/<topic>.md` (on-demand-loaded). Project description goes in README.md (read once per session by /orient). CLAUDE.md is the routing + Hard Rules + delta-from-AGENTS.md — tight by design.
+
+When tempted to add a long explanation here, ask: does this need to be in EVERY prompt of the session, or can it live in `.claude/rules/<topic>.md` and load on-demand? The answer is usually "on-demand". Only universal-cross-cutting rules (the 15 Hard Rules) belong in CLAUDE.md's hot path.
+
+### 2026-05-06 evening — Hard Rule numbering convention
+
+`[agent]` Hard Rules table grew 10 → 15 this session (codifying 5 lessons from the doc-update mandate). When adding new rules: append at the bottom (additive); preserve operator-verbatim quotes in existing rules unchanged (sacrosanct); each rule has Why column citing the lesson source (incident, decision, SB closure). Don't renumber — operators reference rules by number across sessions; renumbering breaks references.
+
+### 2026-05-06 evening — drift-vs-fresh distinction in Project Surfaces
+
+`[agent]` Project Surfaces table accumulates count drift over consecutive sessions (slash commands 28→30, hooks 14→10, tools 13→15, MCP 8→10). Empirical-verification before refresh (Hard Rule 15) is the discipline. Inline "empirically verified YYYY-MM-DD" timestamp helps future readers know freshness window. The TABLE STRUCTURE is stable; only inline values drift.
+
+### What this section is NOT
+
+`[agent]` Not the SB tracker (that's `wiki/governance/systemic-bugs.md`). Not the decisions logbook (`wiki/governance/decisions.md`). Not the session log (`wiki/log/`). For Claude-Code-specific meta-lessons that benefit cold-pickup Claude-Code agents but are too small to warrant their own rule file. Operator promotes to structured artifact (rule, principle, lesson) when pattern matures.
 
 ## Session Bootstrap
 
@@ -176,7 +225,7 @@ Topic-specific rules loaded when work touches their domain. Per Claude Code conv
 |---|---|
 | [.claude/rules/routing.md](.claude/rules/routing.md) | Operator intent is ambiguous; need to map prose → tool/MCP/CLI |
 | [.claude/rules/methodology.md](.claude/rules/methodology.md) | Stage selection, model selection, ALLOWED/FORBIDDEN per stage |
-| [.claude/rules/hook-architecture.md](.claude/rules/hook-architecture.md) | Designing/debugging hooks; 14 wired machine-level hook fires across 8 events (PreToolUse, PostToolUse, SessionStart, UserPromptSubmit, PreCompact, PostCompact, Stop, SessionEnd) |
+| [.claude/rules/hook-architecture.md](.claude/rules/hook-architecture.md) | Designing/debugging hooks; **10 wired machine-level hook matchers across 8 events** (PreToolUse, PostToolUse, SessionStart, UserPromptSubmit, PreCompact, PostCompact, Stop, SessionEnd); 17 `.sh` + 1 `.py` on disk total — unwired retained as archive per operator directive 2026-05-06; per-hook inventory at [.claude/hooks/README.md](.claude/hooks/README.md) (DRAFT v1 — 2026-05-06 evening). Empirically verified 2026-05-06. |
 | [.claude/rules/work-mode.md](.claude/rules/work-mode.md) | Solo-session pattern, PO approval boundary, status-claim discipline |
 | [.claude/rules/self-reference.md](.claude/rules/self-reference.md) | Confused about $HOME vs second brain; identity questions |
 | [.claude/rules/words-are-sacrosanct.md](.claude/rules/words-are-sacrosanct.md) | About to summarize/paraphrase the operator (don't); about to log a directive |
@@ -190,13 +239,16 @@ Topic-specific rules loaded when work touches their domain. Per Claude Code conv
 
 | Surface | Path | Determinism | Notes |
 |---|---|---|---|
-| Slash commands (28) | [.claude/commands/](.claude/commands/) | 100% on invoke | `/orient`, `/cycle`, `/mode-{pm,architect,dual,status,clear}`, `/blockers`, `/progress`, `/decisions`, `/log`, `/audit`, `/sync-progress`, `/help-root`, `/handoff`, `/stamp-{horizontal,vertical,on,off,auto,status}` (6 SB-115), `/install-agent-brain`, `/mission`, `/focus`, `/impediment` (3 SB-118), `/priorities` (SB-127 imminent-work), `/terminate`, `/finish-smoothly` (operator-authored 2026-05-06 session-termination prep) |
-| Modes (3) | [.claude/modes/](.claude/modes/) | Operator-picks (durable) | PM Scrum Master / DevOps Architect / Dual Expert. State at `.claude/active-mode`. Combine with `/loop /cycle` for autopilot. |
-| Hooks (13 wired) | [.claude/hooks/](.claude/hooks/) | ~85% (additionalContext JSON) | session-orient + post-compact direct agent to `/orient`; security envelope (policy-block + malware-block + opt-write-block + leak-detector); pre-compact handoff snapshot; UserPromptSubmit context-warning + agent-discipline-gate + mode-enforcement; Stop end-of-cycle-stamp; session-summary on end. |
-| Tools (12 .py + MCP) | [tools/](tools/) | 100% non-LLM | `state, blockers, progress, decisions, cycle, tasks, stamp, objective, priorities, run-tests` Python modules + `mcp_server` exposes 7 MCP tools (read-only) at `tools/mcp_server.py` + `_paths` helper. Wired via `.mcp.json`. `run-tests` is unified regression runner (159/159 aggregate across 9 test files). |
-| Skills (2) | [.claude/skills/](.claude/skills/) | ~90-95% description-match | `surface-state` (auto-fires on "where are we" prose → `/orient`); `surface-blockers` (auto-fires on "what's blocking" prose → `/blockers`). |
+| **Slash commands (43)** | [.claude/commands/](.claude/commands/) | 100% on invoke | `/orient`, `/cycle`, `/mode-{pm,architect,dual,status,clear}`, `/blockers`, `/progress`, `/decisions`, `/log`, `/audit`, `/sync-progress`, `/help-root`, `/handoff`, `/stamp-{horizontal,vertical,on,off,auto,status}` (6 SB-115), `/statusline-{status,list,switch}` (3 SB-124b/c — generic profile switching with arg-hint autocomplete), `/statusline-{focus,base,standard,project,intermediary,full-aidlc,aidlc-stamp-full,full-aidlc-narrow,aidlc-stamp-full-narrow}` (9 SB-124b/c — per-profile shortcuts; one per deployed profile, parallels /stamp-* sub-feature pattern), `/install-agent-brain`, `/mission`, `/focus`, `/impediment` (3 SB-118), `/priorities` (SB-127 imminent-work), `/terminate`, `/finish-smoothly` (session-termination prep), `/task` (SB-124d active-task cursor + create verbs), `/questions` (SB-134 agent-pending Q retention). Per-command index at [.claude/commands/README.md](.claude/commands/README.md) (DRAFT v1 — 2026-05-06 evening, organized by 8 categories: orient/cycle, modes, stamp, statusline, objective layer, backlog, knowledge/audit, install). Empirically verified count 2026-05-06 evening (was 30; +4 statusline-{status,list,switch}; +9 per-profile shortcuts = 43). |
+| Modes (3) | [.claude/modes/](.claude/modes/) | Operator-picks (durable) | PM Scrum Master / DevOps Architect / Dual Expert. State at `.claude/active-mode`. Combine with `/loop /cycle` for autopilot. Per-mode index + cycle-sequence comparison at [.claude/modes/README.md](.claude/modes/README.md) (DRAFT v1 — 2026-05-06 evening). |
+| **Hooks (10 wired matchers across 8 events; 17 .sh + 1 .py on disk)** | [.claude/hooks/](.claude/hooks/) | ~85% (additionalContext JSON; PreCompact/PostCompact via top-level systemMessage per SB-133) | session-orient + post-compact direct agent to `/orient`; security envelope (policy-block + malware-block + opt-write-block + leak-detector); pre-compact handoff snapshot; UserPromptSubmit compound stack (context-warning + output-discipline-guard + mode-enforcement + mindfulness — SB-126); Stop end-of-cycle-stamp; session-summary on end. Unwired hooks retained as archive per operator directive 2026-05-06. Per-hook inventory + WIRED-vs-ARCHIVE labels at [.claude/hooks/README.md](.claude/hooks/README.md) (DRAFT v1 — 2026-05-06 evening). |
+| **Tools (15 .py + MCP)** | [tools/](tools/) | 100% non-LLM | `state, blockers, progress, decisions, cycle, tasks, stamp, objective, priorities, questions, group, run-tests` (12 functional modules) + `mcp_server.py` + `_paths.py` + `__init__.py`. `run-tests` unified regression runner (**215/234 aggregate across 13 test files** as of 2026-05-06 evening — 3 files with partial failures: end-of-cycle-stamp-diff-suppression 21/22, mode-enforcement 0/0 collection issue, questions 33/51). `group` is chain/group/tree composition primitive (Q1 Layer A, canonical taxonomy from second-brain). Per-tool index + composition map at [tools/README.md](tools/README.md) (DRAFT v1 — 2026-05-06 evening). |
+| Skills (2) | [.claude/skills/](.claude/skills/) | ~90-95% description-match | `surface-state` (auto-fires on "where are we" prose → `/orient`); `surface-blockers` (auto-fires on "what's blocking" prose → `/blockers`). Per-skill index at [.claude/skills/README.md](.claude/skills/README.md) (DRAFT v1 — 2026-05-06 evening). |
 | Governance (3 SRP docs) | [wiki/governance/](wiki/governance/) | Read-only views | `blockers.md`, `progress.md`, `decisions.md`. SRP-separated. Refresh via `/sync-progress` + `/decisions append`. |
-| MCP server (root-ghostproxy) | [.mcp.json](.mcp.json) + tools/mcp_server.py | 100% per call | 7 tools: root_state, root_blockers, root_progress, root_decisions_{list,get,verify,next_id}, root_objective (SB-118+SB-127 — mission/focus/impediment/priorities), root_orient. Uses `/opt/.../venv/bin/python` (mcp pkg). |
+| **MCP server (root-ghostproxy) — 10 tools** | [.mcp.json](.mcp.json) + tools/mcp_server.py | 100% per call | Tool count empirically verified 2026-05-06 evening. Tools include: root_state, root_blockers, root_progress, root_decisions_{list,get,verify,next_id}, root_objective (SB-118+SB-127 — mission/focus/impediment/priorities), root_questions (SB-134 — agent-pending Q queue), root_orient, plus +1 (verify mcp_server.py for full list). Uses `/opt/.../venv/bin/python` (mcp pkg). |
+| Subagents (3) | [.claude/agents/](.claude/agents/) | Brain-loaded on spawn | root-explorer / root-architect / root-pm-scoper (SB-081). Mandatory brain-load per frontmatter. Runtime gap: session-restart required for Claude Code to discover. Per-agent index at [.claude/agents/README.md](.claude/agents/README.md) (DRAFT v1 — 2026-05-06 evening). |
+| Templates (5 categories) | [templates/](templates/) | Spec — install.sh renders | ccstatusline-config + widgets, nftables, systemd-networkd, wpa_supplicant. Per-category index at [templates/README.md](templates/README.md) (DRAFT v1 — 2026-05-06 evening). |
+| Rules (11) | [.claude/rules/](.claude/rules/) | On-demand by topic | Strictness-tier matrix at [.claude/rules/README.md](.claude/rules/README.md) (DRAFT v1 — 2026-05-06 evening). |
 
 ## Second Brain Connection (placeholder)
 

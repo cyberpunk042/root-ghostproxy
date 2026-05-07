@@ -1,6 +1,27 @@
+---
+title: "scripts/ — root-ghostproxy deployment + maintenance toolkit"
+type: reference
+subtype: subdir-readme
+domain: cross-domain
+status: active
+confidence: high
+created: 2026-05-04
+updated: 2026-05-06
+maturity: growing
+sources:
+  - id: brain-improvement-mandate-2026-05-06
+    type: directive
+    file: ../wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+tags: [readme, scripts, deployment, install, maintenance]
+---
+
 # `scripts/` — root-ghostproxy deployment + maintenance toolkit
 
-This directory holds the bash scripts that ship with root-ghostproxy and the shared library functions they depend on.
+## Summary
+
+This directory holds the bash scripts that ship with root-ghostproxy and the shared library functions they depend on. Two checkout modes (MODE=A in-place at `$HOME` for advanced operators, MODE=B safe subdir clone for typical users), a one-shot bootstrap (`install-from-curl.sh` curl-bash entry point), and a surgical post-Path-A reconciliation tool (`merge-from-backup.sh`) with full governance (security scanning + audit log + follow-up review task auto-generation per operator directive 2026-05-05). The `lib/` subdirectory holds re-source-guarded shared helpers — `common.sh` for logging + TTY detection + ask/confirm, `conflict-points.sh` as the single-source-of-truth for which files are at risk during MODE=A overwrite, `backup.sh` for backup-before-checkout, `json-merge.sh` for atomic stage-then-swap with JSON validation, `security-scan.sh` for HIGH/MED/LOW flag detection on candidate-merge content, and `merge-manifest.sh` for governance-artifact authoring.
+
+This README is the operator-facing guide; the actual scripts have their own usage/flags/examples in their headers. After install, ongoing host configuration is handled by `install.sh` (at repo root, distinct from this directory's bootstrap-only scripts).
 
 > **Looking for a one-liner install?** From an ALREADY-PUBLISHED repo:
 >
@@ -289,15 +310,21 @@ These scripts ship as part of the project's deliverable. Authoring conventions:
 
 ---
 
-## Cross-references
+## Relationships
 
-- Project README: [`/README.md`](../README.md) — what root-ghostproxy IS
-- Bootstrap guide: [`/BOOTSTRAP.md`](../BOOTSTRAP.md) — cold-pickup orientation
-- Architecture: [`/ARCHITECTURE.md`](../ARCHITECTURE.md) — system design
-- Security envelope: [`/SECURITY.md`](../SECURITY.md) — host-level safety controls
-- `install.sh` / `uninstall.sh` at repo root — host configuration deployers (implement-stage 98%; `--profile {base|full|project|interactive}` × `--mode {bridge|endpoint|hybrid|auto}` × per-op toggles; `--dry-run` + `--check`; shellcheck PASS)
-- `.gitignore` whitelist for `/scripts/` lives in section 4.7 of [`/.gitignore`](../.gitignore)
+- **PARALLELS** [`/templates/README.md`](../templates/README.md) — scripts/ is the deployment-tooling layer; templates/ is the configuration-spec layer
+- **USES** `/install.sh` at repo root — host configuration deployer (implement-stage 98%; `--profile {base|full|project|interactive}` × `--mode {bridge|endpoint|hybrid|auto}` × per-op toggles; `--dry-run` + `--check`; **`--wizard` state-aware route** detects current install state + offers prioritized next-best-actions; **granular install** via `--with-group <name>` / `--no-group <name>` (groups: security, session-lifecycle, agent-discipline, stamp, bridge, opencode, wifi, integrity, ccstatusline, tools-{core,cycle,stamp,objective,all}); shellcheck PASS)
+- **EXTENDS** [`/README.md`](../README.md) — root project README
+- **EXTENDS** [`/BOOTSTRAP.md`](../BOOTSTRAP.md) — cold-pickup orientation
+- **CONSTRAINED BY** [`/SECURITY.md`](../SECURITY.md) — host-level safety controls (merge-from-backup's HIGH-flag refuse policy implements this)
+- **DERIVED FROM** [`/ARCHITECTURE.md`](../ARCHITECTURE.md) — system design (MODE=A vs MODE=B reflects ghost-proxy stealth bridge vs subdirectory deployment)
+- **CONSTRAINED BY** [`.gitignore`](../.gitignore) whitelist (section 4.7 — what `/scripts/` files are tracked)
+- `install-from-curl.sh` hands off to `install.sh --wizard` after checkout completes when no explicit profile/mode is given — operator gets a state-aware "where you are + what to do next" report rather than dropping into a raw shell
 - Cross-project channel for second-brain notifications: [`/wiki/log/`](../wiki/log/) — second-brain agent writes handoff notes here, picked up by `/orient` step 11
+
+## Cross-references (informal navigation)
+
+Same surface as Relationships above; kept for cold-pickup agents searching for "Cross-references".
 
 ## Maintenance
 
@@ -318,3 +345,21 @@ When changing the conflict surface (adding/removing a file from `CONFLICT_FILES`
 2. Update the [Conflict surface](#conflict-surface) table in this file
 3. Update `/.gitignore` whitelist if the new file requires it
 4. Verify the publish script's auto-patch (`/tmp/publish-root-ghostproxy.sh` — operator-side ephemeral) covers it
+
+---
+
+## Agent personal-learning notes (operator-allowed, per directive 2026-05-06)
+
+> Notes flagged `[agent]` per SB-095 — agent-authored, not operator-stated. Promotable to structured artifacts at operator's discretion.
+
+### Modes A/B safety: MODE=B is genuinely safe-by-default; MODE=A's safety comes from disciplined backup-then-merge
+
+`[agent]` Empirically — MODE=B's promise of "your `$HOME` is UNTOUCHED" is structurally true: the clone lands at `$TARGET/` and nothing outside that target is read or written. MODE=A's safety promise ("we back up before we overwrite") is **conditional on the operator running the script as documented**: skipping the dry-run, skipping `merge-from-backup.sh --diff`, or running on a host where `.pre-ghostproxy.bak/` already exists from a prior run can produce surprising results. The script's per-change-confirmation discipline is load-bearing for that path.
+
+### `lib/conflict-points.sh` is the load-bearing single-source-of-truth
+
+`[agent]` When the conflict surface changes (new whitelisted config file, new convention), the temptation is to update the table in this README first. Resist that. **Update `lib/conflict-points.sh` first**; let the table follow. The lib file is what the runtime reads; the table here is documentation. Inverting that order is how runtime drift starts.
+
+### `merge-from-backup.sh` governance is operator-tested
+
+`[agent]` Per operator directive 2026-05-05 (sacrosanct): *"merges can compound into a nightmare without governance"*. The audit log + follow-up review task + refuse-on-flag policy were authored to prevent that. Tested by running the merge in dry-run + apply modes; the per-change-confirmation discipline structurally prevents the agent from auto-applying flagged changes even when the agent thinks the change is fine. **Don't add an `--auto` flag**. The friction is the feature.

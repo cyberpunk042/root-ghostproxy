@@ -1,6 +1,8 @@
 # $HOME/.claude/rules/methodology.md — Methodology engine for root-ghostproxy
 
 > Loaded on demand when stage or model selection comes up. CLAUDE.md has the summary; this file is the project-specific delta.
+>
+> **Strictness tier** (per `operating-principles.md` §3): **Strict** (stage gates ALLOWED/FORBIDDEN per stage are enforced) + **Advisory** (model selection per task_type informs but doesn't strictly bind). Stage boundaries are hard per the `stage-gated` methodology-profile choice — leakage between stages carries security cost for type=root projects.
 
 ## Engine location
 
@@ -31,7 +33,9 @@ For root-ghostproxy specifically:
 
 | task_type | Model | Selected when |
 |---|---|---|
-| `epic` / `module` | feature-development | Solution not yet known; design required (most M### work) |
+| `milestone` | (group of epics) | v0.2 ai-natural-task-management active alongside v0.1 (introduced 2026-05-06) — 4-level Milestone → Epic → Module → Task hierarchy |
+| `epic` | feature-development | Solution not yet known; design required (sfif-rollout, E001 auto-pilot rework, E002 piling-tasks, E003 compound-retention-and-multi-group) |
+| `module` | feature-development | Most M### work (M001-M014) |
 | `bug` | bug-fix | Restoring correct behavior; no new architecture |
 | `refactor` | refactor | Restructure existing IaC without behavior change |
 | (wire existing) | integration | Bridge pattern — e.g., `tools.setup --connect-project` integration |
@@ -41,8 +45,24 @@ For root-ghostproxy specifically:
 
 **Do not ship implementation in a Document task. Do not ship tests as features.** The profile name `stage-gated` is enforcement, not advisory. Per second brain learning (OpenArms Bug 5: scaffold produced 135 lines of business logic — boundary now hard).
 
+## Tools supporting methodology execution (15 Python modules)
+
+Per [tools/README.md](../../tools/README.md) the 15 Python tools at `$HOME/tools/` support methodology execution:
+
+- `tools.cycle` orchestrates cycle status (active mode + stage + blockers + progress + lifecycle signals)
+- `tools.tasks` parses backlog tasks; `active show / set / clear` manages cursor (SB-124d); `create under-epic / under-task / from-blocker` for E002 piling-tasks (DRAFT scaffolds)
+- `tools.progress` refreshes `wiki/governance/progress.md` callout from live state
+- `tools.decisions` manages logbook (40 entries D001-D040)
+- `tools.blockers` surfaces operator-decision-pending in DECISION PACKAGE format (per SB-071)
+- `tools.run-tests` is the **canonical verifier for `verified-edit` action type** (per Hard Rule 14 / M-E001-1 vocabulary type 2) — 13 test files / 215/234 aggregate as of 2026-05-06 evening
+
 ## Cross-references
 
-- Full engine reference: `<second-brain>/.claude/rules/methodology.md` (canonical, second brain).
-- Engine: `$HOME/wiki/config/methodology.yaml` (this project's local copy).
-- Adoption Guide: `<second-brain>/wiki/spine/references/adoption-guide.md`.
+- Full engine reference: `<second-brain>/.claude/rules/methodology.md` (canonical, second brain)
+- Engine: `$HOME/wiki/config/methodology.yaml` (this project's local copy)
+- Adoption Guide: `<second-brain>/wiki/spine/references/adoption-guide.md`
+- [`.claude/rules/README.md`](README.md) — 11 rules with strictness-tier matrix
+- [`tools/README.md`](../../tools/README.md) — 15 tools supporting methodology execution
+- [`.claude/commands/README.md`](../commands/README.md) — 30 slash commands (incl. /audit, /sync-progress, /decisions, /blockers, /progress, /handoff)
+- `wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md` — sacrosanct verbatim directive governing this rule's edit pass
+- `wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md` — M-E001-1 productive-cycle action vocabulary (Hard Rule 14 — every cycle-fire emits one of 9 action types per stage's allowed outputs)

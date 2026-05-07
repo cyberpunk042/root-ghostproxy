@@ -315,3 +315,22 @@ Anti-pattern violations (recurring):
 - Hook design pattern: `.claude/rules/hook-architecture.md`
 - Loop-cron lifecycle: `.claude/rules/loop-cron-lifecycle.md`
 - Solo session work mode: `.claude/rules/work-mode.md`
+- [`.claude/rules/README.md`](README.md) — 11 rules with strictness-tier matrix
+- [`.claude/rules/trigger-model.md`](trigger-model.md) — 8-mechanism signal→action→recovery; strictness graduation per mechanism
+- [`.claude/rules/compound-and-waterfall.md`](compound-and-waterfall.md) — additive layering discipline (compound axis) + state-flow (waterfall axis)
+- [`.claude/rules/context-engineering.md`](context-engineering.md) — auto/pre/on-demand/facultative context-injection modes
+- `wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md` — sacrosanct verbatim directive governing this rule's edit pass
+
+## Hard Rules 11-15 — extension principles codified at hot-path layer (CLAUDE.md / AGENTS.md)
+
+> The 15 extension principles above (1-4 core + 5-15 extensions) capture the META principles. CLAUDE.md + AGENTS.md add **Hard Rules 11-15** at the auto-loaded hot-path layer — these are the OPERATIONALIZATION of the META principles for Claude Code (CLAUDE.md, project-specific) and cross-tool universal (AGENTS.md). Cross-reference, do NOT duplicate the rule statements here:
+
+| Hard Rule | Maps to operating-principles extension | One-line operationalization |
+|---|---|---|
+| **Hard Rule 11** (CLAUDE.md/AGENTS.md) — additive ≠ discarding | This rule's "always flexible" (#2) + "going-to-extremes" (#12) | Layer new content; refresh inline values; do NOT replace sections wholesale unless operator explicitly directs |
+| **Hard Rule 12** (CLAUDE.md/AGENTS.md) — brain-inheritance pattern | This rule's "$HOME scope discipline" (#9) extended | $HOME operational tooling source-of-truth; /opt second-brain INHERITS / adapts; knowledge flows OTHER direction via gateway contribute |
+| **Hard Rule 13** (CLAUDE.md/AGENTS.md) — chain operations per fire | This rule's "systemic-fix priority within loop" (#11) + SB-131 closure | Coherent multi-edit per cron-fire is substance pattern; single-edit-per-fire is THIN-output anti-pattern (SB-128 family) |
+| **Hard Rule 14** (CLAUDE.md/AGENTS.md) — productive cycle taxonomy | This rule's "evidence-priority hierarchy" (#5 extension) operationalized at action-emission layer | Each cycle-fire MUST emit one of 9 canonical M-E001-1 action types; mandatory cycle-report last-line `Productive output: <type> — <one-line specific>` |
+| **Hard Rule 15** (CLAUDE.md/AGENTS.md) — empirical-count-verification before drift-claim | This rule's "research-first discipline" (#5) + "empirical-verification-before-blocked" (#8) | Before refreshing counts (decisions / SBs / tools / commands / hooks / rules / tests / modules / tasks) in any brain file, run programmatic walk + parse; inline empirically-verified-YYYY-MM-DD timestamp |
+
+The hot-path Hard Rules 11-15 are the every-prompt-context-budget operationalization; the extension principles 5-15 here are the meta-judgment substrate. Both layers compose — hot-path rules fire fast for common situations; meta-principles inform judgment when situations are novel.

@@ -3,6 +3,8 @@
 > Loaded on demand when a loop/cron is firing AND the agent considers cancellation or modification. Per operator directive 2026-05-05 (sacrosanct, autonomous-management permission): *"when its really logical to remove or even possibly update a loop/cron you can but it has to be probably bound to some hard ruling about that it has to make sense in the context and be relative... lets continue till this feel like a proper bulletproof MVP."*
 >
 > **TRIGGER REFINEMENT 2026-05-05** per operator correction: the autonomous-cancellation PERMISSION (above) stands. The bug was the TRIGGERS — specifically L4's "workstream caught up" was activated by an "MVP target hit" assessment that was premature, killing the loop while iteration was still meaningful. Operator: *"WHY IS EVERYTHING SO FUCKING UNCLEAR... NO LOOP TO PROGRESS AND FIX THE SYSTEMTIC BUGS AND START WORKING AND EVOLVING IN ITERATION"*. Fix: keep the autonomous-cancellation option, but TIGHTEN the triggers so the loop runs longer through accumulating findings + iteration. Operator-absent-for-long is still a valid cancellation case (L6 N=30); workstream-caught-up alone is NOT (operator wants iteration to continue surfacing batches).
+>
+> **Strictness tier** (per `operating-principles.md` §3): **Advisory** for the autonomous-cancellation permission spectrum (operator-granted; agent applies discretion); **Enforced** for the refined triggers (each scenario MUST verify all 5 conditions before any cancel/update — see § The hard ruling below). Per SB-128(b)+(c) productive-cycle taxonomy, cycle content per fire MUST emit one of 9 M-E001-1 action types — even when L4 condition is met, the cycle must emit `explicit-standby-with-named-reason` (M-E001-1 type 4) with concrete blocker/decision/pause-source rather than thin standby. Cross-reference `mindfulness.sh` clause #6 (substance-per-cycle) — substance discipline is the loop's content-validity gate.
 
 ## The hard ruling (context-logical autonomous management)
 
@@ -139,9 +141,14 @@ The wakeup delay isn't fixed — the agent picks per-cycle based on context:
 ## Cross-references
 
 - Methodology engine (stage gates): `$HOME/wiki/config/methodology.yaml`
-- Tools that drive evaluation: `tools.state`, `tools.blockers`, `tools.progress`
-- Modes (per-mode cycle definitions): `$HOME/.claude/modes/<mode>.md`
-- Determinism ladder: `$HOME/.claude/rules/hook-architecture.md`
+- Tools that drive evaluation: `tools.state`, `tools.blockers`, `tools.progress` — per [`tools/README.md`](../../tools/README.md) canonical per-module composition map
+- Modes (per-mode cycle definitions): `$HOME/.claude/modes/<mode>.md` — per [`.claude/modes/README.md`](../modes/README.md) cycle-sequence comparison
+- Determinism ladder: `$HOME/.claude/rules/hook-architecture.md` — `.claude/hooks/README.md` canonical per-hook inventory
 - Operator directive (sacrosanct primary source): `$HOME/wiki/log/2026-05-05-loop-cron-lifecycle-policy-blockers-tools-and-bulletproof-mvp-directive.md` (also pre-existing copy at /opt/.../raw/notes/)
 - SB-058 close-pacing: `$HOME/wiki/log/2026-05-05-close-timing-clear-blocker-output-style-and-end-of-cycle-status.md`
 - SB-068 auto-retrigger: `$HOME/wiki/log/2026-05-05-auto-retrigger-after-quick-focused-cycles.md`
+- [`.claude/rules/README.md`](README.md) — 11 rules with strictness-tier matrix
+- [`.claude/rules/trigger-model.md`](trigger-model.md) — scheduled tasks are 1 of 8 mechanisms; ACTION layer = M-E001-1 vocabulary applies
+- **Mindfulness baseline hook** [`.claude/hooks/mindfulness.sh`](../hooks/mindfulness.sh) — clause #6 substance-per-cycle is the cycle's content-validity gate (per SB-126 + SB-128)
+- `wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md` — sacrosanct verbatim directive governing this rule's edit pass
+- **`wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md`** — M-E001-1 productive-cycle action vocabulary (9 types). Each cycle-fire emits ONE canonical action type — even L4-cancel cycles must emit `explicit-standby-with-named-reason` with concrete blocker; THIN standby is SB-128 bug. Hard Rule 14 (CLAUDE.md/AGENTS.md) — `Productive output: <type> — <one-line specific>` last-line discipline mandatory.

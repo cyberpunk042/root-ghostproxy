@@ -1,4 +1,31 @@
 #!/usr/bin/env python3
+# ============================================================================
+# ARCHIVED — UNWIRED 2026-05-06 — superseded by SB-115 redesign
+# ----------------------------------------------------------------------------
+# Replaced by: /stamp-{horizontal,vertical,on,off,auto,status} slash commands
+# + persistent config at $HOME/.claude/stamp-config.json + tools/stamp.py
+# + end-of-cycle-stamp.sh (reads config on Stop event).
+#
+# Kept for reference per operator directive 2026-05-06:
+# "label them as archive if they are not usefull anymore. dont necessarily
+#  delete them. they remind me of something."
+#
+# Reason for archival: original prompt-marker mechanism (`!stamp=horizontal` etc.)
+#            DID NOT WORK in real session per operator-empirical 2026-05-06
+#            (synthetic test passed; real-session marker not picked up — SB-091
+#            recurrence: synthetic-test-claimed-as-verified). SB-115 redesign
+#            replaced with slash-command + persistent JSON config (operator-
+#            empirically verified working).
+# Cross-refs: .claude/hooks/README.md (DRAFT v1 — WIRED-vs-ARCHIVE labels) ·
+#             .claude/hooks/end-of-cycle-stamp.sh (active successor) ·
+#             tools/stamp.py (config persistence layer) ·
+#             .claude/commands/stamp-*.md (6 slash commands — operator UX) ·
+#             tools/tests/test-stamp.py (23/23 regression tests for the active path) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#
+# Original purpose preserved below for historical reference.
+# ============================================================================
+#
 # stamp-control.sh — UserPromptSubmit hook for SB-114 per-prompt stamp control.
 #
 # Detects markers in operator's prompt and writes flag file consumed by

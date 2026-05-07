@@ -5,6 +5,25 @@ non-None reason, the hook denies the current tool call AND emits a loud
 systemMessage so the user notices the regression. The check is intentionally
 strict — better to deny good calls than to let a tampered config silently
 weaken protection.
+
+Status (2026-05-06 evening): not-yet-wired as standalone CLI; imported as
+Python module by policy-block.sh + malware-block.sh. Standalone CLI wiring
+deferred to T015 post-install verification work (foundation IaC roadmap).
+The module IS active runtime — every PreToolUse fire calls integrity_check()
+via the wired hooks; this file ITSELF is not directly hook-wired in
+.claude/settings.json (which is correct — it's a library, not a hook).
+
+Cross-refs:
+- .claude/hooks/README.md (DRAFT v1 — WIRED-vs-ARCHIVE labels mark this
+  as not-yet-wired-as-standalone-CLI but actively imported)
+- .claude/hooks/policy-block.sh + .claude/hooks/malware-block.sh (importers)
+- .claude/rules/hook-architecture.md (Strict-tier 2-layer architecture +
+  3-component design pattern; integrity_check() is the foundation safety
+  envelope's first layer)
+- T015 module page in backlog (planned standalone CLI wiring + manual
+  invocation surface for operator audit)
+- wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+  (sacrosanct verbatim directive governing this comment refresh)
 """
 
 import json

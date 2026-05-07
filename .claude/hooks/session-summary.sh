@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
-# SessionEnd hook: print a one-line summary of how many denies and detected
-# leaks happened during this session, so the user has visible feedback that
-# the protection is doing something (or that it caught something they should
-# look at).
+# session-summary.sh — SessionEnd hook: print one-line summary of denies + detected
+# leaks during this session, so the user has visible feedback that the protection
+# is doing something (or that it caught something they should look at).
+#
+# Wired event: SessionEnd · matcher: (any)
+# Strictness tier (per .claude/rules/hook-architecture.md): **Advisory** observability —
+#   informational close-of-session counts; no block/deny
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) · .claude/hooks/policy-block.sh
+#             + malware-block.sh + leak-detector.sh (the layers this summary counts) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#             (sacrosanct verbatim directive governing this comment refresh)
 
 import json
 import os

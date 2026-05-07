@@ -1,6 +1,6 @@
 ---
-description: Manage the active-task cursor — show current, set to a different task ID (validates against backlog), clear. State persists at $HOME/.claude/active-task; consumed by /handoff + pre-compact.sh handoff doc.
-argument-hint: [show | set <T###> | clear]
+description: Manage the active-task cursor (show/set/clear) AND create new tasks (M-E002-1: under-epic / under-task / from-blocker). State persists at $HOME/.claude/active-task; consumed by /handoff + pre-compact.sh.
+argument-hint: [show | set <T###> | clear | create under-epic --epic <slug> --title <text> | create under-task --task <T###> --title <text> | create from-blocker --blocker <SB-NNN|B###> --title <text>]
 ---
 
 # /task — manage the active-task cursor
@@ -16,6 +16,9 @@ The active-task layer is the **backlog cursor** — distinct from mission/focus/
 | (no args) or `show` | Print the current active task ID + drill-down (status, priority, module, stage, readiness, Done When count, BLOCKED BY). |
 | `set <T###>` | Set active task to the given ID. Refuses if the ID is not present in `$HOME/wiki/backlog/tasks/`. |
 | `clear` | Empty the state file. |
+| `create under-epic --epic <slug> --title <text>` | Create new task as child of given Epic (M-E002-1; agent-drafted with parent_epic frontmatter). |
+| `create under-task --task <T###> --title <text>` | Create new sub-task under given parent task (parent_task frontmatter). |
+| `create from-blocker --blocker <SB-NNN\|B###> --title <text>` | Create task spawned from a blocker (parent_blocker frontmatter). |
 
 ## Steps
 
@@ -27,7 +30,8 @@ case "$ARG" in
   ""|"show") /opt/devops-solutions-information-hub/.venv/bin/python -m tools.tasks active show ;;
   "clear")   /opt/devops-solutions-information-hub/.venv/bin/python -m tools.tasks active clear ;;
   set\ *)    /opt/devops-solutions-information-hub/.venv/bin/python -m tools.tasks active ${ARG} ;;
-  *)         echo "usage: /task [show | set <T###> | clear]"; exit 2 ;;
+  create\ *) /opt/devops-solutions-information-hub/.venv/bin/python -m tools.tasks ${ARG} ;;
+  *)         echo "usage: /task [show | set <T###> | clear | create under-epic|under-task|from-blocker --... --title ...]"; exit 2 ;;
 esac
 ```
 

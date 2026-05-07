@@ -2,6 +2,12 @@
 
 > Deep system topology + component inventory + data flow + hook architecture + module integration interfaces + failure modes. Distinct from [README.md](README.md)'s architecture summary (high-level project description); ARCHITECTURE.md is the technical depth file. Distinct from [DESIGN.md](DESIGN.md) (pattern rationale); ARCHITECTURE.md is the *what + how*, DESIGN.md is the *why*.
 
+> **Agent doc-update discipline (operator directive 2026-05-06, sacrosanct)**: when refreshing ARCHITECTURE.md, **adding ≠ discarding**. Layer new content; refresh inline values where empirically drifted; do NOT replace existing sections wholesale. Going-to-extremes (SB-082/093 family) recurs when an agent rewrites instead of revises. Sacrosanct: operator-verbatim quotes in ADR table preserved EXACTLY · ASCII diagrams (network position, data flows, hook firing order) preserved EXACTLY · Glossary entries preserved (only ADD new terms) · Failure Modes table preserved (operationally critical; updates need empirical verification per Hard Rule 15).
+
+## Summary
+
+This file documents the technical depth of root-ghostproxy's two architectural halves — a **transparent L2 inspection bridge** (between OPNsense edge and LAN switch; module slots for Suricata IDS/IPS + PolarProxy TLS termination) AND an **OS-level AI agent safety envelope** (shared safety policy at OS root level; all installed AI tools obey via canonical envelope contract). Topology + Interface Roles + Component Inventory + 4 Data Flow subsections + 2-Layer Hook Architecture (machine-level fires before project-level) + Module Integration Interfaces (Suricata NFQUEUE/AF_PACKET paths · PolarProxy transparent forward + dummy-interface Suricata pairing) + Failure Modes + Recovery + Performance Characteristics (aspirational) + Scalability boundaries + External integration points + Architectural Decisions (ADRs with operator-verbatim) + Glossary. **Empirical state verified 2026-05-06 evening**: 30 slash commands · 10 wired hook matchers across 8 events (17 .sh + 1 .py on disk; archived hooks retained per operator directive) · 15 Python tools + MCP server (10 root_* tools) · 11 rules · 138-row systemic-bugs tracker · 40 decisions D001-D040 · milestone v0.2 + 4 epics + 14 modules + 66 atomic tasks (4-level hierarchy). Brain-improvement mandate Phase 2 in flight (per [wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md](wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md)).
+
 ## System Overview
 
 root-ghostproxy turns a Linux host into two things at once:
@@ -78,21 +84,25 @@ Specific device names (e.g. `enp2s0`, `enp4s0`, `wlp3s0`, or `eth0`/`eth1`/`wlan
 
 ## Component Inventory
 
-| Component | Layer | Purpose | Status |
+| Component | Layer | Purpose | Status (2026-05-06 evening) |
 |---|---|---|---|
-| **Linux bridge** | Foundation | Forwards Ethernet frames between the two ethernet members. The inline data path. | Pending Foundation IaC (M003) |
-| **Bridge nftables rules** | Foundation | nftables INPUT/FORWARD/OUTPUT chains; controls what traffic crosses the bridge + what reaches the host | Pending Foundation IaC (M003) |
-| **Management wifi service** | Foundation | wpa_supplicant or equivalent; wifi client config; outbound-only nftables rules | Pending Foundation IaC (M003) |
-| **OS-root safety envelope** | Foundation | The shared AI agent policy: tamper sentinel + pre-tool hooks + post-tool hooks + session-lifecycle hooks. The endpoint half of the AI safety setup. | Pending Foundation IaC (M003) — operator-authored, not extending prior $HOME/.claude debris |
-| **opencode bridge plugin** | Foundation | Maps opencode's tool names + plugin SDK envelope onto the canonical Claude Code envelope; spawns the same hook scripts so opencode obeys the same policy. | Pending Foundation IaC (M003) |
+| **Linux bridge** | Foundation | Forwards Ethernet frames between the two ethernet members. The inline data path. | install.sh implement-stage 98% (D024 GREENLIT); systemd-networkd templates authored at `templates/systemd-networkd/`; real-execute = operator-driven future-session run |
+| **Bridge nftables rules** | Foundation | nftables INPUT/FORWARD/OUTPUT chains; controls what traffic crosses the bridge + what reaches the host | T013 FORWARD/OUTPUT operator-decision pending (default-accept vs default-drop threat-model question); INPUT chain (mgmt wifi outbound-only) authored |
+| **Management wifi service** | Foundation | wpa_supplicant or equivalent; wifi client config; outbound-only nftables rules | Authored at `templates/wpa_supplicant/`; wpa_supplicant@mgmt0.service systemd unit enabled at install; outbound-only ruleset at `templates/nftables/` |
+| **OS-root safety envelope** | Foundation | The shared AI agent policy: tamper sentinel + pre-tool hooks + post-tool hooks + session-lifecycle hooks. The endpoint half of the AI safety setup. | **10 wired hook matchers across 8 events** (17 .sh + 1 .py on disk; archived hooks retained per operator directive 2026-05-06); per-hook inventory at [`.claude/hooks/README.md`](.claude/hooks/README.md) |
+| **Active Objective Layer** (state files SB-118 + SB-127 + SB-124d) | Foundation | Multi-cycle objective tracking — `$HOME/.claude/active-{mission,focus,impediment,priorities,task}` state files. Read by mode-enforcement.sh banner + cycle.py stamp + mcp_server.py (root_objective MCP tool) + /handoff handoff doc + pre-compact.sh handoff snapshot. Operator-set via `/mission`, `/focus`, `/impediment`, `/priorities`, `/task` slash commands. | Implemented + operator-empirical verified |
+| **opencode bridge plugin** | Foundation | Maps opencode's tool names + plugin SDK envelope onto the canonical Claude Code envelope; spawns the same hook scripts so opencode obeys the same policy. | Implemented at `$HOME/.config/opencode/plugin/claude-bridge.ts` (untested with live opencode) |
 | **Methodology engine** | Foundation | `wiki/config/methodology.yaml` + `sdlc-profile.yaml` + `domain-profile.yaml` + `methodology-profile.yaml`. Drives stage-gated work loop. | Complete (copied from second brain to `$HOME/wiki/config/`) |
-| **Backlog scaffold** | Foundation | `wiki/backlog/{epics,modules,tasks}/` with active rollout epic + 14 modules + 66 atomic tasks | Complete (in `$HOME/wiki/backlog/`) |
-| **Sister-project integration** | Foundation | Registration in second brain + `--connect-project` mechanism produces 4 artefacts in $HOME: `.mcp.json` `research-wiki` entry, `tools/gateway.py` forwarder, `tools/view.py` forwarder, `## Second Brain Connection` block in AGENTS.md (variant=ROOT_OS_SETUP) | Registration complete; --connect-project not yet run for real |
-| **Project-internal verifier** | Infrastructure | `tools/verify-policy.py` (or equivalent) — verifies safety envelope invariants programmatically | Pending Infrastructure tooling (M004) |
-| **Suricata module** | Features (facultative) | Inline IDS/IPS on bridge data path; eve.json structured output | Not installed |
-| **PolarProxy module** | Features (facultative) | TLS termination + cleartext PCAP-over-IP for downstream consumption (Suricata via dummy interface + tcpreplay) | Not installed |
-| **Backlog tasks (atomic)** | Continuous | `wiki/backlog/tasks/T<NNN>-*.md` — atomic work units going through stages | Initial scaffolding only |
-| **Operator log + session log** | Continuous | `wiki/log/YYYY-MM-DD-*.md` — operator directives verbatim + AI session logs + completion notes | Not yet populated |
+| **Backlog scaffold** | Foundation | `wiki/backlog/{milestones,epics,modules,tasks}/` with **milestone v0.2 + 4 active epics + 14 modules + 66 atomic tasks** (4-level hierarchy introduced 2026-05-06: Milestone → Epic → Module → Task) | Complete (in `$HOME/wiki/backlog/`) |
+| **Governance layer** | Foundation | `wiki/governance/` SRP-separated docs: blockers.md (operator-decision-pending) + decisions.md (40 entries D001-D040 logbook) + progress.md (live-state callout) + systemic-bugs.md (138-row tracker; max ID SB-138; 1 historical duplicate) | Complete — populated daily |
+| **Sister-project integration** | Foundation | Registration in second brain + `--connect-project` mechanism produces 4 artefacts in $HOME: `.mcp.json` `research-wiki` entry, `tools/gateway.py` forwarder, `tools/view.py` forwarder, `## Second Brain Connection` block in AGENTS.md (variant=ROOT_OS_SETUP) | Registration complete; --connect-project not yet run for real (M007 territory) |
+| **Subdirectory READMEs** (9 — DRAFT v1) | Foundation (documentation) | Per-mechanism canonical indexes — `.claude/{commands,hooks,modes,rules,agents,skills}/README.md` + `tools/README.md` + `templates/README.md` + `scripts/README.md`. All wiki-schema 9-field compliant + Summary + Relationships sections. | Authored 2026-05-06 evening per brain-improvement mandate Phase 1 |
+| **Project-internal verifier** | Infrastructure | `tools/verify-policy.py` (or equivalent) — verifies safety envelope invariants programmatically | Pending Infrastructure tooling (M004); `install.sh --check` runs op_verify (16+ checks) as interim |
+| **Suricata module** | Features (facultative) | Inline IDS/IPS on bridge data path; eve.json structured output | Not installed (M005 operator-driven future-session) |
+| **PolarProxy module** | Features (facultative) | TLS termination + cleartext PCAP-over-IP for downstream consumption (Suricata via dummy interface + tcpreplay) | Not installed (M005 operator-driven future-session) |
+| **ccstatusline integration** | Features | Custom Claude Code statusline with 13 widgets + 5 profiles + wrapper. Operator-mandated 3-profile column tier. | Implemented + OPERATOR VISUALLY VERIFIED cycle 43 |
+| **Backlog tasks (atomic)** | Continuous | `wiki/backlog/tasks/T<NNN>-*.md` — atomic work units going through stages | 66 tasks T001-T066 across M001-M014 + new E001/E002/E003 epics |
+| **Operator log + session log** | Continuous | `wiki/log/YYYY-MM-DD-*.md` — operator directives verbatim + AI session logs + completion notes + decision packages + design notes | Extensively populated (many 2026-05-04/05/06 sessions; brain-improvement mandate log + M-E001-1 vocabulary log + decision-package logs) |
 
 ## Data Flow
 
@@ -205,10 +215,10 @@ Hook event types:
 | `PreToolUse` | Before a tool call executes | Tamper sentinel + policy decision |
 | `PostToolUse` | After tool output is captured | Leak detection + output redaction |
 | `SessionStart` | At session start | Banner + integrity self-check + project-priming (`session-orient.sh` directs agent to invoke `/orient`) |
-| `UserPromptSubmit` | When operator submits a prompt | `context-warning.sh` (% context remaining at thresholds 5/3/2/0); `output-discipline-guard.sh` (agent-discipline-gate per SB-108: high-confidence premise-risk + escalation detection, single-line banner via additionalContext when triggered) |
-| `PreCompact` | Before context compaction | `pre-compact.sh` writes deterministic state snapshot to `wiki/log/<ts>-pre-compact-handoff.md` (active mode + active task + cycle JSON + blockers JSON + recent logs + git state) so post-compact recovery has lossless reference |
-| `PostCompact` | After context compaction | `post-compact.sh` directs agent to invoke `/orient`; finds + references the most-recent pre-compact-handoff doc in additionalContext (closes the SB-078/SB-079 loop) |
-| `Stop` | At end of agent's turn | `end-of-cycle-stamp.sh` per SB-114/SB-115: emit end-of-turn status stamp via top-level `systemMessage` (the only valid display channel for Stop hook per Claude Code schema). Reads `$HOME/.claude/stamp-config.json` for layout (horizontal/vertical) + enabled (on/off/auto). Slash-command-driven config via `/stamp-*` commands + `tools/stamp.py`. DRAFT per SB-116 UX redesign Epic. |
+| `UserPromptSubmit` | When operator submits a prompt | **4-hook compound stack per SB-126** (each emits separate `additionalContext` field — compound, not competing): (1) `context-warning.sh` (% context remaining at thresholds 5/3/2/0% **AND absolute-token thresholds <50k/<25k/<10k per SB-119**; SB-107 transcript_path resolution); (2) `output-discipline-guard.sh` agent-discipline-gate per SB-108 with **3 detectors**: premise-risk (SB-090) + escalation (SB-094) + **conditional-clause grammar (SB-120)** — single-line banner when triggered; (3) `mode-enforcement.sh` per SB-056/117/118/127/129 (dynamic mode-file parsing + voice-table cite-bracket extraction + SB-117 frequency-control via /tmp cache + SB-118 objective layer + SB-127 priorities tier); (4) `mindfulness.sh` per SB-126/128/131 (7-clause baseline reminder per-prompt when active-mode set — one-notch / confirm-don't-construct / artifacts-flagged-as-agent-draft / forward-not-freeze / P1-first / substance-per-cycle / not-blocked-when-unblocked) |
+| `PreCompact` | Before context compaction | `pre-compact.sh` writes deterministic state snapshot to `wiki/log/<ts>-pre-compact-handoff.md` (active mode + active task + active mission/focus/impediment/priorities + cycle JSON + blockers JSON + recent logs + git state) so post-compact recovery has lossless reference. **Emits TOP-LEVEL `systemMessage` per SB-133 envelope schema fix** (NOT `hookSpecificOutput` envelope which only validates for PreToolUse/UserPromptSubmit/PostToolUse/PostToolBatch — was silently failing every compaction since SB-078 introduction). |
+| `PostCompact` | After context compaction | `post-compact.sh` directs agent to invoke `/orient`; finds + references the most-recent pre-compact-handoff doc in additionalContext (closes the SB-078/SB-079 loop). **Same SB-133 envelope fix** — top-level `systemMessage`. |
+| `Stop` | At end of agent's turn | `end-of-cycle-stamp.sh` per SB-114/SB-115: emit end-of-turn status stamp via top-level `systemMessage` (the only valid display channel for Stop hook per Claude Code schema). Reads `$HOME/.claude/stamp-config.json` for layout (horizontal/vertical) + enabled (on/off/auto). Slash-command-driven config via `/stamp-*` commands + `tools/stamp.py`. DRAFT per **SB-116 UX redesign Epic placeholder**; SB-138 stamp diff-suppression D038 directive partial-test-fail surfaced. |
 | `SessionEnd` / `SessionSummary` | At session end | Per-session deny/leak count + audit log entry |
 
 ### Project surfaces composing with hooks
@@ -217,16 +227,18 @@ The hook layer is one of 8 mechanisms in the project's unified trigger model (pe
 
 | Mechanism | Path | Determinism | Role |
 |---|---|---|---|
-| Hooks | `.claude/hooks/*.sh` | Logical | Lifecycle enforcement + project-priming |
-| Slash commands | `.claude/commands/*.md` (25 — incl. /orient, /cycle, /handoff, /audit, /log, /blockers, /progress, /decisions, /sync-progress, /help-root, /mode-{pm,architect,dual,clear,status}, /stamp-{horizontal,vertical,on,off,auto,status} (SB-115), /install-agent-brain, /mission, /focus, /impediment (SB-118)) | 100% on invoke | Operator-typed deterministic workflows |
-| Skills | `.claude/skills/<name>/` (2 local + user-level) | Description-match | Auto-trigger on operator prose |
-| Modes | `.claude/modes/*.md` (3) | State-driven | Persona shift across turns; modulates `/cycle` |
-| Sub-agents | `.claude/agents/*.md` (3 brain-loaded) | Cold-context | Delegated research with explicit "load brain first" prompts |
-| Tools | `tools/*.py` (10 modules — state, blockers, progress, decisions, cycle, tasks, stamp, objective, mcp_server, _paths) + harness-deferred | Programmatic | State queries + computations + render config |
-| MCP tools | `mcp_server.py` (6 read-only tools) | Programmatic | Cross-process structured returns |
-| Scheduled tasks | `CronCreate` / `ScheduleWakeup` | Cron OR self-paced | Wraps any of the above for repeated firing |
+| Hooks | `.claude/hooks/*.sh` (10 wired matchers across 8 events; 17 .sh + 1 .py on disk; archived hooks retained per operator directive) | Logical (block + reason + remediation per design pattern) | Lifecycle enforcement + project-priming + UserPromptSubmit 4-hook compound stack per SB-126. Per-hook canonical inventory + WIRED-vs-ARCHIVE labels at [`.claude/hooks/README.md`](.claude/hooks/README.md). |
+| Slash commands | `.claude/commands/*.md` (**30** — adds /priorities SB-127, /terminate, /finish-smoothly, /task SB-124d, /questions SB-134 since count last refreshed) | 100% on invoke | Operator-typed deterministic workflows. Per-category index at [`.claude/commands/README.md`](.claude/commands/README.md). |
+| Skills | `.claude/skills/<name>/SKILL.md` (2 local + user-level) | ~70-95% description-match | Auto-trigger on operator prose. Per-skill canonical index at [`.claude/skills/README.md`](.claude/skills/README.md). |
+| Modes | `.claude/modes/*.md` (3) | State-driven (durable per `.claude/active-mode`) | Persona shift across turns; modulates `/cycle`. Per-mode index + cycle-sequence comparison at [`.claude/modes/README.md`](.claude/modes/README.md). |
+| Sub-agents | `.claude/agents/*.md` (3 **brain-loaded** sub-agents per SB-081 closure — distinct from generic cold-context Agent-tool dispatch; mandatory brain-load prompts naming CLAUDE.md/AGENTS.md/relevant rules) | Brain-loaded on spawn (project-specific) | Delegated research with explicit "load brain first" prompts. Runtime gap: session-restart required for Claude Code to discover. Per-agent index at [`.claude/agents/README.md`](.claude/agents/README.md). |
+| Tools | `tools/*.py` (**15 .py modules** — state, blockers, progress, decisions, cycle, tasks (incl. active-task cursor SB-124d + create verbs), stamp, objective (SB-118), priorities (SB-127), questions (SB-134), group (Q1 Layer A — chain/group/tree primitive), run-tests (unified regression runner), mcp_server, _paths, __init__) + harness-deferred | Programmatic (100% non-LLM) | State queries + computations + render config. Per-tool index + composition map at [`tools/README.md`](tools/README.md). |
+| MCP tools | `tools/mcp_server.py` (**10 root_* tools** — root_state, root_blockers, root_progress, root_decisions_{list,get,verify,next_id}, root_objective SB-118+SB-127, root_questions SB-134, root_orient) | Programmatic | Cross-process structured returns. |
+| Scheduled tasks | `CronCreate` / `ScheduleWakeup` | Cron OR self-paced | Wraps any of the above for repeated firing. Auto-cancellation gating per [`.claude/rules/loop-cron-lifecycle.md`](.claude/rules/loop-cron-lifecycle.md) (autonomous-management permission with refined triggers). |
 
-Hook regression tests live at `.claude/hooks/tests/` — cycle 53 added `test-policy-block.py` (verifies SB-083 fix) and `test-malware-block.py` (verifies SB-084 fix). Run: `python3 .claude/hooks/tests/test-*.py` for pre-flight verification before hook edits.
+**M-E001-1 productive-cycle action vocabulary** (per Hard Rule 14 in CLAUDE.md/AGENTS.md + `wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md`): each cycle-fire emits one of 9 canonical action types (sb-closure / verified-edit / drift-fix-with-empirical / explicit-standby-with-named-reason / new-artifact / doc-refresh / blocker-surface / operator-directive-register / read-only-audit). All 8 mechanisms above converge on this same ACTION layer. Mandatory cycle-report last-line: `Productive output: <type> — <one-line specific>`.
+
+Hook regression tests live at `.claude/hooks/tests/` (8 test files) + `tools/tests/` (5 test files) = **13 test files / 215/234 aggregate** (empirically verified 2026-05-06 evening via `python3 -m tools.run-tests`). 3 partial-fail surfaced for operator-decision: test-mode-enforcement 0/0 collection regression, test-end-of-cycle-stamp-diff-suppression 21/22 (1 fail), test-questions 33/51 (18 fail). Run: `python3 -m tools.run-tests` for pre-flight verification before hook edits per Hard Rule 14 (verified-edit action type).
 
 ## Module Integration Interfaces
 
@@ -323,8 +335,19 @@ The current architecture is **single-host single-segment**. Scale boundaries:
 | 2026-05-05 | Prior $HOME files (README, install.sh, hooks, integrity.py, opencode bridge plugin, memory folder) are AI-debris from prior session, not authoritative | Operator: *"I DIDNT WRITE ANYTHING.. JUST FORGFET EVERYTHING FUCING EXIST."* Project's authoritative implementation will be re-authored by methodology-driven flow. |
 | 2026-05-05 | Two-layer hook architecture is invariant | Machine-level (root-ghostproxy) fires before project-level (sister projects). Machine-level deny is final. Project-level can add restrictions but not subtract. |
 | 2026-05-05 | `auto_connect: false` permanent default for type=root | Type=root projects gate the security envelope; explicit-authorization gate via `--connect-project` is the friction-by-design. M010 may revisit per operator. |
+| 2026-05-06 | **SB-115 brain-inheritance pattern** (codified as Hard Rule 12) | $HOME source-of-truth for **operational tooling** (hooks, slash commands, tools/*.py, settings.json wiring conventions, ANSI-fence rendering patterns, statusline widgets, mode-enforcement banner shape). /opt second-brain INHERITS / adapts these patterns. **Knowledge** flows OTHER direction (root-ghostproxy → second brain via `gateway contribute`). Operator verbatim 2026-05-06: *"WTF WHY WOULD YOU SAY second-brain is different ?? you are the root retart... second-brain take everything from you...."* |
+| 2026-05-06 | **SB-118 objective layer state files** (mission/focus/impediment) | Multi-cycle objective tracking ABOVE active-task cursor — `$HOME/.claude/active-{mission,focus,impediment}` state files + `tools/objective.py` set/clear/show + `/mission` `/focus` `/impediment` slash commands + mode-enforcement.sh banner surfacing + cycle.py stamp render + mcp_server root_objective MCP tool. Operator directive 2026-05-06: *"this make me think if we dont also need a current mission and a current focus... we can even add impediment.. this is another sub-level from a focus that is blocked for example"*. |
+| 2026-05-06 | **SB-127 priorities tier** (imminent-work hot-queue ABOVE PM blockers) | `$HOME/.claude/active-priorities` state file + `tools/priorities.py` (verbs: add/show/clear/remove/promote/demote/set/insert/update — insert+update added per SB-130) + `/priorities` slash command + mode-enforcement banner section + both stamp layouts. Operator directive 2026-05-06: *"my new STP file which would contain a list with task-and/or-focus combo with priotities that should be identified as the imminent work, even before the PM work"*. |
+| 2026-05-06 | **SB-123 compound + waterfall** unified rule | `.claude/rules/compound-and-waterfall.md` formalizes two orthogonal design axes — **compound** (additive layers at-a-moment: mode + priorities + mission + focus + impediment + live state visible simultaneously) + **waterfall** (state flows event-to-event: SessionStart → UserPromptSubmit hooks → Stop → PreCompact → PostCompact → /orient). Operator directive 2026-05-06: *"This also make me think of the compound and waterfall strategy... it should be compounding"*. |
+| 2026-05-06 | **SB-126 mindfulness baseline hook** | `.claude/hooks/mindfulness.sh` UserPromptSubmit hook injecting 7-clause baseline reminder per-prompt when active-mode set: one-notch-not-extreme (SB-082/093) · confirm-don't-construct (SB-090) · artifacts-flagged-as-agent-draft (SB-095) · forward-not-freeze (SB-099) · P1-first (SB-128) · substance-per-cycle (SB-128 + Hard Rule 14) · not-blocked-when-unblocked + chain-operations (SB-131). Forms 4-hook UserPromptSubmit compound stack with context-warning + output-discipline-guard + mode-enforcement. |
+| 2026-05-06 | **SB-128 productive-cycle taxonomy + Hard Rule 14** | M-E001-1 vocabulary DRAFT v2 — 9 canonical action types every cycle-fire emits. Mandatory cycle-report last-line `Productive output: <type> — <one-line specific>`. THIN standby without named subject is the SB-128 bug. Cross-tool universal — every AI tool's cycle skill emits the same vocabulary. |
+| 2026-05-06 | **SB-131 chain-operations** (codified as Hard Rule 13) | Coherent multi-edit per cron-fire is substance pattern; single-edit-per-fire is THIN-output anti-pattern (SB-128 family). Operator directive 2026-05-06: *"sometimes we should also have chain operations and groups calls with potentially chains which make tree of operations.. like updating multiple thing like project file and cursor / ecosystem files and such and whatnot"*. `tools/group.py` Q1 Layer A primitive (chain/group/tree composition). |
+| 2026-05-06 | **SB-133 PreCompact + PostCompact envelope schema fix** | Hooks emit TOP-LEVEL `systemMessage` per Claude Code schema (NOT `hookSpecificOutput` envelope which only validates for PreToolUse/UserPromptSubmit/PostToolUse/PostToolBatch). Was silently failing every compaction since SB-078 introduction — defeated entire SB-078/SB-079 reliability chain. Empirical schema-failure observed in /compact stdout proved regression real. |
+| 2026-05-06 | **Hard Rules 11-15 codified at hot-path layer** (CLAUDE.md / AGENTS.md) | Five new universal Hard Rules: 11 additive ≠ discarding (SB-082/093 going-to-extremes recurrence) · 12 brain-inheritance pattern (SB-115) · 13 chain-operations per fire (SB-131) · 14 productive-cycle taxonomy (M-E001-1 vocabulary; SB-128 closure) · 15 empirical-count-verification before drift-claim (SB-129 quality-recompile + ad-hoc count drift across multiple brain files). Each cites operator-verbatim or session-incident in Why column. Every-prompt-context-budget operationalization of operating-principles.md extension principles. |
+| 2026-05-06 | **Brain-improvement mandate first-pass + 9 sub-READMEs DRAFT v1** | Operator directive 2026-05-06: *"you are going to be the one from the external that update the brain of the root project"* + *"do not minimize"* + *"30+ operations for sure"*. Phase 1 (README pass) complete: README.md refreshed + scripts/README.md refreshed + 8 NEW sub-READMEs authored at `tools/README.md` + `.claude/{commands,hooks,modes,rules,agents,skills}/README.md` + `templates/README.md`. All wiki-schema 9-field compliant + Summary + Relationships sections. Phase 2 (top-level docs + categories) operator-gated per individual yes-per-file: CLAUDE.md / AGENTS.md / CONTEXT.md / TOOLS.md / SKILLS.md / Rules / Hooks / BOOTSTRAP.md done; ARCHITECTURE.md / DESIGN.md / SECURITY.md / commands / modes / agents / skills / tools-docstrings pending. |
+| 2026-05-06 | **install.sh implement-stage GREENLIT (D024)** | T012 install.sh advances scaffold → implement (98% readiness); T013 systemd-networkd as network tool; T014 accept current `$HOME/.claude/*` state as canonical. Real-execute on host = operator-driven future-session run. install.sh gains `--wizard` state-aware route + granular `--with-group`/`--no-group` per-category install + `--profile project --dest <path>` for sister-project agent-brain deploy + `/install-agent-brain <path>` slash command wrapper. shellcheck PASS; 16-step `op_verify` `--check` mode. |
 
-ADR detail (when authored at design stage) lives at `$HOME/wiki/decisions/` (planned location; not yet populated).
+ADR detail lives at [`wiki/governance/decisions.md`](wiki/governance/decisions.md) — full audit trail with **40 entries D001-D040**, rationale + reversibility + downstream effects per entry. Refresh via `python3 -m tools.decisions append --title --rationale --reversibility`.
 
 ## Glossary (architectural terms)
 
@@ -348,19 +371,99 @@ ADR detail (when authored at design stage) lives at `$HOME/wiki/decisions/` (pla
 | **Transparent forward proxy** | The PolarProxy operating mode for root-ghostproxy: connects to external TLS servers on behalf of LAN clients, decrypting + re-encrypting in flight. The "proxy" half of root-ghostproxy (when PolarProxy is installed). |
 | **Two-layer hook architecture** | The OS-root + project-level hook arrangement. Machine-level fires first (root-ghostproxy's domain); project-level fires second (each project's own). |
 
+## Agent personal-learning notes (operator-allowed, per directive 2026-05-06)
+
+> **Operator directive 2026-05-06 (sacrosanct)**: *"you can take notes of your personal learnings progress here, there is such a room for system project even a root one"*. Entries are **agent-authored** (per SB-095 — agent-DRAFT, not operator-stated). Operator may revise / promote / remove. Each timestamped + initialed `[agent]`. ARCHITECTURE.md-specific framing — system-architecture-doc lessons.
+
+### 2026-05-06 evening — ARCHITECTURE.md is the technical depth file (NOT the project description)
+
+`[agent]` ARCHITECTURE.md and README.md sometimes drift into duplication when an agent extends both with the same content. Discipline: README.md = project description + identity + vision + modules + status (what the project IS); ARCHITECTURE.md = topology + components + data flow + hook architecture + module integration interfaces + failure modes (what the project DOES technically). Don't duplicate. When an architecture detail belongs in both, put it in ARCHITECTURE.md and cross-reference from README.md.
+
+### 2026-05-06 evening — ASCII diagrams are sacrosanct (preserve box-drawing exactly)
+
+`[agent]` The 4 ASCII diagrams in ARCHITECTURE.md (network position, network passive flow, Suricata IPS paths, PolarProxy integration, tool-call flow + hook firing order) are sacrosanct in their exact rendering. Box-drawing characters + line breaks + indentation form the visual structure. ANY edit risks misalignment. Discipline: when the underlying topology changes, RE-RENDER the entire diagram in a scratch buffer + verify alignment + paste — don't piecemeal-edit lines within the diagram.
+
+### 2026-05-06 evening — ADR table is append-only with operator quotes preserved
+
+`[agent]` The ADR table (lines 313+) accumulates architectural decisions over project lifetime. Operator-verbatim quotes in ADRs (lines 317/319/323 + new 2026-05-06 ADRs) are sacrosanct. Discipline: APPEND new ADRs at the END of the table; never reorder; never modify existing rows; preserve operator quotes EXACTLY. The decisions logbook at `wiki/governance/decisions.md` (40 entries D001-D040) is the operational source-of-truth; the ADR table here is the architectural curation (a subset focused on architectural decisions, not all decisions).
+
+### 2026-05-06 evening — Component Inventory Status column drifts fast
+
+`[agent]` The Status column in Component Inventory transitions frequently (Pending → Implemented → Operator-empirical-verified → DRAFT → Archive). Per Hard Rule 15 (empirical-count-verification before drift-claim), refresh status values inline with empirical-verification-YYYY-MM-DD timestamp where useful. Don't compound prior status values with current cycle's deltas. Run a programmatic walk + parse before refreshing.
+
+### What this section is NOT
+
+`[agent]` Not the SB tracker (`wiki/governance/systemic-bugs.md`). Not the decisions logbook (`wiki/governance/decisions.md`). Not the session log (`wiki/log/`). Not DESIGN.md (pattern rationale — the WHY). For ARCHITECTURE.md-specific system-architecture-doc lessons that benefit fresh-pickup agents but are too small to warrant their own rule file. Operator promotes to structured artifact when pattern matures.
+
 ## Cross-References
+
+### Top-level brain files (10)
 
 | For… | Read |
 |---|---|
 | Project front door + vision + identity + modules + status | [README.md](README.md) |
+| Cold-pickup orientation | [BOOTSTRAP.md](BOOTSTRAP.md) |
 | Why this shape (design pattern rationale) | [DESIGN.md](DESIGN.md) |
 | Tool reference (when scripts exist) | [TOOLS.md](TOOLS.md) |
 | Threat model + protections + escalation + audit | [SECURITY.md](SECURITY.md) |
-| Cross-tool agent contract | [AGENTS.md](AGENTS.md) |
-| Claude Code-specific routing | [CLAUDE.md](CLAUDE.md) |
-| Current operational state | [CONTEXT.md](CONTEXT.md) |
+| Cross-tool agent contract + 15 universal Hard Rules | [AGENTS.md](AGENTS.md) |
+| Claude Code-specific routing + 15 Hard Rules | [CLAUDE.md](CLAUDE.md) |
+| Current operational state (Active Objective Layer + SFIF + pending decisions) | [CONTEXT.md](CONTEXT.md) |
 | Skills directory context (skill-vs-command-vs-hook decision matrix) | [SKILLS.md](SKILLS.md) |
+
+### Subdirectory READMEs (9 — DRAFT v1, agent-authored 2026-05-06 evening)
+
+| For… | Read |
+|---|---|
+| **Per-hook canonical inventory** + WIRED-vs-ARCHIVE labels (canonical extension of Hook Architecture section above) | [.claude/hooks/README.md](.claude/hooks/README.md) |
+| 30 slash commands by category (canonical extension of Project surfaces table) | [.claude/commands/README.md](.claude/commands/README.md) |
+| **Per-tool composition map** + state-file architecture diagram | [tools/README.md](tools/README.md) |
+| 3 modes + cycle-sequence comparison | [.claude/modes/README.md](.claude/modes/README.md) |
+| 11 rules + strictness-tier matrix | [.claude/rules/README.md](.claude/rules/README.md) |
+| 3 brain-loaded sub-agents + SB-081 runtime gap | [.claude/agents/README.md](.claude/agents/README.md) |
+| 2 skills + mechanism-choice context | [.claude/skills/README.md](.claude/skills/README.md) |
+| 5 install template categories | [templates/README.md](templates/README.md) |
+| Deployment + maintenance toolkit | [scripts/README.md](scripts/README.md) |
+
+### Backlog + governance + log
+
+| For… | Read |
+|---|---|
 | Methodology engine | [wiki/config/methodology.yaml](wiki/config/methodology.yaml) |
-| SFIF model (canonical) | `<second-brain>/wiki/spine/models/quality/model-sfif-architecture.md` |
-| Suricata source-syntheses (in second brain) | `<second-brain>/wiki/sources/src-suricata*.md` |
-| PolarProxy source-syntheses (in second brain) | `<second-brain>/wiki/sources/src-polarproxy.md`, `src-hanke-honeypot-polarproxy-suricata-integration.md` |
+| 4-level backlog hierarchy (Milestone → Epic → Module → Task) | [wiki/backlog/](wiki/backlog/) |
+| **40-entry decisions logbook (D001-D040)** — full audit trail | [wiki/governance/decisions.md](wiki/governance/decisions.md) |
+| **138-row systemic-bugs tracker** | [wiki/governance/systemic-bugs.md](wiki/governance/systemic-bugs.md) |
+| Operator-decision-pending blockers register | [wiki/governance/blockers.md](wiki/governance/blockers.md) |
+| Live-state callout | [wiki/governance/progress.md](wiki/governance/progress.md) |
+
+### Universal cross-cutting rules (architecture-relevant)
+
+| For… | Read |
+|---|---|
+| **Unified 8-mechanism signal→action→recovery model** + M-E001-1 action layer | [.claude/rules/trigger-model.md](.claude/rules/trigger-model.md) |
+| **Compound + waterfall axes** (additive layering at-a-moment + sequential cascade event-to-event — directly relevant for hook architecture) | [.claude/rules/compound-and-waterfall.md](.claude/rules/compound-and-waterfall.md) |
+| Context-engineering (auto/pre/on-demand/facultative injection modes) | [.claude/rules/context-engineering.md](.claude/rules/context-engineering.md) |
+| Hook architecture rule (2-layer + 3-component design pattern + bypass mechanism per hook) | [.claude/rules/hook-architecture.md](.claude/rules/hook-architecture.md) |
+| Loop-cron-lifecycle (when scheduled tasks self-cancel/update) | [.claude/rules/loop-cron-lifecycle.md](.claude/rules/loop-cron-lifecycle.md) |
+| Operating principles (4 core + 11 extension + Hard Rules 11-15 mapping) | [.claude/rules/operating-principles.md](.claude/rules/operating-principles.md) |
+| **CLAUDE.md / AGENTS.md Hard Rules 11-15** — additive≠discarding · brain-inheritance · chain-operations · productive-cycle taxonomy · empirical-count-verification | [CLAUDE.md](CLAUDE.md) Rules 11-15 + [AGENTS.md](AGENTS.md) Rules 11-15 |
+
+### Brain-improvement mandate (this work block — 2026-05-06)
+
+| For… | Read |
+|---|---|
+| Sacrosanct verbatim directive governing the brain-quality passes | [wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md](wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md) |
+| **M-E001-1 productive-cycle action vocabulary DRAFT v2** (9 types — every mechanism above emits one) | [wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md](wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md) |
+| Decision package log (RESOLVED — sub-READMEs scope) | [wiki/log/2026-05-06-194730-decision-package-new-subdir-readmes.md](wiki/log/2026-05-06-194730-decision-package-new-subdir-readmes.md) |
+
+### Second brain (canonical sources)
+
+| For… | Read |
+|---|---|
+| Methodology engine canonical | `<second-brain>/wiki/config/methodology.yaml` |
+| SFIF model canonical | `<second-brain>/wiki/spine/models/quality/model-sfif-architecture.md` |
+| Suricata source-syntheses (4 pages) | `<second-brain>/wiki/sources/src-suricata*.md` |
+| PolarProxy source-syntheses (2 pages) | `<second-brain>/wiki/sources/src-polarproxy.md` + `src-hanke-honeypot-polarproxy-suricata-integration.md` |
+| Identity profile canonical | `<second-brain>/wiki/ecosystem/project_profiles/root-ghostproxy/identity-profile.md` |
+| Adoption Guide canonical | `<second-brain>/wiki/spine/references/adoption-guide.md` |
+| Wiki-schema (9 required fields + per-type required sections) | `<second-brain>/wiki/config/wiki-schema.yaml` |

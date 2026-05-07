@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # aidlc-readiness.sh — readiness % on selected task (or epic if no task selected).
-# Output: "R:25%" / "R:?"
+# Output: "Readiness: 25%" / "Readiness: ?"
 set -euo pipefail
 # shellcheck disable=SC1091
 source "$(dirname "$0")/_lib.sh"

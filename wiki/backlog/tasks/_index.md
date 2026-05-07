@@ -12,6 +12,14 @@ Naming: `T<NNN>-<slug>.md`. Sequence is per-project (T001 onwards). Per Adoption
 
 Each task page has frontmatter (status, priority, parent_module, parent_epic, current_stage, readiness, sfif_stage, created/updated dates, sources, tags), Description (1+ paragraphs), Done When (atomic checkboxes), Dependencies, Relationships.
 
+**Optional hierarchy fields (M-E002-2 schema extension, agent-DRAFT 2026-05-06 per Milestone v0.2 — gated on operator scope confirmation before tool wiring; existing tasks unchanged)**:
+
+- `parent_task: T<NNN>-<slug>` — declares this task is a sub-task of another task (multi-level nesting per operator: *"task-sub-task"*)
+- `parent_blocker: SB-<NNN>` or `parent_blocker: B<NNN>` — declares this task spawned from a blocker (per operator: *"task based on blockers"*)
+- `parent_milestone: <slug>` — declares direct task→milestone laddering (rare; default ladder is parent_module → parent_epic → parent_milestone)
+
+Schema-only at this point. No tools/commands consume them yet. Future task-creation verbs (M-E002-1) will populate them. See [Milestone v0.2](../milestones/v0.2-ai-natural-task-management.md) "Suggested evolution" section.
+
 ## Coverage by module (66 atomic tasks across 14 modules)
 
 ### Stream 2 — Pure SFIF Project Base

@@ -100,7 +100,7 @@ When the operator runs `/loop <interval> /cycle` and the active mode is `devops-
    - For tasks gated on operator decisions: flag for the PM cycle (don't act)
 5. **Stage gate check** — confirm any stage-transitions in flight have hit their gate command (per `methodology.yaml`); if not, name what's missing.
 6. **Cross-cutting: top-down ↔ bottom-up reconciliation** — does in-flight bottom-up work reveal that top-down design needs revision? Or vice versa? Flag the iteration loop.
-5. **Wait** — one-line summary + stand by. Don't ship implementation without operator authorization for the active task.
+7. **Wait** — one-line summary + stand by. Don't ship implementation without operator authorization for the active task. Per SB-128(b) productive-cycle taxonomy (canonical at `$HOME/.claude/commands/cycle.md`): cycle report's last line MUST end with `Productive output: <category> — <one-line specific>`. Architect-mode-relevant categories: (1) SB closure with test, (2) code edit + test pass, (3) drift fix with re-read, (4) doc with operator-quoted directive, (5) explicit standby with stage-gate / operator-decision named reason, (6) tracker reconciliation. Pure survey with no edit → category 5 with concrete blocker/gate name.
 
 ## When to switch out
 

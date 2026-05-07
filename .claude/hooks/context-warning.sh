@@ -5,6 +5,22 @@
 # 4 modes: auto / strategic-early / edging / scope-shift-clear) is informed by
 # real perception. Pure observability — does NOT prescribe action.
 #
+# Wired event: UserPromptSubmit · matcher: (any) · 4-hook compound stack per SB-126
+# (compounds with: output-discipline-guard + mode-enforcement + mindfulness)
+# Tests: .claude/hooks/tests/test-context-warning.py (8/8 pass — empirically
+#        verified 2026-05-06 evening via tools.run-tests; covers SB-107 transcript_path
+#        resolution + SB-119 absolute-token thresholds <50k/<25k/<10k)
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) · .claude/rules/hook-architecture.md
+#             (Strict-tier 3-component pattern; this hook is OBSERVABILITY tier
+#               — no block/deny, just additionalContext banner) ·
+#             CLAUDE.md/AGENTS.md Hard Rule 15 (empirical-count-verification —
+#               this hook surfaces measured tokens, not estimated) ·
+#             wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md
+#             (M-E001-1 vocabulary — context-window thresholds inform but don't
+#               emit action types directly) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#             (sacrosanct verbatim directive governing this comment refresh)
+#
 # Operator directives (sacrosanct):
 #   2026-05-06 — "there should be a hook that start warning at the prompt
 #     inputs so that at <5% we say something and then at 3 and 2 pourcent

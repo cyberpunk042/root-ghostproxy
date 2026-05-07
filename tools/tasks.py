@@ -181,6 +181,21 @@ def main() -> int:
     active_set.add_argument("task_id")
     active_sub.add_parser("clear", help="empty active-task state file")
 
+    # M-E002-1 creation verbs — DRAFT scaffolds (raise NotImplementedError until
+    # operator scope decisions on Q4 — direct task write vs lightweight queue).
+    create_p = sub.add_parser("create", help="[DRAFT] create new task page (M-E002-1, scope-pending)")
+    create_sub = create_p.add_subparsers(dest="create_cmd", required=True)
+    cu_epic = create_sub.add_parser("under-epic", help="create task as child of an epic")
+    cu_epic.add_argument("--epic", required=True, help="parent epic slug (e.g. epic-e001-auto-pilot-rework)")
+    cu_epic.add_argument("--title", required=True)
+    cu_epic.add_argument("--module", help="optional parent_module")
+    cu_task = create_sub.add_parser("under-task", help="create sub-task of another task")
+    cu_task.add_argument("--task", required=True, help="parent task ID (e.g. T012)")
+    cu_task.add_argument("--title", required=True)
+    cf_blk = create_sub.add_parser("from-blocker", help="create task spawned from a blocker (SB or B-row)")
+    cf_blk.add_argument("--blocker", required=True, help="blocker ID (e.g. SB-104, B003)")
+    cf_blk.add_argument("--title", required=True)
+
     args = parser.parse_args()
     tasks = collect_all_tasks()
 
@@ -243,6 +258,60 @@ def main() -> int:
                 ACTIVE_TASK_FILE.write_text("")
             print("active-task: cleared")
             return 0
+
+    if args.cmd == "create":
+        # M-E002-1 DRAFT v1 — direct-write to wiki/backlog/tasks/ (Q4 default; reversible)
+        import re as _re
+        from datetime import date as _date
+
+        TASKS_DIR = Path(os.environ.get("HOME", "/root")) / "wiki" / "backlog" / "tasks"
+
+        def _next_task_id() -> str:
+            existing = [int(m.group(1)) for f in TASKS_DIR.glob("T*.md")
+                        if (m := _re.match(r"T(\d+)", f.name))]
+            return f"T{(max(existing) + 1) if existing else 1:03d}"
+
+        def _slugify(s: str) -> str:
+            s = _re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+            return s[:60] or "untitled"
+
+        tid = _next_task_id()
+        slug = _slugify(args.title)
+        path = TASKS_DIR / f"{tid}-{slug}.md"
+        today = _date.today().isoformat()
+
+        parent_lines = []
+        if args.create_cmd == "under-epic":
+            parent_lines.append(f'parent_epic: "{args.epic}"')
+            if getattr(args, "module", None):
+                parent_lines.append(f'parent_module: "{args.module}"')
+        elif args.create_cmd == "under-task":
+            parent_lines.append(f'parent_task: "{args.task}"')
+        elif args.create_cmd == "from-blocker":
+            parent_lines.append(f'parent_blocker: "{args.blocker}"')
+
+        frontmatter = "\n".join([
+            "---",
+            f'title: "{tid} — {args.title}"',
+            "type: task",
+            "status: not-started",
+            "priority: P3",
+            *parent_lines,
+            "current_stage: document",
+            "readiness: 0",
+            f"created: {today}",
+            f"updated: {today}",
+            "tags: [agent-drafted, m-e002-1-create-verb]",
+            "---",
+        ])
+        body = f"\n\n# {tid} — {args.title}\n\n> Agent-DRAFT created via `tools.tasks create {args.create_cmd}` (M-E002-1, 2026-05-06). Operator-revisable.\n\n## Description\n\n(operator to fill)\n\n## Done When\n\n- [ ] (operator to fill)\n"
+
+        if path.exists():
+            print(f"refused: {path} already exists", file=sys.stderr)
+            return 1
+        path.write_text(frontmatter + body)
+        print(f"created {path}")
+        return 0
 
     return 0
 

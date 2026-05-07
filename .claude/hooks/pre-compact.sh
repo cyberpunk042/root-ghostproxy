@@ -1,5 +1,25 @@
 #!/usr/bin/env python3
-# PreCompact hook — capture handoff state BEFORE compaction summarizes context away.
+# pre-compact.sh — PreCompact hook: capture handoff state BEFORE compaction
+# summarizes context away.
+#
+# Wired event: PreCompact · matcher: (any) · companion: post-compact.sh
+# Strictness tier (per .claude/rules/hook-architecture.md): **Enforced** state-capture —
+#   writes wiki/log/<ts>-pre-compact-handoff.md before compaction destroys nuance
+# Self-gate (per SB-088): CLAUDE_PROJECT_DIR / cwd self-gate to prevent cross-firing
+# **CRITICAL ENVELOPE FIX (SB-133, 2026-05-06)**: emits TOP-LEVEL `systemMessage`
+#   per Claude Code schema for PreCompact (NOT `hookSpecificOutput` envelope which
+#   only validates for PreToolUse / UserPromptSubmit / PostToolUse / PostToolBatch).
+#   Was silently failing every compaction since SB-078 introduction with
+#   `hookSpecificOutput` envelope — defeated the entire SB-078/SB-079 reliability
+#   chain. Empirical schema-failure observed in /compact stdout proved regression.
+# SB closures: SB-078 (pre-compact handoff readiness — proactive mechanism) ·
+#              SB-133 (envelope schema fix — top-level systemMessage)
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) · .claude/hooks/post-compact.sh
+#             (the OTHER end of the loop — reads handoff doc after compaction) ·
+#             .claude/commands/handoff.md (operator-on-demand handoff equivalent) ·
+#             .claude/commands/finish-smoothly.md (knowledge-extraction PASS variant) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#               (sacrosanct verbatim directive governing this comment refresh)
 #
 # Why: Compaction destroys nuance. Operator-verbatim quotes, recent decisions,
 # in-flight task state, sub-agent findings, current cycle's SB pick — all
@@ -120,6 +140,8 @@ def main() -> None:
     active_focus = safe_read(str(PROJECT_ROOT / ".claude" / "active-focus"), "(unset)")
     active_impediment = safe_read(str(PROJECT_ROOT / ".claude" / "active-impediment"), "(none — focus unblocked)")
     active_priorities = safe_read(str(PROJECT_ROOT / ".claude" / "active-priorities"), "(none set)")
+    # Questions retention (operator directive 2026-05-06): pending agent → operator questions
+    active_questions = safe_read(str(PROJECT_ROOT / ".claude" / "active-questions"), "(none pending)")
 
     cycle_json = safe_run(
         [PYTHON, "-m", "tools.cycle", "--json"],
@@ -161,6 +183,12 @@ def main() -> None:
 
 ```
 {active_priorities}
+```
+
+## Questions (agent → operator pending input — operator directive 2026-05-06)
+
+```
+{active_questions}
 ```
 
 ## Cycle state (tools.cycle --json)

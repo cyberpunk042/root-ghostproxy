@@ -1,6 +1,22 @@
 #!/usr/bin/env python3
 # agent-discipline-gate (file: output-discipline-guard.sh — name kept for stability).
 #
+# Wired event: UserPromptSubmit · matcher: (any) · part of 4-hook compound stack
+# per SB-126 (compounds with: context-warning + mode-enforcement + mindfulness)
+# Tests: .claude/hooks/tests/test-output-discipline-guard.py (19/19 pass —
+#        empirically verified 2026-05-06 evening via tools.run-tests)
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) ·
+#             .claude/rules/hook-architecture.md (Strict-tier 3-component pattern) ·
+#             .claude/rules/words-are-sacrosanct.md (premise-confirmation gate +
+#               conditional-clause grammar — rule layer this hook detects at runtime) ·
+#             wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md
+#             (M-E001-1 vocabulary — banner output is informational; doesn't itself
+#               emit an action type but informs agent's action-emission discipline) ·
+#             CLAUDE.md/AGENTS.md Hard Rule 11 (additive ≠ discarding —
+#               operator-correction triggers escalation detector) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#               (sacrosanct verbatim directive governing this comment refresh)
+#
 # UserPromptSubmit hook for runtime SB-090 + SB-094 + SB-120 detection. Combines:
 #   - PREMISE-RISK detection (SB-090): operator words enumerate observations or
 #     ask questions without imperative verbs → agent should not infer action.

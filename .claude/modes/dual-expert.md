@@ -74,7 +74,8 @@ When the operator runs `/loop <interval> /cycle` and the active mode is `dual-ex
    - **Operator-stated priority advancement** — concrete progress on P1/P2 (in priority order, NOT short-circuiting per mindfulness clause #5)
    - **Explicit standby-with-reason** — when (a) above all fail empirically AND (b) reason is named beyond "ceiling reached" (e.g., "P1 just-fixed this fire, awaiting empirical confirmation next fire")
    If none applied → that's the SB-128 bug recurring; capture as instance + force one of the above before next fire.
-7. **Wait** — one combined summary + stand by; ScheduleWakeup for next fire
+   See `$HOME/.claude/commands/cycle.md` "Productive cycle taxonomy" section for the canonical 6-category taxonomy + empirical-signal column + mandatory cycle-report-last-line format. The categories above are the dual-mode-relevant subset.
+7. **Wait** — one combined summary + stand by; ScheduleWakeup for next fire. Cycle report's last line MUST end with `Productive output: <category> — <one-line specific>` per cycle.md taxonomy.
 
 The Dual cycle is naturally LONGER than focused-mode cycles. If running `/loop 30m /cycle` in dual mode produces too much per fire, narrow to focused mode for that period.
 

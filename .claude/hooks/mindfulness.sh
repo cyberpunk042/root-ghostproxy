@@ -1,10 +1,31 @@
 #!/usr/bin/env python3
 # mindfulness.sh — UserPromptSubmit hook injecting mindfulness baseline.
 #
-# Operator directive 2026-05-06: *"about those crazy act... it probably just
-# need another hook / sub-hook in reality where we remind of the basis of
-# mindful that naturally dont lead to pendulum and extrapolation and
-# hallucination moves..."*
+# Wired event: UserPromptSubmit · matcher: (any) · 4-hook compound stack per SB-126
+# (compounds with: context-warning + output-discipline-guard + mode-enforcement)
+# Tests: .claude/hooks/tests/test-mindfulness.py (22/22 pass — empirically
+#        verified 2026-05-06 evening via tools.run-tests)
+# 7 clauses (each cites SB closure for traceability):
+#   1. one-notch-not-extreme → SB-082/093 pendulum
+#   2. confirm-don't-construct → SB-090 premise-construction
+#   3. artifacts-flagged-as-agent-draft → SB-095 hallucinated-artifacts
+#   4. forward-not-freeze → SB-099 abdication
+#   5. P1-first → SB-128 family (don't short-circuit to lower-priority)
+#   6. substance-per-cycle → SB-128 + Hard Rule 14 (M-E001-1 vocabulary)
+#   7. not-blocked-when-unblocked + chain-operations → SB-131
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) · .claude/rules/operating-principles.md
+#             (extension principles 11-13 + Hard Rules 11-13 in CLAUDE.md/AGENTS.md
+#               — mindfulness clauses are pre-trigger reminders for these rules) ·
+#             .claude/rules/words-are-sacrosanct.md (clause #2 cites premise gate) ·
+#             wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md
+#             (clause #6 cites M-E001-1 vocabulary 4 canonical action types) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#             (sacrosanct verbatim directive governing this comment refresh)
+#
+# Operator directive 2026-05-06 (sacrosanct verbatim): *"about those crazy act...
+# it probably just need another hook / sub-hook in reality where we remind of
+# the basis of mindful that naturally dont lead to pendulum and extrapolation
+# and hallucination moves..."*
 #
 # Engineering scope (closes the recurring rule-only-fix gap from SB-113):
 #

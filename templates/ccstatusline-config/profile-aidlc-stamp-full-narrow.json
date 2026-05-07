@@ -1,0 +1,76 @@
+{
+  "_DRAFT_NOTE": "AGENT-DRAFTED 2026-05-06 per SB-095 — DRAFT v1, NOT operator-confirmed. Phase 7 of UX-design pass: narrow-terminal variant of profile-aidlc-stamp-full (t5 review tier). Same 4-line architecture-grouped layout (action / objective / telemetry / env+audit) with reduced widget density per line so total width fits ~100-char terminals. Drops: L1-model (already on L3) · L1-stage (SFIF carries the phase signal) · L3-session-name · L3-thinking · L3-vim · L4-weeklyusage · L4-sescost. Mission/focus widgets keep their 80-char smart-abbrev budget — operators on truly narrow terminals see graceful truncation via ccstatusline flex (last-resort).",
+  "_TIER": "t5-narrow — 4-line review variant for narrow terminals (~100 chars)",
+  "_USE_CASE": "Review/audit on narrow terminal — when operator needs full AIDLC + objective + audit visibility but can't afford the full t5 widget density.",
+  "_DROPPED_VS_FULL": [
+    "L1-model (redundant with L3-model)",
+    "L1-stage (SFIF carries the phase signal already)",
+    "L3-session-name (rarely needed at-a-glance)",
+    "L3-thinking (model-meta detail)",
+    "L3-vim (low-priority indicator)",
+    "L4-weeklyusage (session-usage carries the spend signal)",
+    "L4-sescost (already in usage widget context)"
+  ],
+  "version": 3,
+  "lines": [
+    [
+      {"id": "L1-mode",        "type": "custom-command", "color": "magenta",     "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-mode.sh",            "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "L1-sep1",        "type": "separator", "character": "  │  "},
+      {"id": "L1-task",        "type": "custom-command", "color": "brightWhite", "commandPath": "$HOME/.local/share/ccstatusline-widgets/selected-task.sh",        "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "L1-flex1",       "type": "flex-separator"},
+      {"id": "L1-sfif",        "type": "custom-command", "color": "blue",        "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-sfif.sh",            "rawValue": true, "timeout": 1000},
+      {"id": "L1-sep2",        "type": "separator", "character": "  ·  "},
+      {"id": "L1-readiness",   "type": "custom-command", "color": "green",       "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-readiness.sh",       "rawValue": true, "timeout": 1000},
+      {"id": "L1-flex2",       "type": "flex-separator"},
+      {"id": "L1-blockers",    "type": "custom-command", "color": "red",         "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-blockers.sh",        "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "L1-sep3",        "type": "separator", "character": "  │  "},
+      {"id": "L1-sbs",         "type": "custom-command", "color": "brightYellow","commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-open-sbs.sh",       "rawValue": true, "timeout": 1000},
+      {"id": "L1-sep4",        "type": "separator", "character": "  │  "},
+      {"id": "L1-tasks",       "type": "custom-command", "color": "green",       "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-tasks-progress.sh", "rawValue": true, "timeout": 1000}
+    ],
+    [
+      {"id": "L2-mission",     "type": "custom-command", "color": "brightWhite", "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-mission.sh",        "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "L2-flex1",       "type": "flex-separator"},
+      {"id": "L2-focus",       "type": "custom-command", "color": "brightWhite", "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-focus.sh",          "rawValue": true, "timeout": 1000},
+      {"id": "L2-flex2",       "type": "flex-separator"},
+      {"id": "L2-impediment",  "type": "custom-command", "color": "red",         "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-impediment.sh",     "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "L2-flex3",       "type": "flex-separator"},
+      {"id": "L2-priority1",   "type": "custom-command", "color": "brightCyan",  "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-priority1.sh",      "rawValue": true, "timeout": 1000, "bold": true}
+    ],
+    [
+      {"id": "L3-model",       "type": "model", "color": "cyan"},
+      {"id": "L3-flex1",       "type": "flex-separator"},
+      {"id": "L3-ctxbar",      "type": "context-bar", "color": "blue"},
+      {"id": "L3-sep1",        "type": "separator", "character": "  "},
+      {"id": "L3-ctxpct",      "type": "context-percentage", "color": "brightYellow", "bold": true},
+      {"id": "L3-flex2",       "type": "flex-separator"},
+      {"id": "L3-tin",         "type": "tokens-input", "color": "green"},
+      {"id": "L3-sep2",        "type": "separator", "character": "  "},
+      {"id": "L3-tout",        "type": "tokens-output", "color": "green"},
+      {"id": "L3-sep3",        "type": "separator", "character": "  ·  "},
+      {"id": "L3-speed",       "type": "total-speed", "color": "green"}
+    ],
+    [
+      {"id": "L4-branch",      "type": "git-branch",         "color": "magenta", "bold": true},
+      {"id": "L4-sep1",        "type": "separator",          "character": "  "},
+      {"id": "L4-status",      "type": "git-status",         "color": "magenta"},
+      {"id": "L4-sep2",        "type": "separator",          "character": "  "},
+      {"id": "L4-sha",         "type": "git-sha",            "color": "brightBlack"},
+      {"id": "L4-flex1",       "type": "flex-separator"},
+      {"id": "L4-sesusage",    "type": "session-usage",      "color": "magenta", "bold": true},
+      {"id": "L4-sep3",        "type": "separator",          "character": "  ·  "},
+      {"id": "L4-compact",     "type": "compaction-counter", "color": "brightBlack"},
+      {"id": "L4-sep4",        "type": "separator",          "character": "  ·  "},
+      {"id": "L4-cwd",         "type": "current-working-dir","color": "brightBlack"},
+      {"id": "L4-sep5",        "type": "separator", "character": "  │  "},
+      {"id": "L4-decisions",   "type": "custom-command", "color": "brightBlue",  "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-decisions.sh",       "rawValue": true, "timeout": 1000},
+      {"id": "L4-sep6",        "type": "separator", "character": "  │  "},
+      {"id": "L4-questions",   "type": "custom-command", "color": "brightYellow","commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-questions.sh",       "rawValue": true, "timeout": 1000}
+    ]
+  ],
+  "flexMode": "full",
+  "colorLevel": 2,
+  "globalBold": false,
+  "minimalistMode": false,
+  "powerline": {"enabled": false, "separators": [""], "separatorInvertBackground": [false], "startCaps": [], "endCaps": [], "autoAlign": false, "continueThemeAcrossLines": false}
+}

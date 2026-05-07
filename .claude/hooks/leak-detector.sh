@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
-# PostToolUse hook: scan tool OUTPUTS for credential-shaped values.
+# leak-detector.sh — PostToolUse hook: scan tool OUTPUTS for credential-shaped values.
+#
+# Wired event: PostToolUse · matcher: Read|Bash|WebFetch|Grep
+# Strictness tier (per .claude/rules/hook-architecture.md): **Enforced** observability —
+#   detection + logging + alert; cannot redact (fires after tool output captured)
+# Tests: NO formal regression suite (manual test cases only — future M003 T-M003-7
+#        territory per refinement queue)
+# Cross-refs: .claude/hooks/README.md (DRAFT v1 — flags no-formal-regression-suite) ·
+#             .claude/rules/hook-architecture.md (Enforced-tier observability —
+#               surfaces detection without state mutation) ·
+#             AGENTS.md Hard Rule 1 (deny-by-default) — leak-detector is the
+#               post-fact equivalent (loud alert when something slipped through) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#               (sacrosanct verbatim directive governing this comment refresh)
+#
 # Fires AFTER a tool ran, so cannot redact — but surfaces leaks loudly so
 # the user can clear the conversation and rotate before more damage happens.
 #

@@ -2,6 +2,8 @@
 
 > **Fresh session?** Read [BOOTSTRAP.md](BOOTSTRAP.md) first — one-page cold-pickup guide.
 
+> **Agent doc-update discipline (operator directive 2026-05-06, sacrosanct)**: when improving this README or any sister doc, **adding ≠ discarding**. Layer new content onto prior content; refresh inline values where empirically drifted (with empirical-verification command output inline); do NOT replace existing sections wholesale unless the operator explicitly directs. Going-to-extremes (SB-082/093 family) recurs when an agent rewrites instead of revises. Cycle taxonomy: see `$HOME/.claude/commands/cycle.md` "Productive cycle taxonomy" + `wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md` (M-E001-1 DRAFT v2 — 9 action types) + `.claude/hooks/mindfulness.sh` clause #6 (4 canonical types).
+
 **A system AI safety setup project.** Infrastructure-as-Code that turns a Linux box into a transparent L2 inspection bridge sitting inline between an edge firewall (OPNsense) and the first switch on the LAN, with optional inspection modules — Suricata for signature-based IDS/IPS, PolarProxy for TLS termination — layered on facultatively for deeper visibility into AI-related network traffic crossing the host.
 
 > "its IAC and its basically a IPS sitting in between the Edge firewall (OPNSense) and the first switch / the local network... So its not just an IPS its a system AI safety setup project and the IPS tools (suricata and [polarproxy]) as modules" — operator, 2026-05-04
@@ -178,6 +180,8 @@ The other four projects in the ecosystem (OpenArms, OpenFleet, AICP, devops-cont
 
 The two-layer hook architecture point is load-bearing for the ecosystem: because root-ghostproxy installs at `$HOME` and configures `~/.claude/`, its hooks fire on tool calls in **all** Claude Code sessions on the host — including sessions opened in other sister projects. A LAN endpoint where root-ghostproxy is installed has its endpoint-AI-safety policy enforced uniformly across every AI-agent session, regardless of which project that session is operating in. This is what distinguishes "machine-level safety policy" (root-ghostproxy's job) from "project-level conventions" (every sister project's own `.claude/` directory, when present).
 
+> **Brain inheritance pattern** (operator directive 2026-05-06, SB-115 closure): `$HOME` is the **source-of-truth for operational tooling** (hooks, slash commands, tools/*.py, settings.json wiring conventions, ANSI-fence rendering patterns, statusline widgets, mode-enforcement banner shape). `/opt/devops-solutions-information-hub/` (the second brain) **inherits / adapts** these patterns, not the reverse. When `$HOME`'s hook evolves (e.g., SB-115 redesign of stamp config from prompt-marker to slash-command + persistent JSON), `/opt`'s parallel hook should track the improvement, not maintain a divergent copy. Anti-pattern: framing $HOME and /opt as independent peers when /opt is structurally a consumer of $HOME's operational layer. Knowledge contributions flow the OTHER direction (root-ghostproxy → second brain via `gateway contribute`); see [.claude/rules/self-reference.md](.claude/rules/self-reference.md) "Bidirectional inheritance" section for the layered table.
+
 ## Architecture: Layered
 
 The project is built in three independent layers. The foundation is required (it's the IaC + bridge + management envelope). The two module layers are facultative (they add inspection capabilities; the foundation runs without them).
@@ -303,9 +307,11 @@ These are not committed work; they are the kind of extensibility the modular arc
 
 The project is at the **scaffold + partial-implement** SFIF stage. Concretely, this means:
 
-> **Note (added cycle 62, 2026-05-05; refreshed 2026-05-06 post-handoff iteration)**: the "barely started" framing comes from operator's verbatim 2026-05-04 directive (preserved sacrosanct in section "Operator Directives Captured This Session"). Substantial scaffolding has landed since: 14 modules + 66 atomic tasks + 8 brain files + 30 decisions logbook entries (latest D030 captures the compound+waterfall integration block) + install.sh dry-run-passing + 14 hooks across 8 events (PreToolUse, PostToolUse, SessionStart, UserPromptSubmit ×4 incl. mindfulness SB-126 6-clause, PreCompact, PostCompact, Stop, SessionEnd) + 9 custom statusline widgets (operator visually verified) + aidlc-objective.sh widget (SB-124b — agent-drafted, not yet wired) + 3 brain-loaded subagents + trigger-model.md + compound-and-waterfall.md unified rules + ccstatusline integration + deployment scripts at $HOME/scripts/ + hook + tool regression tests (7 test files / 98 cases / all green) at .claude/hooks/tests/ + tools/tests/ + 26 slash commands (incl. /stamp-* config + /install-agent-brain + /mission /focus /impediment SB-118 + /priorities SB-127) + 11 deterministic Python tools (state/blockers/progress/decisions/cycle/tasks/stamp+density/objective/priorities) + MCP server with 7 tools incl. root_objective + 130-row systemic-bugs tracker (10 open Epic-pending, 13 behavioral recurring, 17 verified, 82 structurally-fixed). The project-lifecycle macro stage is still scaffold (foundation gate met for install.sh dry-run; advance to implement-stage is operator-decision).
+> **Note (added cycle 62, 2026-05-05; refreshed 2026-05-06 post-handoff iteration; refreshed 2026-05-06 evening under /loop with empirical re-verification)**: the "barely started" framing comes from operator's verbatim 2026-05-04 directive (preserved sacrosanct in section "Operator Directives Captured This Session"). Substantial scaffolding has landed since: **14 modules + 66 atomic tasks + 4 epics (E001 auto-pilot rework / E002 piling-tasks / E003 compound-retention / sfif-rollout) + 1 milestone (v0.2)** + 9-10 top-level brain files + **40 decisions logbook entries** (latest D040 captures the Q1-Q4 self-elevation closure) + `install.sh` dry-run-passing + **17 `.sh` hook scripts on disk; 10 wired matchers across 8 events** (PreToolUse / PostToolUse / SessionStart / UserPromptSubmit / PreCompact / PostCompact / Stop / SessionEnd) — unwired hook scripts retained as archive per operator directive 2026-05-06 *"label them as archive if they are not usefull anymore. dont necessarily delete them"* + 9 custom statusline widgets (operator visually verified) + aidlc-objective.sh widget (SB-124b — agent-drafted, not yet wired) + **3 brain-loaded subagents** + trigger-model.md + compound-and-waterfall.md unified rules (the 10th and 11th rule files) + ccstatusline integration + deployment scripts at $HOME/scripts/ + **8 hook regression test files** + tools regression suite at .claude/hooks/tests/ + tools/tests/ + **30 slash commands** (incl. /stamp-* config + /install-agent-brain + /mission /focus /impediment SB-118 + /priorities SB-127 + /terminate /finish-smoothly + /task SB-124d + /questions SB-134) + **15 deterministic Python tools** (state/blockers/progress/decisions/cycle/tasks/stamp+density/objective/priorities/questions/+helpers) + MCP server with root_objective tool + **138-row systemic-bugs tracker (max ID SB-138; 1 historical duplicate ID)**. The project-lifecycle macro stage is still scaffold (foundation gate met for `install.sh --dry-run`; T012 advance to implement-stage GREENLIT per D024 — execute is operator-driven future-session work).
+>
+> **Counts verified empirically 2026-05-06 evening** by `/opt/.../.venv/bin/python` walking `tools/`, `.claude/{commands,hooks,rules,modes,agents,skills}/`, `wiki/backlog/{epics,modules,tasks,milestones}/`, `wiki/governance/{decisions.md,systemic-bugs.md}` + `.claude/settings.json`. Drift between this paragraph and the earlier "What exists right now" table is structural; refresh both when one is updated.
 
-### What exists right now (refreshed 2026-05-06)
+### What exists right now (refreshed 2026-05-06 evening — counts verified empirically)
 
 | Artefact | Status | Where |
 |---|---|---|
@@ -318,6 +324,7 @@ The project is at the **scaffold + partial-implement** SFIF stage. Concretely, t
 | Active epic | `SFIF Rollout + Second-Brain Integration (2026-05)` | `$HOME/wiki/backlog/epics/sfif-rollout-and-second-brain-integration.md` |
 | 14 module pages | M001–M014 across Stream 2 SFIF base + Stream 1 second-brain integration + ccstatusline + pipelock | `$HOME/wiki/backlog/modules/root-ghostproxy-m{001..014}-*.md` |
 | 66 atomic task pages | Per-module breakdowns | `$HOME/wiki/backlog/tasks/T*.md` |
+| 4 epic pages + 1 milestone | sfif-rollout (active) + E001 auto-pilot-rework + E002 piling-tasks + E003 compound-retention; milestone v0.2 ai-natural-task-management active alongside v0.1 | `$HOME/wiki/backlog/epics/*.md` + `wiki/backlog/milestones/*.md` |
 | Source-synthesis pages (Suricata + PolarProxy) | 6 pages in second brain | `<second-brain>/wiki/sources/src-{suricata*,polarproxy,hanke-honeypot-polarproxy-suricata-integration}.md` |
 | **`install.sh`** (foundation installer) | Authored, implement-stage, readiness 98% — `--dry-run` + `--check` + `--profile {base\|full\|project\|interactive}` + `--mode {bridge\|endpoint\|hybrid\|auto}` + per-op toggles. shellcheck PASS. | `$HOME/install.sh` |
 | **Per-project install** (`--profile project`) | Deploys agent brain (settings + hooks + rules + commands + agents + modes + skills + tools) to a sister project; OS-level ops disabled in this profile | `$HOME/install.sh --profile project --dest <path>` OR `/install-agent-brain <path>` slash command |
@@ -326,18 +333,18 @@ The project is at the **scaffold + partial-implement** SFIF stage. Concretely, t
 | **Integrity sentinel** | SHA256 baselines for safety-policy artefacts; `op_install_integrity_sentinel` registers; `op_verify` + `integrity_check()` validate | `$HOME/.claude/integrity.json` (per host) |
 | **Post-install verification** | `install.sh --check` runs 16+ checks: settings.json parses, hooks executable, integrity match, opencode bridge, br0 UP, wifi config + ruleset + table loaded + service enabled, brain-piece counts | `$HOME/install.sh --check` |
 | **Agent context files** (10) | README + CLAUDE.md, AGENTS.md, BOOTSTRAP.md, CONTEXT.md, ARCHITECTURE.md, TOOLS.md, DESIGN.md, SKILLS.md, SECURITY.md | `$HOME/*.md` |
-| **28 slash commands** | /orient, /handoff, /cycle, /stamp-{on,off,auto,horizontal,vertical,status}, /mode-{pm,architect,dual,clear,status}, /blockers, /progress, /decisions, /audit, /sync-progress, /log, /help-root, /install-agent-brain, /mission, /focus, /impediment, /priorities, /terminate, /finish-smoothly | `$HOME/.claude/commands/*.md` |
+| **30 slash commands** | /orient, /handoff, /cycle, /stamp-{on,off,auto,horizontal,vertical,status}, /mode-{pm,architect,dual,clear,status}, /blockers, /progress, /decisions, /audit, /sync-progress, /log, /help-root, /install-agent-brain, /mission, /focus, /impediment, /priorities, /terminate, /finish-smoothly, **/task** (SB-124d cursor + create verbs), **/questions** (SB-134 retention) | `$HOME/.claude/commands/*.md` |
 | **3 brain-loaded subagents** | root-explorer, root-architect, root-pm-scoper | `$HOME/.claude/agents/*.md` |
 | **3 modes** | PM Scrum Master, DevOps Architect, Dual Expert | `$HOME/.claude/modes/*.md` |
 | **2 skills** | surface-state, surface-blockers (description-match auto-trigger) | `$HOME/.claude/skills/<name>/SKILL.md` |
-| **10 rules** | routing, methodology, hook-architecture, work-mode, self-reference, words-are-sacrosanct, operating-principles, loop-cron-lifecycle, trigger-model, context-engineering | `$HOME/.claude/rules/*.md` |
-| **Hooks** (12 wired across 8 events) | PreToolUse (3), PostToolUse (1), SessionStart (2), UserPromptSubmit (2), PreCompact (1), PostCompact (1), Stop (1), SessionEnd (1) | `$HOME/.claude/hooks/*.{sh,py}` |
-| **Hook regression tests** | policy-block, malware-block, opt-write-block | `$HOME/.claude/hooks/tests/*.py` |
-| **9 deterministic Python tools** | state, blockers, progress, decisions, cycle, tasks, stamp, mcp_server, _paths | `$HOME/tools/*.py` |
+| **11 rules** | routing, methodology, hook-architecture, work-mode, self-reference, words-are-sacrosanct, operating-principles, loop-cron-lifecycle, trigger-model, context-engineering, **compound-and-waterfall** | `$HOME/.claude/rules/*.md` |
+| **Hooks** (10 wired matchers across 8 events; 17 .sh files on disk — non-wired hooks retained as archive) | PreToolUse, PostToolUse, SessionStart, UserPromptSubmit (4 hooks: context-warning + output-discipline-guard + mode-enforcement + mindfulness — compound stack per SB-126), PreCompact, PostCompact, Stop, SessionEnd | `$HOME/.claude/hooks/*.{sh,py}` |
+| **8 hook regression test files** | policy-block, malware-block, opt-write-block, mode-enforcement, mindfulness, context-warning, **output-discipline-guard** (SB-090/094/120 detector triple), test-priorities | `$HOME/.claude/hooks/tests/*.py` |
+| **15 deterministic Python tools** | state, blockers, progress, decisions, cycle, tasks (incl. active-task cursor SB-124d), stamp, mcp_server, _paths, objective (SB-118 mission/focus/impediment), priorities (SB-127), questions (SB-134 retention), run-tests, + 2 helpers | `$HOME/tools/*.py` |
 | **Stamp control** | Persistent config (layout horizontal/vertical, enabled on/off/auto) + 6 slash commands + UserPromptSubmit marker hook | `$HOME/.claude/stamp-config.json` + `$HOME/tools/stamp.py` + `$HOME/.claude/hooks/stamp-control.sh` |
 | **ccstatusline integration** | 13 custom widgets + 5 profiles + wrapper + switch-profile.sh | `$HOME/templates/ccstatusline-{config,widgets}/` |
-| **Decisions logbook** | 26+ entries, full audit trail | `$HOME/wiki/governance/decisions.md` |
-| **Systemic-bugs tracker** | 118-row register; per-bug status + verification evidence | `$HOME/wiki/governance/systemic-bugs.md` |
+| **Decisions logbook** | **40 entries** (D001-D040), full audit trail | `$HOME/wiki/governance/decisions.md` |
+| **Systemic-bugs tracker** | **138-row register; max ID SB-138; 1 historical duplicate ID; per-bug status + verification evidence** | `$HOME/wiki/governance/systemic-bugs.md` |
 | **Backlog + log + governance dirs** | Full structure | `$HOME/wiki/{backlog/{epics,modules,tasks},log,governance,lessons}/` |
 | **Bootstrap scripts** | install-from-curl, checkout-{a,b}, mcp-launcher, merge-from-backup | `$HOME/scripts/*.sh` |
 
@@ -773,22 +780,23 @@ curl http://testmynids.org/uid/index.html
 
 ## Status
 
-| Metric | Value (current, 2026-05-05) | Target (full install) |
+| Metric | Value (current, 2026-05-06 evening) | Target (full install) |
 |---|---|---|
-| **SFIF Stage** | scaffold + partial-foundation | Features (modules deployed) |
+| **SFIF Stage** | scaffold + partial-foundation (foundation gate met for `install.sh --dry-run`; T012 advance to implement-stage GREENLIT per D024) | Features (modules deployed) |
 | **Methodology layer** | Adopted (4 yaml files in $HOME/wiki/config/) | Adopted + adapted (gate commands customized) |
-| **Backlog** | Active epic + 14 modules + index files | Same + atomic tasks under each module |
+| **Backlog** | Active epic + 14 modules + 66 atomic tasks + 4 epics + 1 milestone (v0.2 active alongside v0.1) | Same + atomic tasks under each module |
 | **Sister-project registration** | Complete in second brain | Same (no drift) |
 | **Sister-project connection (--connect-project)** | Not run for real (only dry-run tested) | Run, all 4 artefacts in place, smoke test passing |
-| **Agent-context files** | This README + 7 secondary (CLAUDE.md, AGENTS.md, CONTEXT.md, ARCHITECTURE.md, TOOLS.md, DESIGN.md, SECURITY.md, SKILLS.md) — in progress | All authored, methodology-aware, no duplication |
-| **Foundation IaC (install.sh)** | Not authored | Authored, idempotent, dry-run-clean |
-| **Network bridge config** | Not authored | Authored: bridge with two ethernet members, management wifi outbound-only |
-| **Project-internal verifier tooling** | Not authored | `tools/verify-policy.py` exists, integrated into pre-commit or CI |
+| **Agent-context files** | README + 9 top-level (CLAUDE.md, AGENTS.md, BOOTSTRAP.md, CONTEXT.md, ARCHITECTURE.md, TOOLS.md, DESIGN.md, SECURITY.md, SKILLS.md) — in progress under operator-led brain-improvement mandate (2026-05-06) | All authored, methodology-aware, no duplication |
+| **Foundation IaC (install.sh)** | **Authored, implement-stage, readiness 98%** — `--dry-run` + `--check` + `--profile {base\|full\|project\|interactive}` + `--mode {bridge\|endpoint\|hybrid\|auto}` + per-op toggles + `--wizard` state-aware route. shellcheck PASS. Idempotent. Real-execute pending operator-driven future-session run. | Real-execute on at-least-one operator host; idempotency invariant verified (T016) |
+| **Network bridge config** | **Templates authored** at `templates/systemd-networkd/` (.netdev + .network); FORWARD/OUTPUT nftables rules pending T013 operator-decision | Authored + deployed: bridge with two ethernet members, management wifi outbound-only, FORWARD/OUTPUT nftables locked down |
+| **Project-internal verifier tooling** | Partial — `install.sh --check` runs op_verify (16+ checks); standalone `tools/verify-policy.py` not yet authored (M004 work block) | `tools/verify-policy.py` exists, integrated into pre-commit or CI |
 | **Suricata module** | Not installed | Installed, integrated, canary alert verified |
 | **PolarProxy module** | Not installed | Installed, integrated, decryption smoke-tested |
 | **AI-specific Suricata rule sets** | Not authored | Curated, deployed, tested against captured AI traffic |
 | **TLS-firewall ruleset for PolarProxy** | Not authored | Authored, tested, banking/healthcare/pinned domains bypassed |
 | **Operator's `auto_connect` decision** | Pending (currently `false`) | Operator-decided per M010 |
+| **Brain pieces (post-/loop iteration)** | 11 rules + 30 commands + 3 modes + 3 agents + 2 skills + 15 tools + 17 hooks (10 wired) + 138-row SB tracker + 40 decisions + 8 hook regression test files (counts empirically verified 2026-05-06 evening) | Same shape; counts evolve with project |
 
 **Phase:** Scaffold + partial-foundation. **Scale:** Micro. **Execution mode:** Solo. **PM Level:** L1.
 
@@ -807,6 +815,22 @@ curl http://testmynids.org/uid/index.html
 | **[SKILLS.md](SKILLS.md)** | Skills directory context (where skills live, conventions, when to use each). Future-tense for this project — skills directory may not exist initially. |
 
 Each file serves ONE concern. Together they form the multi-layer agent context architecture: AGENTS.md (universal cross-tool) + CLAUDE.md (Claude Code-specific) + secondary depth files (per-concern).
+
+### Subdirectory READMEs (added 2026-05-06 evening — DRAFT v1, agent-authored, operator-revisable)
+
+Per operator directive 2026-05-06 ("we might even create new files... for the needs and or SRP and cleaneness and polish"), the following subdirs gained DRAFT v1 indexing READMEs to reduce cold-pickup-friction. Each is flagged agent-authored in frontmatter (per SB-095) — operator promotes to stable after review.
+
+| Subdir README | What it indexes |
+|---|---|
+| **[`scripts/README.md`](scripts/README.md)** | Deployment + maintenance toolkit — install-from-curl, checkout-A/B, merge-from-backup + `lib/` (pre-existing; refreshed 2026-05-06 with install.sh wizard reference + agent-learning notes) |
+| **[`tools/README.md`](tools/README.md)** | 15 deterministic Python modules (state, blockers, progress, decisions, cycle, tasks, stamp, mcp_server, _paths, objective, priorities, questions, run-tests, group, +helpers) + composition map |
+| **[`.claude/commands/README.md`](.claude/commands/README.md)** | 30 slash commands organized by category (orient/cycle, modes, stamp, objective layer, backlog, knowledge/audit, install) |
+| **[`.claude/hooks/README.md`](.claude/hooks/README.md)** | 18 hook scripts (10 wired matchers across 8 events; 8 archive — retained per operator directive); per-event tables + composition (compound + waterfall axes) |
+| **[`.claude/modes/README.md`](.claude/modes/README.md)** | 3 modes (PM Scrum Master / DevOps Architect / Dual Expert) with cycle-sequence comparison |
+| **[`.claude/rules/README.md`](.claude/rules/README.md)** | 11 on-demand topic rules with strictness-tier + when-loaded matrix |
+| **[`.claude/agents/README.md`](.claude/agents/README.md)** | 3 brain-loaded subagents (root-explorer / root-architect / root-pm-scoper) — runtime gap noted (SB-081 session-restart required) |
+| **[`.claude/skills/README.md`](.claude/skills/README.md)** | 2 skills (surface-state / surface-blockers) — description-match auto-trigger mechanism |
+| **[`templates/README.md`](templates/README.md)** | 5 template categories (ccstatusline-config + widgets, nftables, systemd-networkd, wpa_supplicant) used by install.sh |
 
 ## For Agents Working on This Project
 
@@ -1018,8 +1042,39 @@ This README is being authored as part of a multi-day work block focused on root-
 | 2026-05-04 | Two template lists in the wiki | `wiki/config/templates/sister-project-preparation/` (manifest + 7 file templates) + `wiki/config/templates/second-brain-integration/` (manifest + 5 overlay templates) |
 | 2026-05-05 | Backlog scaffolding + methodology copy in $HOME | `$HOME/wiki/{config,backlog,log}/` populated; epic + 10 modules ported; methodology yaml + 3 profile yamls copied |
 | 2026-05-05 | This README + companion MD files (CLAUDE.md, AGENTS.md, CONTEXT.md, ARCHITECTURE.md, TOOLS.md, DESIGN.md, SECURITY.md, SKILLS.md) | `$HOME/*.md` |
+| 2026-05-06 | install.sh wizard + granular install (groups + per-op toggles + `--profile project` for sister-brain deploy + `--check` op_verify); SB-115/116/117 stamp-config redesign (slash-command + persistent JSON + horizontal/vertical layouts); compound+waterfall.md SRP rule (SB-123 closure); mission/focus/impediment 3-layer state files (SB-118 closure); priorities imminent-work layer (SB-127 closure); mindfulness baseline hook (SB-126 closure) | install.sh + tools/stamp.py + .claude/commands/stamp-* + .claude/active-{mission,focus,impediment,priorities} + tools/objective.py + tools/priorities.py + .claude/hooks/mindfulness.sh + .claude/rules/compound-and-waterfall.md |
+| 2026-05-06 | Systemic-bugs thorough audit closures (Phase A/B/C); decisions logbook from D026 → D040; tracker grew 130 → 138 rows; agent-discipline-gate hook (SB-090/094/120 detection triple — premise-risk + escalation + conditional-clause); Stop-hook output-shape oscillation closure (SB-107/SB-091/SB-097/SB-099/SB-102 family); evidence-priority hierarchy (operating-principles.md #5 extension); /terminate + /finish-smoothly slash commands; SB-128(b)+(c) productive-cycle taxonomy in /cycle.md + mode files; SB-132 malware-block hook-ln false-positive fix; SB-124d active-task cursor management (`/task` command + `tools.tasks active` verbs) | output-discipline-guard.sh + words-are-sacrosanct.md "Conditional-clause grammar" section + operating-principles.md evidence-priority hierarchy + .claude/commands/{terminate,finish-smoothly,task}.md + tools/tasks.py active subcommand + .claude/hooks/tests/test-output-discipline-guard.py + tracker SB-130 through SB-138 |
+| 2026-05-06 evening | Brain-improvement mandate — operator directive: agent as external updater for the brain, README-first then full pass; this iteration's drift-fix on README counts (decisions 26→40, SBs 118/130→138, tools 9-11→15, commands 26-28→30, hooks 12→17/10wired, rules 10→11), brain-inheritance admonition, doc-update-discipline admonition, agent-learning notes section | This README's empirical-verification refresh + admonitions + new Recent Work entries |
+| 2026-05-06 evening (post-"do not minimize" directive) | Authored 8 new sub-READMEs (DRAFT v1, agent-authored per SB-095): tools/, .claude/{commands,hooks,modes,rules,agents,skills}/, templates/. Each substantive (~80-200 lines) with index tables, composition diagrams, extension guides, anti-patterns, cross-references. Root README's Documentation Map extended with "Subdirectory READMEs" subsection. Decision package log resolved (`wiki/log/2026-05-06-194730-decision-package-new-subdir-readmes.md`). | 8 new files: `tools/README.md` + `.claude/{commands,hooks,modes,rules,agents,skills}/README.md` + `templates/README.md`; root README Documentation Map updated |
 
 Session logs detailing the conversation's progression live at `<second-brain>/raw/notes/2026-05-04-*.md` and (going forward) at `$HOME/wiki/log/`.
+
+## Agent personal-learning notes (operator-allowed)
+
+> **Operator directive 2026-05-06 (sacrosanct)**: *"you can take notes of your personal learnings progress here, there is such a room for system project even a root one"*. The notes below are **agent-authored** (per SB-095 — flagged as agent-DRAFT, not operator-stated content) and reflect what the external-updater agent has learned operating against this brain. Operator may revise / promote / remove / re-author. Each entry timestamped + initialed `[agent]` for future operator-distinguishability.
+
+### 2026-05-06 evening — additive vs destructive doc improvement (lesson learned the hard way)
+
+`[agent]` Pattern observed across multiple cycles this session: when noticing drift between an existing section I authored and a newer canonical source, my reflex is to **replace** the existing section with a thin pointer to the canonical source. Operator caught this twice in the same session — once on `cycle.md` taxonomy ("ohh its probably part of the regression yeah... why would you do that ?") and verbal-corrected the meta-pattern ("Why are you not able to just do normal improvements instead of causing regression"). The lesson is operationally simple: **add a cross-reference line at the bottom; do NOT delete the existing section's content**. Deletion-because-newer-canonical-exists is regression; addition-of-pointer-to-newer-canonical is improvement.
+
+This pattern is structurally a cousin to:
+- SB-082/093 going-to-extremes (single-direction swing instead of one-notch refinement)
+- SB-090 premise-construction (assumed "harmonization needed" without operator-confirm)
+- SB-128 thin-output (reductive content replacement = thin per-cycle delivery)
+
+The doc-update-discipline admonition near the top of this README codifies this lesson for future agents reading the README cold. The `cycle.md` "Productive cycle taxonomy" section was un-replaced and the cross-reference line at the bottom is the additive solution.
+
+### 2026-05-06 evening — empirical-verification of counts before claiming
+
+`[agent]` Multiple drift instances accumulated in this README over consecutive sessions (30→40 decisions, 118→138 SBs, 26→30 commands, 11→15 tools). When refreshing, ran a single Python walk over `tools/`, `.claude/{commands,hooks,rules,modes,agents,skills}/`, `wiki/backlog/`, and parsed `decisions.md` + `systemic-bugs.md` directly — that gave authoritative counts in one pass. Lesson: **doc-count drift is normal and expected**; the discipline is empirical-verification before refresh, not assuming the prior count plus the current cycle's deltas are correct (compounding errors). Add a "Counts verified empirically YYYY-MM-DD" timestamp inline so future readers know the freshness window.
+
+### 2026-05-06 — chain-style operations (per SB-131 + operator's "30+ operations for sure" framing)
+
+`[agent]` Operator-stated pattern: *"sometimes we should also have chain operations and groups calls with potentially chains which make tree of operations"*. Single-edit-per-cron-fire is the THIN-output anti-pattern; coherent-multi-edit-per-fire is the substance pattern. Concretely: a SB closure typically pulls along (1) the SB tracker row update + (2) the structural fix (rule/hook/code/test) + (3) regression-test addition + (4) cross-reference in related docs + (5) decisions-logbook entry. Treating these as 5 cycles is wasteful; treating them as 1 chain-fire is the operator's stated pattern.
+
+### What this section is NOT
+
+`[agent]` This section is NOT a session log (those live at `wiki/log/`). It is NOT the systemic-bugs tracker (that lives at `wiki/governance/systemic-bugs.md`). It is NOT the decisions logbook (`wiki/governance/decisions.md`). It is for **distilled meta-lessons** that an agent has noticed but is too small / cross-cutting / agent-perspective to belong in the canonical layers. Operator will eventually decide which (if any) to promote into structured artifacts (lessons drafts, principles extensions, rule additions).
 
 ## Acknowledgments
 

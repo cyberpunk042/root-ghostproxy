@@ -85,4 +85,10 @@ The relationship between $HOME and /opt second-brain is NOT peer-to-peer. It is 
 - Universal self-reference (canonical, second brain): `<second-brain>/.claude/rules/self-reference.md` (BUT note: that file frames the second brain as the second brain. This file frames $HOME as the OS-setup project.)
 - README.md — full project description.
 - BOOTSTRAP.md — cold-pickup guide.
-- CONTEXT.md — current SFIF stage + active epic + 13 modules + verbatim directives + pending decisions.
+- CONTEXT.md — current SFIF stage + Active Objective Layer (mission/focus/impediment/priorities/task) + Active Milestone v0.2 + 4 epics + 14 modules + verbatim directives + pending decisions.
+- [`.claude/rules/README.md`](README.md) — 11 rules with strictness-tier matrix
+- [`.claude/rules/trigger-model.md`](trigger-model.md) — 8-mechanism signal→action→recovery model
+- [`.claude/rules/compound-and-waterfall.md`](compound-and-waterfall.md) — additive layering (compound axis) + state-flow (waterfall axis); inheritance pattern documented in body of THIS file is canonical for $HOME ↔ /opt operational tooling flow
+- [`.claude/hooks/README.md`](../hooks/README.md) · [`.claude/commands/README.md`](../commands/README.md) · [`.claude/skills/README.md`](../skills/README.md) · [`.claude/modes/README.md`](../modes/README.md) · [`.claude/agents/README.md`](../agents/README.md) · [`tools/README.md`](../../tools/README.md) — operational tooling indexes (DRAFT v1, agent-authored 2026-05-06 evening); $HOME source-of-truth per the bidirectional inheritance section above
+- `wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md` — sacrosanct verbatim directive governing this rule's edit pass
+- CLAUDE.md / AGENTS.md **Hard Rule 12** (brain-inheritance pattern) — codifies this rule's bidirectional inheritance section at the hot-path layer for every-prompt-context-budget enforcement

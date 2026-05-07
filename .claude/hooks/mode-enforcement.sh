@@ -2,7 +2,32 @@
 # mode-enforcement.sh — UserPromptSubmit hook injecting active-mode persona +
 # discipline + live-state context.
 #
-# Operator directives:
+# Wired event: UserPromptSubmit · matcher: (any) · 4-hook compound stack per SB-126
+# (compounds with: context-warning + output-discipline-guard + mindfulness)
+# Tests: .claude/hooks/tests/test-mode-enforcement.py — **REGRESSION SURFACED**
+#        2026-05-06 evening: 0/0 collected per tools.run-tests output (was 38/38
+#        passing per D033). NOT a logic regression in mode-enforcement.sh itself —
+#        likely test-discovery / pytest config / import-path issue. Surfaced for
+#        operator-decision per the brain-improvement Hooks pass option A protocol.
+# SB closures: SB-056 (mode-not-felt at runtime — closes at hook layer with dynamic
+#              mode-file parsing + live-state cross-reference) · SB-117 frequency-
+#              control via /tmp cache (suppress byte-identical re-emission;
+#              signal on state-delta) · SB-118 objective layer (mission/focus/
+#              impediment surfacing) · SB-122 MAX_REMINDER_CHARS cap REMOVED
+#              (operator-explicit content not capped) · SB-127 priorities tier
+#              (imminent-work ABOVE PM blockers) · SB-129 voice-table cite-bracket
+#              extraction (4-col Quality/Sounds-like/Anti-pattern/Why-cite parser)
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) · .claude/modes/README.md
+#             (3 modes + cycle-sequence comparison — this hook reads modes
+#               dynamically via the parser) · .claude/rules/hook-architecture.md ·
+#             tools/objective.py + tools/priorities.py (state files this hook reads) ·
+#             wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md
+#             (M-E001-1 vocabulary — banner output informs cycle's action-emission
+#               but doesn't itself emit an action type) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#             (sacrosanct verbatim directive governing this comment refresh)
+#
+# Operator directives (sacrosanct verbatim):
 #   2026-05-06 — *"I feel like the mode is not respected much.. maybe it
 #     should inject directives and such and context and whatnot. I am in
 #     dual-expert mode and I dont feel it"*
@@ -63,6 +88,7 @@ ACTIVE_MISSION_FILE = PROJECT_ROOT / ".claude" / "active-mission"
 ACTIVE_FOCUS_FILE = PROJECT_ROOT / ".claude" / "active-focus"
 ACTIVE_IMPEDIMENT_FILE = PROJECT_ROOT / ".claude" / "active-impediment"
 ACTIVE_PRIORITIES_FILE = PROJECT_ROOT / ".claude" / "active-priorities"
+ACTIVE_QUESTIONS_FILE = PROJECT_ROOT / ".claude" / "active-questions"
 MODES_DIR = PROJECT_ROOT / ".claude" / "modes"
 SYSTEMIC_BUGS_PATH = PROJECT_ROOT / "wiki" / "governance" / "systemic-bugs.md"
 LOG_DIR = PROJECT_ROOT / "wiki" / "log"
@@ -229,6 +255,17 @@ def get_live_state_context() -> dict:
     except Exception:
         pass
 
+    # Questions (operator directive 2026-05-06): agent-pending questions accumulation
+    # — closes the "if there is question and I dont see them its about the same as if
+    # there was no question" bug. Surfaces in banner so operator never misses pending Qs.
+    try:
+        if ACTIVE_QUESTIONS_FILE.exists():
+            state["questions"] = [
+                ln.strip() for ln in ACTIVE_QUESTIONS_FILE.read_text().splitlines() if ln.strip()
+            ]
+    except Exception:
+        pass
+
     # Systemic bugs — explicit sys.path injection for cwd-independent import
     if str(PROJECT_ROOT) not in sys.path:
         sys.path.insert(0, str(PROJECT_ROOT))
@@ -255,13 +292,22 @@ def get_live_state_context() -> dict:
     except Exception:
         pass
 
-    # Task cursor from progress.md callout (best-effort regex)
+    # Task cursor from progress.md callout (best-effort regex).
+    # Word-boundary truncation: preserves whole words up to soft cap (160 chars)
+    # rather than mid-word cut. SB-122 cousin — operator-explicit content (the
+    # cursor is operator-meaningful state, not noise) shouldn't read broken.
     try:
         if PROGRESS_PATH.exists():
             text = PROGRESS_PATH.read_text()
             m = re.search(r"Active task cursor:\s*([^\n]+)", text)
             if m:
-                state["task_cursor"] = m.group(1).strip()[:80]
+                cursor = m.group(1).strip()
+                if len(cursor) > 160:
+                    # Soft cap at 160; truncate at last whitespace within window
+                    # to avoid mid-word cuts; fall back to hard cut if no space.
+                    cut = cursor.rfind(" ", 0, 160)
+                    cursor = cursor[: cut if cut > 100 else 160] + "…"
+                state["task_cursor"] = cursor
     except Exception:
         pass
 
@@ -317,6 +363,23 @@ def compose_reminder(mode: str, sections: dict, state: dict) -> tuple[str, list]
     else:
         parts.append("PRIORITIES: (none set)")
         keys.append("priorities")
+
+    # Agent-pending QUESTIONS (operator directive 2026-05-06): surface always-render so
+    # operator never misses pending agent-asked-input. [+detail] marker indicates
+    # SRP companion file exists at .claude/active-questions-detail/Q<N>.md (presweep
+    # enrichment per operator's "I dont see all the data available to them" critique).
+    questions = state.get("questions") or []
+    detail_dir = PROJECT_ROOT / ".claude" / "active-questions-detail"
+    if questions:
+        q_lines = []
+        for i, q in enumerate(questions[:5], start=1):
+            marker = " [+detail]" if (detail_dir / f"Q{i}.md").exists() else ""
+            q_lines.append(f"Q{i}: {q[:100]}{marker}")
+        parts.append("QUESTIONS (agent → operator): " + " · ".join(q_lines))
+        keys.append("questions")
+    else:
+        parts.append("QUESTIONS: (none pending)")
+        keys.append("questions")
 
     # Mission / Focus / Impediment (SB-118) — operator-explicit-set
     # Always render all 3 even when empty (operator-visibility: empty = "(unset)")

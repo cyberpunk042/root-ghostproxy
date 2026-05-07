@@ -6,7 +6,7 @@
       {"id": "2", "type": "separator", "character": " │ "},
       {"id": "3", "type": "context-bar", "color": "blue"},
       {"id": "4", "type": "separator", "character": " "},
-      {"id": "5", "type": "context-percentage", "color": "yellow"},
+      {"id": "5", "type": "context-percentage", "color": "brightYellow"},
       {"id": "6", "type": "separator", "character": " │ "},
       {"id": "7", "type": "total-speed", "color": "green"}
     ],

@@ -126,3 +126,10 @@ Future: enrich command + skill + mode frontmatter with tool-consumable fields (c
 - Co-evolution lesson: `/opt/.../wiki/lessons/01_drafts/second-brain-and-projects-co-evolve-never-finished-doctrine.md`
 - BOOTSTRAP.md (the read-order surfaces context-injection sequencing)
 - `.claude/rules/compound-and-waterfall.md` — sister rule: WHEN/HOW to think about layered context (compound axis = additive coexistence) vs flowed context (waterfall axis = sequential cascade); the four injection modes here populate the compound stack
+- `.claude/rules/trigger-model.md` — sister rule: signal→action→recovery composition across 8 mechanisms (hooks/commands/skills/modes/tools/MCP/scheduled-tasks/sub-agents)
+- [`.claude/rules/README.md`](README.md) — 11 rules with strictness-tier matrix
+- [`.claude/hooks/README.md`](../hooks/README.md) — UserPromptSubmit 4-hook compound stack (per-prompt context injection mechanism)
+- [`.claude/commands/README.md`](../commands/README.md) — 30 slash commands (each emits action types per M-E001-1 vocabulary)
+- [`.claude/skills/README.md`](../skills/README.md) — 2 description-match auto-trigger skills (auto-injection mode for skill workflows)
+- `wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md` — sacrosanct verbatim directive governing this rule's edit pass
+- **`wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md`** — M-E001-1 productive-cycle action vocabulary (9 types). Per-fire context-emission discipline — every cycle's compound-stack injects context AND emits one canonical action type (Hard Rule 14 in CLAUDE.md/AGENTS.md). The action vocabulary is the universal cross-tool consumption interface for context-injected workflows.

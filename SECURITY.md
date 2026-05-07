@@ -2,6 +2,12 @@
 
 > Security policy for root-ghostproxy. Threat model, layer-by-layer protections, fail-closed invariants, escalation, audit, and known limitations. Load-bearing for type=root + group=operating-system-setup projects — the project IS a security envelope, so SECURITY.md is not auxiliary documentation but a load-bearing artefact of the project itself.
 
+> **Agent doc-update discipline (operator directive 2026-05-06, sacrosanct)**: when refreshing SECURITY.md, **adding ≠ discarding**. Layer new content; refresh inline values where empirically drifted; do NOT replace existing sections wholesale. Going-to-extremes (SB-082/093 family) recurs when an agent rewrites instead of revises — particularly dangerous on a security-policy doc where defense-in-depth layers can be silently lost. Sacrosanct: operator-verbatim quotes (network posture line 87+ "wifi client mode... DNS over TLS... no leak... no SSH server" · acknowledgments framing line 227+ "secure an OS and configure claude code and opencode at the root with all the safety needed") preserved EXACTLY. Threat Model + Fail-Closed Invariants + Layer-by-Layer Protections structure preserved (only ADD new threats / invariants / layers in dedicated sub-sections).
+
+## Summary
+
+This file documents root-ghostproxy's security policy — the project IS a security envelope, so this doc is load-bearing not auxiliary. Stance: **deny-by-default at every layer** (endpoint AI agent policy + bridge inspection + integrity layer); **fail-closed where stakes are high** (tamper detection refuses every tool call until restored) + **fail-open where stakes are low** (Suricata IPS bypass option keeps network up during inspection-down windows; PolarProxy free-tier silently degrades decryption past cap). 3 protection layers: Layer 1 endpoint AI agent safety (foundation — always required) · Layer 2 Suricata IDS/IPS (facultative module) · Layer 3 PolarProxy TLS termination (facultative module). Threat model defends against 3 in-scope adversaries (external network attacker · adversarial content via tool outputs · compromised AI agent on host) with 4 out-of-scope categories explicitly listed (insider with operator credentials · AI provider account compromise · physical access · supply chain). 7 fail-closed invariants enforced via tamper-detection sentinel. Audit logging across 7 channels. Hardening intensifies per SFIF stage. Known limitations distinguish inherited (PolarProxy + Suricata upstream constraints) from by-design (project-posture choices). **Hard Rules 11-15** (CLAUDE.md / AGENTS.md hot-path layer) operationalize security discipline: additive ≠ discarding (defense-in-depth preservation) · brain-inheritance pattern ($HOME source-of-truth for safety policy; /opt cannot weaken) · chain operations (SB closures pull along regression tests) · productive-cycle taxonomy (read-only-audit action type IS security audit) · empirical-count-verification (deny-set threshold verified, not estimated).
+
 ## Project Security Stance (one paragraph)
 
 root-ghostproxy is a system AI safety setup project. Its security stance is **deny-by-default** at every layer: the endpoint AI agent policy denies tool calls unless they pass deny-set + behavior checks; the bridge denies fall-through traffic if the inspection layer says drop; the integrity layer denies every tool call if safety controls are tampered with. The project assumes adversarial input — both at the network layer (untrusted inbound/outbound traffic) and at the agent layer (adversarial content embedded in tool outputs that can hijack agent reasoning via prompt injection). The protections are designed to fail closed where the cost of a false positive is small (deny a tool call; alert the operator) and fail open only where the cost of a false negative is small AND the cost of a false positive is large (network inspection in degraded mode keeps traffic flowing; alerting the operator that inspection has degraded is the mitigation).
@@ -53,7 +59,8 @@ The project defends in depth across three layers. Layer 1 is the foundation and 
 - **Behavior-pattern check on tool inputs.** Tool inputs are inspected for shell-exfil idioms, malicious payload patterns, and known dangerous-shape inputs. Matches are blocked or asked-for-confirmation depending on severity.
 - **Output scanning for sensitive values.** Tool outputs are inspected for credential-shaped values matching patterns for major AI/cloud/SaaS providers. Detected leaks are logged and the operator is alerted; the leak-shaped value is optionally redacted before being surfaced to the agent.
 - **Cross-AI-tool consistency via shared policy.** Multi-AI-tool environments share one policy source so deny rules + behavior checks are not duplicated across tool runtimes — defined once at the OS-root level, enforced uniformly. Adding a new AI tool means adding a thin extension that mirrors hooks under the new tool's plugin/extension SDK; the policy itself is not duplicated.
-- **Fail-closed tamper detection.** A pre-tool-call sentinel verifies the safety policy is intact: policy source present, hooks not disabled, deny-set above a known-safe threshold, all required enforcement scripts present + executable + non-suspicious size. If any check fails, every subsequent tool call refuses until restored. The sentinel itself is integrity-protected.
+- **Fail-closed tamper detection.** A pre-tool-call sentinel verifies the safety policy is intact: policy source present, hooks not disabled, deny-set above a known-safe threshold, all required enforcement scripts present + executable + non-suspicious size. If any check fails, every subsequent tool call refuses until restored. The sentinel itself is integrity-protected. Implementation: `.claude/hooks/integrity.py` imported by policy-block.sh + malware-block.sh (per `.claude/hooks/README.md` canonical inventory).
+- **Agent-discipline runtime layer** (per SB-108 + 2026-05-06 closures). UserPromptSubmit hook `output-discipline-guard.sh` detects 3 high-confidence agent-behavioral safety patterns at runtime: PREMISE-RISK (SB-090 — premise-construction-without-confirmation; agent infers operator-stated when operator only observed), ESCALATION (SB-094 — operator-frustration markers compound the risk), and CONDITIONAL-CLAUSE (SB-120 — future-conditional grammar that agent may treat as current grant). Single-line concise banner via additionalContext when triggered; silent on routine prompts. **Mindfulness baseline** (`mindfulness.sh` UserPromptSubmit hook per SB-126) injects 7-clause baseline reminder per-prompt when active-mode set: one-notch (anti-pendulum SB-082/093) · confirm-don't-construct (SB-090) · artifacts-flagged-as-agent-draft (SB-095) · forward-not-freeze (SB-099) · P1-first (SB-128) · substance-per-cycle (SB-128) · not-blocked-when-unblocked + chain-operations (SB-131). These are agent-behavioral safety controls (cycle-quality + drift-prevention discipline); distinct from credential/exfil safety controls but operating in the same lifecycle layer (4-hook UserPromptSubmit compound stack per SB-126).
 
 **What it does NOT provide at this layer:**
 - Network-layer defense — that's Layers 2 and 3
@@ -151,7 +158,7 @@ The project's security posture intensifies as it climbs SFIF stages:
 | Run `./install.sh --dry-run` before any install on a host | Preview what will change. The install backs up existing files but a dry-run is the safety net before any backup ever happens. |
 | Verify integrity check passes before AND after any change to the safety policy | The integrity check is what stops a half-installed or tampered state from going live. |
 | Audit `git status` and `git ls-files` before publishing | Ensure no unintended file is in the tracked set. The deny-all + whitelist `.gitignore` should leave only project files visible. |
-| Run hook regression tests after editing any hook | `python3 .claude/hooks/tests/test-policy-block.py` + `test-malware-block.py` verify that hook regex changes don't introduce false-positives (which silently block the agent's own work) or false-negatives (which silently let attacks through). Both suites must PASS 4/4 before claiming a hook fix done. |
+| Run hook + tools regression tests after editing any hook or tool | **Canonical: `python3 -m tools.run-tests`** — unified runner across **13 test files** (8 hook tests at `.claude/hooks/tests/test-*.py` + 5 tools tests at `tools/tests/test-*.py`). Per Hard Rule 14 (productive-cycle taxonomy — verified-edit action type) requires real regression-suite output, not synthetic test (per SB-091 anti-pattern). Aggregate as of 2026-05-06 evening: **215/234 passing** (3 partial-fail surfaced for operator-decision: test-mode-enforcement.py 0/0 collection regression — pytest discovery issue NOT logic regression; test-end-of-cycle-stamp-diff-suppression.py 21/22 — SB-138 territory; test-questions.py 33/51 — SB-134 DRAFT scaffolds). All 7 hook regex regression suites individually green (policy-block 10/10 · malware-block 8/8 · opt-write-block 5/5 · output-discipline-guard 19/19 · context-warning 8/8 · mindfulness 22/22). |
 | Rotate AI provider keys regularly | Key compromise is out of scope at the network layer; rotation is operator's responsibility. |
 | Review leak-detector logs weekly | Patterns of leak attempts are themselves a signal. |
 | Re-verify deny-set count after any settings.json edit | The threshold is what tamper-detection enforces. Editing without re-verifying risks fail-closing every subsequent tool call. |
@@ -198,23 +205,112 @@ These limitations are inherited (from upstream tooling) or by-design (from the p
 3. **CA distribution is a separate operational track.** PolarProxy's CA must be deployed to LAN endpoints by some mechanism (manual install, AD GPO, MDM, Linux package). root-ghostproxy provides the proxy + CA; deployment is operator's lift.
 4. **Two-layer hook architecture means root-ghostproxy's machine-level policy fires across all sister-project Claude Code sessions on the host.** A LAN endpoint with root-ghostproxy installed has its endpoint AI safety policy enforced uniformly across every AI-agent session, regardless of which project that session is operating in. Operator working in another sister project on the same host inherits root-ghostproxy's policy. This is by-design (it's the point of the machine-level layer); the side-effect is that other-project work is constrained by root-ghostproxy's deny-set.
 5. **Multi-host portability is intent, not yet realized.** Operator's framing is that root-ghostproxy will be deployable to a new host when needed (`"this machine or another [new] one"`). The current state is single-host. Cross-host deployment may surface host-specific config items (interface device names, CA trust paths, package manager differences) that are currently abstracted but not validated across hosts.
+6. **3 partial-fail tests surfaced for operator-decision** (per Hooks pass 2026-05-06 evening): test-mode-enforcement.py 0/0 collection regression (pytest discovery issue — likely import-path / fixture / pytest config change since 38/38 passing per D033; NOT mode-enforcement.sh logic regression); test-end-of-cycle-stamp-diff-suppression.py 21/22 (1 fail — SB-138 stamp diff-suppression D038 territory); test-questions.py 33/51 (18 fail — SB-134 DRAFT scaffolds + many test paths likely incomplete). Per Hooks-pass option A discipline: surfaced for operator-decision, NOT unilateral fix. Open question for operator: investigate test-discovery regression as priority (it's the most concerning — was 38/38 before).
+7. **Archive hook scripts retained on disk per operator directive 2026-05-06**: 4 archived hooks (`deny-secret-files.sh`, `premise-guard.sh`, `stamp-control.sh`, `integrity.py-not-yet-wired-as-CLI`) retained per operator verbatim *"label them as archive if they are not usefull anymore. dont necessarily delete them"*. Cached session config invoking premise-guard.sh stub is harmless (drain stdin + exit 0 = official no-op); deny-secret-files.sh is subsumed by policy-block.sh (broader matcher); stamp-control.sh is superseded by SB-115 redesign (slash-command + persistent JSON config). 17 .sh + 1 .py on disk; 10 wired matchers across 8 events. Per-hook canonical inventory at [.claude/hooks/README.md](.claude/hooks/README.md).
+8. **Agent-DRAFT artifacts flagged at every reference per SB-095** (Hard Rule 4 + hallucinated-artifacts anti-pattern). 9 sub-READMEs authored 2026-05-06 evening per brain-improvement mandate are DRAFT v1 — `status: draft` + `confidence: medium` + `maturity: seed` in frontmatter. Operator promotes after fresh-pickup-agent navigability review. Rule extension: any agent-authored file MUST flag DRAFT in frontmatter or body header at every reference; never treat as operator-known unless explicitly acknowledged.
+
+## Hard Rules 11-15 — security-relevant operationalization at hot-path layer
+
+The 5 universal Hard Rules added 2026-05-06 to CLAUDE.md + AGENTS.md operationalize security discipline at every-prompt-context-budget layer. Each is security-relevant:
+
+| Hard Rule | Security implication |
+|---|---|
+| **Rule 11 — Adding ≠ discarding** | **Defense-in-depth preservation**. SECURITY.md and the safety-policy artifacts (`.claude/settings.json`, hook scripts, deny-set, integrity sentinel) must NEVER be wholesale-replaced. Going-to-extremes pendulum (SB-082/093 family) on a security-policy doc could silently lose layer protections. The discipline is additive — refresh inline values where empirically drifted; do NOT replace defense-in-depth layers. Operator directive 2026-05-06: *"Why are you not able to just do normal improvements instead of causing regression"*. |
+| **Rule 12 — Brain-inheritance pattern** | **$HOME source-of-truth for safety policy; /opt second-brain cannot weaken**. Per SB-115 + Two-layer hook architecture: machine-level (root-ghostproxy at $HOME) fires BEFORE project-level. /opt is INHERITS / adapts operational tooling FROM $HOME, not the reverse. Safety-policy ownership is unambiguous. Sister project sessions on the same host inherit root-ghostproxy's safety-floor uniformly per Two-layer architecture. |
+| **Rule 13 — Chain operations per fire** | **Security pattern: SB closure pulls along all defense layers**. When a security regression is caught (e.g., SB-083 cmd-sub regex false-positive, SB-084 script-capture false-positive, SB-106 log-tamper false-positive, SB-132 hook-ln false-positive), the closure chain is: tracker row update + structural fix (regex anchored) + regression-test addition + cross-references in related docs + decisions-logbook entry. Per-cycle multi-edit chain ensures the protection layer is restored holistically, not piecemeal. SB-128 thin-output anti-pattern (single-edit-per-fire) is structurally inappropriate for security work. |
+| **Rule 14 — Productive cycle taxonomy** | **`read-only-audit` action type IS the security-audit emission**. M-E001-1 vocabulary type 9 — every cycle-fire that runs `/audit` (10-step integrity check) emits this canonical type. Cross-tool universal — every AI tool's cycle skill emits the same audit-vocabulary regardless of which tool fires. Mandatory cycle-report last-line `Productive output: read-only-audit — <one-line specific>` ensures security audits are visibly named in the cycle report (no silent skipping). |
+| **Rule 15 — Empirical-count-verification before drift-claim** | **Deny-set threshold + hook count + test-pass count verified, not estimated**. Tamper detection's "deny-set above known-safe threshold" check is a count-based assertion — must be verified empirically (not estimated). Same applies to "all required enforcement scripts present" check. Programmatic walk + parse before any drift-claim. Compounding errors on security-relevant counts is the failure mode this rule prevents. |
+
+These hot-path rules complement the design-time principles in DESIGN.md (4 cross-cutting Design Principles) — design at slow-thoughtful tier; runtime enforcement at fast-reflex tier.
+
+## Agent personal-learning notes (operator-allowed, per directive 2026-05-06)
+
+> **Operator directive 2026-05-06 (sacrosanct)**: *"you can take notes of your personal learnings progress here, there is such a room for system project even a root one"*. Entries are **agent-authored** (per SB-095 — agent-DRAFT, not operator-stated). Operator may revise / promote / remove. Each timestamped + initialed `[agent]`. SECURITY.md-specific framing — security-policy-doc lessons.
+
+### 2026-05-06 evening — SECURITY.md is load-bearing, not auxiliary
+
+`[agent]` SECURITY.md is the project's security policy artifact — load-bearing for type=root + group=operating-system-setup projects. Any edit must preserve defense-in-depth layers. The going-to-extremes pendulum (SB-082/093) is particularly dangerous on this doc — wholesale-replace of a layer's protection description could silently lose context that future agents rely on. Discipline: ADD new threats / invariants / layers in dedicated sub-sections; never restructure the Threat Model + Layer-by-Layer + Fail-Closed Invariants tables.
+
+### 2026-05-06 evening — Empirical-count-verification applies to security-relevant counts
+
+`[agent]` Per Hard Rule 15: deny-set threshold + hook count + test-pass count must be verified empirically. SECURITY.md previously claimed "test-policy-block.py + test-malware-block.py PASS 4/4 before claiming a hook fix done" — this was accurate at authoring time but drifted by 2026-05-06 evening (13 test files / 215/234 aggregate, with 3 partial-fail surfaced). Discipline: when SECURITY.md cites counts, run `python3 -m tools.run-tests` first; inline empirically-verified-YYYY-MM-DD timestamp. Counts in SECURITY.md are security-relevant signals — drift here means stale verification claims.
+
+### 2026-05-06 evening — Threat model categories rarely change; protections evolve
+
+`[agent]` Threat Model (Adversaries + Assets to Protect + Out of Scope) is naturally stable — these are project-level taxonomy decisions. What changes more often is the protections at each Layer (e.g., agent-discipline-gate runtime layer added 2026-05-06 per SB-108/090/094/120 closures; mindfulness baseline added per SB-126). Discipline: ADD new protections to Layer 1/2/3 sub-sections; don't add new Threat Model categories unless operator explicitly directs.
+
+### 2026-05-06 evening — Hard Rules 11-15 are runtime operationalization of design-time principles
+
+`[agent]` DESIGN.md captures the 4 cross-cutting Design Principles (deny-by-default · fail-closed/open · markdown-as-IaC · no-policy-duplication) at design-time tier. CLAUDE.md / AGENTS.md Hard Rules 11-15 codify operationalizations at runtime tier. The new "Hard Rules 11-15 — security-relevant operationalization" section in this SECURITY.md bridges the two layers — design-time + runtime are complementary; both needed for defense-in-depth. Discipline: when authoring new Hard Rules at hot-path layer, cross-reference the design-time principle they operationalize.
+
+### What this section is NOT
+
+`[agent]` Not the SB tracker (`wiki/governance/systemic-bugs.md`). Not the decisions logbook (`wiki/governance/decisions.md`). Not the session log (`wiki/log/`). Not DESIGN.md (design-time principles). Not ARCHITECTURE.md (technical depth). For SECURITY.md-specific security-policy-doc lessons that benefit fresh-pickup agents but are too small to warrant their own structured artifact. Operator promotes when pattern matures.
 
 ## Cross-References
 
+### Top-level brain files (10)
+
 | For… | Read |
 |---|---|
-| Architecture topology + component responsibilities | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Design pattern rationale (why deny-by-default, why fail-closed, why two layers) | [DESIGN.md](DESIGN.md) |
-| Tool reference (when install scripts + verifier scripts exist) | [TOOLS.md](TOOLS.md) |
-| Universal cross-tool agent rules | [AGENTS.md](AGENTS.md) |
-| Claude Code-specific routing | [CLAUDE.md](CLAUDE.md) |
 | Project front door | [README.md](README.md) |
-| Current operational state | [CONTEXT.md](CONTEXT.md) |
+| Cold-pickup orientation | [BOOTSTRAP.md](BOOTSTRAP.md) |
+| Architecture topology + component responsibilities | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Design pattern rationale (why deny-by-default, why fail-closed, why two layers — design-time tier) | [DESIGN.md](DESIGN.md) |
+| Tool reference (install + verifier + tools.run-tests) | [TOOLS.md](TOOLS.md) |
+| Universal cross-tool agent rules + 15 universal Hard Rules (incl. 11-15 security operationalization) | [AGENTS.md](AGENTS.md) |
+| Claude Code-specific routing + 15 Hard Rules | [CLAUDE.md](CLAUDE.md) |
+| Current operational state (Active Objective Layer + SFIF + pending decisions) | [CONTEXT.md](CONTEXT.md) |
 | Skills directory context (incl. hook-vs-command-vs-skill decision for safety enforcement) | [SKILLS.md](SKILLS.md) |
+
+### Subdirectory READMEs (9 — DRAFT v1, agent-authored 2026-05-06 evening)
+
+| For… | Read |
+|---|---|
+| **Per-hook canonical inventory + WIRED-vs-ARCHIVE labels** (canonical extension of Layer 1 endpoint AI agent safety section) | [.claude/hooks/README.md](.claude/hooks/README.md) |
+| 30 slash commands by category (incl. /audit security-audit slash command) | [.claude/commands/README.md](.claude/commands/README.md) |
+| 15 Python tools (incl. tools.run-tests unified regression runner per Hard Rule 14) | [tools/README.md](tools/README.md) |
+| 11 rules + strictness-tier matrix (security-relevant: hook-architecture · operating-principles · words-are-sacrosanct) | [.claude/rules/README.md](.claude/rules/README.md) |
+| 3 modes + cycle-sequence comparison | [.claude/modes/README.md](.claude/modes/README.md) |
+| 3 brain-loaded sub-agents | [.claude/agents/README.md](.claude/agents/README.md) |
+| 2 skills + mechanism-choice context | [.claude/skills/README.md](.claude/skills/README.md) |
+| 5 install template categories (incl. nftables outbound-only ruleset + wpa_supplicant config) | [templates/README.md](templates/README.md) |
+| Deployment + maintenance toolkit (incl. merge-from-backup.sh governance with security-scan.sh) | [scripts/README.md](scripts/README.md) |
+
+### Universal cross-cutting rules (security-relevant)
+
+| For… | Read |
+|---|---|
+| **Hook architecture rule** (2-layer + 3-component design pattern + bypass mechanism per hook) | [.claude/rules/hook-architecture.md](.claude/rules/hook-architecture.md) |
+| **Operating principles** (deny-by-default + fail-closed/open + 4 core + 11 extension principles + Hard Rules 11-15 mapping) | [.claude/rules/operating-principles.md](.claude/rules/operating-principles.md) |
+| **Operator-words sacrosanct** + premise-confirmation gate + conditional-clause grammar (agent-behavioral safety discipline) | [.claude/rules/words-are-sacrosanct.md](.claude/rules/words-are-sacrosanct.md) |
+| Self-reference (what $HOME IS + bidirectional inheritance with /opt for safety-policy ownership) | [.claude/rules/self-reference.md](.claude/rules/self-reference.md) |
+| Trigger-model unified 8-mechanism signal→action→recovery (security-relevant: every mechanism emits actions per M-E001-1 vocabulary including read-only-audit type) | [.claude/rules/trigger-model.md](.claude/rules/trigger-model.md) |
+
+### Brain-improvement mandate (this work block — 2026-05-06)
+
+| For… | Read |
+|---|---|
+| Sacrosanct verbatim directive governing the brain-quality passes | [wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md](wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md) |
+| **M-E001-1 productive-cycle action vocabulary DRAFT v2** (Hard Rule 14 — `read-only-audit` action type IS security-audit emission) | [wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md](wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md) |
+
+### Backlog + governance + log (security-relevant)
+
+| For… | Read |
+|---|---|
 | Methodology engine | [wiki/config/methodology.yaml](wiki/config/methodology.yaml) |
 | Active SFIF rollout epic | [wiki/backlog/epics/sfif-rollout-and-second-brain-integration.md](wiki/backlog/epics/sfif-rollout-and-second-brain-integration.md) |
+| **138-row systemic-bugs tracker** — security-regression record (SB-083/084/106/132 hook-regex false-positives chain · SB-088 cross-fire prevention · SB-098 opt-write-block bypass mechanism · SB-105/107 stamp/widget security implications · SB-115 brain-inheritance ownership · SB-126 mindfulness baseline · SB-133 envelope schema fix) | [wiki/governance/systemic-bugs.md](wiki/governance/systemic-bugs.md) |
+| **40-entry decisions logbook (D001-D040)** — security-decision provenance | [wiki/governance/decisions.md](wiki/governance/decisions.md) |
+
+### Second brain (canonical sources)
+
+| For… | Read |
+|---|---|
 | Suricata source-syntheses (Layer 0 README + Layer 1 install/quickstart, IPS modes for Linux, suricata.yaml master config) | `<second-brain>/wiki/sources/src-suricata*.md` |
 | PolarProxy source-syntheses (Layer 0 product page + Layer 1 Hanke integration via dummy interface + tcpreplay) | `<second-brain>/wiki/sources/src-polarproxy.md`, `src-hanke-honeypot-polarproxy-suricata-integration.md` |
+| Identity profile (canonical Goldilocks 9-dim) | `<second-brain>/wiki/ecosystem/project_profiles/root-ghostproxy/identity-profile.md` |
+| Adoption Guide canonical | `<second-brain>/wiki/spine/references/adoption-guide.md` |
 
 ## Acknowledgments
 

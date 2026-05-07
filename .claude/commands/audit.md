@@ -6,9 +6,9 @@ Run integrity audits on $HOME project state.
 
 Run the deterministic checks below, in sequence. Report each pass/fail with context.
 
-1. **Methodology engine yamls parse**:
+1. **Methodology engine yamls parse** (Tier 3 — incl. artifact-types/quality-standards/wiki-schema per D041 2026-05-06):
    ```bash
-   for f in $HOME/wiki/config/{methodology,sdlc-profile,domain-profile,methodology-profile}.yaml; do
+   for f in $HOME/wiki/config/{methodology,sdlc-profile,domain-profile,methodology-profile,artifact-types,quality-standards,wiki-schema}.yaml; do
      <second-brain>/.venv/bin/python -c "import yaml; yaml.safe_load(open('$f')); print('OK $f')"
    done
    ```

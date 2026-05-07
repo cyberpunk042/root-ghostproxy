@@ -54,6 +54,9 @@ The PreCompact hook (`$HOME/.claude/hooks/pre-compact.sh`) auto-fires on compact
    ## Priorities (imminent-work — SB-127)
    <`cat $HOME/.claude/active-priorities` numbered as P1, P2, ...>
 
+   ## Questions (agent → operator pending — operator directive 2026-05-06)
+   <`cat $HOME/.claude/active-questions` numbered as Q1, Q2, ...>
+
    ## Cycle state (tools.cycle --json)
    ```json
    <cycle output>

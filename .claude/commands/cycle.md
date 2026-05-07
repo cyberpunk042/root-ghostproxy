@@ -69,10 +69,34 @@ Run one cycle of the active mode's autopilot sequence.
    - Surface in cycle report: "This cycle's SB pick: SB-XXX. Action: <what>. New status: <status>."
    - **This step is the work-doing step.** Per operating-principles.md #11, the cycle does the systemic-fix work between cycles; this is where the work names itself.
 
+## Productive cycle taxonomy (SB-128 — closes thin-output pattern)
+
+Per operator directive 2026-05-06: *"I am talking about the fact it bugs.. that it does a little thing sometimes even noting and do a weird statement and stop"*. Each cycle fire must produce one of the following productive outputs. **Naming which category was produced is mandatory in the cycle report**; if none applies, the cycle is THIN (the bug operator named) — name it as such instead of dressing it up.
+
+| # | Category | What it looks like | Empirical signal |
+|---|---|---|---|
+| 1 | **SB closure with evidence** | Tracker row status `open|recurring` → `structurally-fixed` or `verified` with fix-evidence + verification-evidence columns populated | tracker diff + test pass output OR operator-empirical confirmation |
+| 2 | **Code edit with test verification** | Source file edit + corresponding test file edit/run + test exit 0 | inline test output, exit code 0 |
+| 3 | **Drift fix with empirical confirmation** | Re-read shows previously-misaligned state now aligned (tracker says X, code/file/state agrees) | inline `grep`/`Read` output of post-fix state |
+| 4 | **Documentation with operator-quoted directive** | Rule/command/mode file edit grounded in verbatim operator quote (sacrosanct) | quoted operator words inline + file diff |
+| 5 | **Explicit standby with concrete reason** | Cycle reports "no productive work this fire because: [specific blocker / operator-pending decision X / pause-requested by operator]" | named blocker/decision/pause-source |
+| 6 | **Tracker reconciliation** | Tracker entry brought to match current empirical reality (status flip / evidence-column refresh / drift-correction with grep) | inline before/after grep output |
+
+**Anti-patterns** (THIN cycle — name it as the bug):
+
+- "Standing by" / "Awaiting your call" without naming a specific blocker → SB-099 abdication-as-freeze
+- "Surveyed N items" without action → SB-128 productive-ceiling
+- Wall-of-tables explanation without concrete edit → SB-036 compulsive-structured-tables
+- "Made minor edit to file X" with no test/verification → P4 declarations-aspirational-until-verified violation
+
+The cycle report's **last line** must end with: `Productive output: <category> — <one-line specific>`. Example: `Productive output: 1 (SB closure) — SB-132 hook-ln false-positive fixed; 8/8 tests pass.`
+
+**Cross-reference**: see also `$HOME/.claude/hooks/mindfulness.sh` clause #6 (4 operator-canonical action types) + `$HOME/wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md` (M-E001-1 DRAFT v2 — 9 types, 4 canonical + 5 agent-proposed). The 6 categories above overlap with those vocabularies; harmonization across all three is operator-decision territory, not agent-unilateral.
+
 ## Composition with /loop
 
 `/loop 30m /cycle` (in any mode) = autopilot. Each fire executes the active mode's cycle, which is deterministic per the mode file. Switching modes mid-loop changes the cycle on the next fire (state file is read fresh each time).
 
 ## Discipline
 
-`/cycle` surfaces, reports, drives the systemic-bugs tracker, and waits. The mode-specific cycle steps (4-6) survey; step 9 actively does the systemic work. Forward feature-action remains operator's call (per principle #11).
+`/cycle` surfaces, reports, drives the systemic-bugs tracker, and waits. The mode-specific cycle steps (4-6) survey; step 9 actively does the systemic work. The productive-cycle taxonomy (above) is the cycle's quality gate — every fire names its output category. Forward feature-action remains operator's call (per principle #11).

@@ -184,6 +184,33 @@ def root_objective() -> str:
 
 
 # ---------------------------------------------------------------------------
+# Questions tool — agent-pending questions retention layer (SB-134)
+# ---------------------------------------------------------------------------
+
+@server.tool()
+def root_questions() -> str:
+    """Read agent-pending questions queue (operator directive 2026-05-06, SB-134).
+
+    Returns JSON:
+        questions (list[str]): pending agent → operator questions from $HOME/.claude/active-questions
+        count (int): number of pending questions
+
+    Empty list = no pending. Surfaces in mode-enforcement banner + horizontal +
+    vertical stamp + pre-compact handoff + /handoff doc per the 6-channel
+    visibility design (SB-134 closure).
+    """
+    from pathlib import Path
+    qp = Path.home() / ".claude" / "active-questions"
+    items: list = []
+    if qp.exists():
+        try:
+            items = [ln.strip() for ln in qp.read_text().splitlines() if ln.strip()]
+        except Exception:
+            pass
+    return json.dumps({"questions": items, "count": len(items)}, indent=2)
+
+
+# ---------------------------------------------------------------------------
 # Composite tool — orient
 # ---------------------------------------------------------------------------
 
@@ -211,11 +238,19 @@ def root_orient() -> str:
             obj["priorities"] = [ln.strip() for ln in pp.read_text().splitlines() if ln.strip()]
         except Exception:
             pass
+    qp = base / "active-questions"
+    questions: list = []
+    if qp.exists():
+        try:
+            questions = [ln.strip() for ln in qp.read_text().splitlines() if ln.strip()]
+        except Exception:
+            pass
     return json.dumps({
         "state": read_state(),
         "blockers": detect_drift(),
         "progress": compute_progress(),
         "objective": obj,
+        "questions": questions,
     }, indent=2)
 
 

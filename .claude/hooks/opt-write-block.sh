@@ -1,18 +1,38 @@
 #!/usr/bin/env python3
 """opt-write-block — PreToolUse hook that denies Write/Edit/NotebookEdit to /opt paths.
 
-Per operator binding rule 2026-05-05: "LET THE SECOND-BRAIN BE ITS OWN... THE ONLY
-WAY TO SEND TO THE SECOND-BRAIN IS TO USE THE CONTRIBUTE FEATURE." The $HOME agent
-must not write into <second-brain>/ directly. The canonical
-channel is `tools.gateway contribute` (gated on M007 connect).
+Wired event: PreToolUse · matcher: Write|Edit|NotebookEdit
+Strictness tier (per .claude/rules/hook-architecture.md): **Strict** — fail-CLOSED with documented bypass
+Tests: .claude/hooks/tests/test-opt-write-block.py (5/5 pass — empirically verified
+       2026-05-06 evening; covers project-cwd-allow + /opt-cwd-deny + bypass-allow +
+       legitimate-second-brain-cwd-allow + non-write-tool-passthrough)
+Bypass: env var `ROOT_OPT_WRITE_REASON=<reason>` documents justified exception
+        (e.g., operator-explicit one-time direction for operational config edits
+        per SB-098 knowledge-vs-operational-config distinction). Logged to
+        opt-write-block.log for audit.
+SB closures: SB-009 (re-wrote to /opt after correction — structural fix here) ·
+             SB-010 (cwd-aware via CLAUDE_PROJECT_DIR + os.getcwd() check) ·
+             SB-098 (knowledge-vs-operational-config distinction — the binding
+             rule covers KNOWLEDGE; bypass exists for operational config when
+             operator explicitly directs)
+Cross-refs: .claude/hooks/README.md (DRAFT v1) · .claude/rules/hook-architecture.md
+            (Strict-tier 3-component pattern; bypass mechanism canonical example) ·
+            .claude/rules/operating-principles.md #9 ($HOME scope discipline +
+              knowledge-vs-operational-config refinement) ·
+            CLAUDE.md/AGENTS.md Hard Rule 12 (brain-inheritance pattern —
+              $HOME source-of-truth for operational tooling; this hook enforces
+              the boundary at tool-call time) ·
+            wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+            (sacrosanct verbatim directive governing this comment refresh)
+
+Per operator binding rule 2026-05-05 (sacrosanct verbatim): "LET THE SECOND-BRAIN
+BE ITS OWN... THE ONLY WAY TO SEND TO THE SECOND-BRAIN IS TO USE THE CONTRIBUTE
+FEATURE." The $HOME agent must not write into <second-brain>/ directly. The
+canonical channel is `tools.gateway contribute` (gated on M007 connect).
 
 This hook is structural enforcement on top of the rule-layer prevention in
 `.claude/rules/work-mode.md` + `.claude/rules/operating-principles.md` §9. It catches
 the bug at tool-call time, not just rule-warning time.
-
-Bypass mechanism: env var `ROOT_OPT_WRITE_REASON=<reason>` documents a justified
-exception (e.g., operator-explicit one-time direction). Logged to opt-write-block.log
-for audit. Without bypass, the tool call is denied with a remediation message.
 
 Wired in `.claude/settings.json` as PreToolUse hook with matcher `Write|Edit|NotebookEdit`.
 

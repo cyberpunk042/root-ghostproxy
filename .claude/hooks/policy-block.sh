@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
-# PreToolUse hook: hard-block credential exposure across the full tool ecosystem.
+# policy-block.sh — PreToolUse hook: hard-block credential exposure across full tool ecosystem.
+#
+# Wired event: PreToolUse · matcher: Read|Bash|Edit|Write|NotebookEdit|Glob|Grep|
+#              WebFetch|WebSearch|Agent|TaskCreate|TaskUpdate|mcp__.*
+# Strictness tier (per .claude/rules/hook-architecture.md): **Strict** — fail-CLOSED
+# Tests: .claude/hooks/tests/test-policy-block.py (10/10 pass — empirically verified
+#        2026-05-06 evening; covers SB-083 cmd-sub regex anchored-to-start-of-cmd,
+#        secret-pattern denies, benign cmd-sub allows, set/env-dump exfil denies)
+# Imports: .claude/hooks/integrity.py (shared sentinel — fail-CLOSED if tampered)
+# Bypass: NONE for credential reads (defense-in-depth invariant). For genuinely-
+#         needed access to a credential-pattern path, operator must edit
+#         permissions.allow in .claude/settings.json explicitly.
+# SB closures: SB-083 (cmd-sub regex anchored)
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) · .claude/rules/hook-architecture.md
+#             (Strict-tier 3-component pattern — insertion + reason + remediation) ·
+#             .claude/rules/operating-principles.md #1 (deny-by-default at every layer) ·
+#             AGENTS.md Hard Rule 1 (deny-by-default cross-tool universal) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#             (sacrosanct verbatim directive governing this comment refresh)
+#
 # Defense-in-depth on top of permissions.deny rules in settings.json.
 # False positives are acceptable; false negatives are not.
 #

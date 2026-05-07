@@ -1,4 +1,4 @@
-Show all 28 root-ghostproxy slash commands with one-line description + when-to-use.
+Show all 43 root-ghostproxy slash commands with one-line description + when-to-use.
 
 > Slash-invoked. Operator types `/help-root` literally. Read-only. Distinct from Claude Code's built-in `/help` (which lists harness-level commands).
 
@@ -89,7 +89,7 @@ SESSION-TERMINATION PREP (per operator-authored 2026-05-06):
                      models to wiki BEFORE handoff.
 
 SUMMARY:
-  Total: 28 commands (15 governance/cycle/mode + 6 stamp config + 3 objective + 1 priorities + 1 install + 2 termination-prep).
+  Total: 43 commands (15 governance/cycle/mode + 6 stamp config + 12 statusline config (3 generic + 9 per-profile shortcuts, SB-124b/c) + 3 objective + 1 priorities + 1 questions (SB-134) + 1 task-cursor+create (M-E002-1) + 1 install + 2 termination-prep).
   Hook directs to /orient on every fresh session.
   PostCompact directs to /orient again after compaction.
   Modes deliver autopilot via /loop /cycle.
@@ -118,7 +118,8 @@ Tools (deterministic non-LLM Python; commands compose them):
 MCP server (when wired via .mcp.json):
   root_state           root_blockers              root_progress
   root_decisions_list  root_decisions_get         root_decisions_verify
-  root_decisions_next_id  root_orient (composite)
+  root_decisions_next_id  root_objective           root_questions
+  root_orient (composite — incl. questions per SB-134)
 ═════════════════════════════════════════════════════════════════════════
 ```
 

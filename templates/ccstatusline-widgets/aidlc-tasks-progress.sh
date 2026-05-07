@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # aidlc-tasks-progress.sh — task counts done/in-progress/not-started.
-# Output: "Tasks:18d/2p/45n" (done/in-progress/not-started)
+# Output: "Tasks: 18/7/42" (done / in-progress / not-started)
 set -euo pipefail
 # shellcheck disable=SC1091
 source "$(dirname "$0")/_lib.sh"

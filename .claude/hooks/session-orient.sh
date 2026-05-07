@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
-# SessionStart hook — frame the conversation + direct the agent to invoke
+# session-orient.sh — SessionStart hook: frame conversation + direct agent to invoke
 # /orient via structured additionalContext (~85% determinism vs ~70% plain stdout).
+#
+# Wired event: SessionStart · matcher: (any) · companion: session-start.sh
+# Strictness tier (per .claude/rules/hook-architecture.md): **Advisory** —
+#   directive injected via additionalContext (~85% generative compliance)
+# Self-gate (per SB-088): CLAUDE_PROJECT_DIR == $HOME (or cwd starts with $HOME)
+#   to prevent cross-firing into sister-project sessions; sister sessions silent
+#   pass-through (exit 0). Plus BOOTSTRAP.md presence check.
+# SB closures: SB-088 (cross-fire prevention via cwd-aware self-gate)
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) · .claude/commands/orient.md
+#             (the deterministic 21-step intel chain this hook directs to) ·
+#             BOOTSTRAP.md (one-page cold-pickup guide loaded by /orient) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#             (brain-improvement mandate /orient discipline — operator-yes-per-file
+#               protocol established in this session is part of /orient awareness)
 #
 # Architecture (per operator directive 2026-05-05):
 #   - Hook = imperative directive injected via additionalContext (agent generatively

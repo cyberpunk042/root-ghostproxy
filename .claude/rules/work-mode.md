@@ -69,6 +69,11 @@ The exception: operator literally requests analysis ("HARD ANALYSIS REQUIRED", "
 - Mechanical doc-drift fixes to top-level brain files (small fixes; large rewrites need approval).
 - Tools-internal bug fixes (parsers, regex, etc.).
 - Recovery from agent's own bugs: when the agent recognizes a mistake, build forward (restore the value, fix in correct place) — don't freeze, don't ask permission for reversible cleanup.
+- **Focus-update narrow autonomous (Q2 resolution 2026-05-06)**: AI may write `$HOME/.claude/active-focus` directly when work-evidence supports the change AND the change is "narrow":
+  - Active-task transitions to `done` AND another task is queued in priorities → focus rewrites to next-task
+  - Impediment cleared empirically (`tools.blockers --check` returns 0 + impediment file unset) → no operator-confirm needed
+  - Mid-session focus-text refinement (typos, wording, scope-tightening within same focus) → unilateral
+  Operator-revisible via `/focus set <text>` always; previous focus snapshotted in handoff doc on change.
 
 **Needs operator approval before execution**:
 - Changes to $HOME/CLAUDE.md, AGENTS.md, README.md, BOOTSTRAP.md, CONTEXT.md, any top-level brain file (large rewrites; small fixes are OK).
@@ -77,6 +82,11 @@ The exception: operator literally requests analysis ("HARD ANALYSIS REQUIRED", "
 - Git operations that could lose work.
 - New top-level files at $HOME.
 - Any change that would alter the safety envelope (policy-block, malware-block, leak-detector behavior).
+- **Focus-update broad changes (Q2 resolution 2026-05-06)**: AI proposes, operator commits via `/focus set <text>` for:
+  - Mission shift (active-mission text change) — operator-only
+  - Epic transition (focus moves between E001/E002/E003 scope)
+  - Operator-named focus override (operator says "focus on X" → AI proposes the exact phrasing, operator commits)
+  - Cross-Epic or cross-Milestone focus retargeting
 
 ## Don't fabricate
 
@@ -142,3 +152,12 @@ The operator-empirical confirmation is one half of verification (the WHAT-works)
 - Sacrosanct rule: `$HOME/.claude/rules/words-are-sacrosanct.md`
 - Routing: `$HOME/.claude/rules/routing.md`
 - BOOTSTRAP: `$HOME/BOOTSTRAP.md`
+- [`.claude/rules/README.md`](README.md) — 11 rules with strictness-tier matrix
+- [`.claude/rules/operating-principles.md`](operating-principles.md) — META principles that work-mode applies (strictness graduation + 4 governing principles + 11 extension principles)
+- [`.claude/rules/compound-and-waterfall.md`](compound-and-waterfall.md) — additive layering discipline (work-mode Hard Rule 4a "Adding ≠ discarding" is the same pattern at the work-mode layer)
+- [`.claude/hooks/README.md`](../hooks/README.md) — UserPromptSubmit 4-hook compound stack (mode-enforcement + mindfulness + output-discipline-guard + context-warning) enforces work-mode at runtime
+- [`.claude/commands/README.md`](../commands/README.md) · [`tools/README.md`](../../tools/README.md) — operator-intent dispatch surfaces governed by this work-mode
+- `wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md` — sacrosanct verbatim directive governing this rule's edit pass
+- CLAUDE.md / AGENTS.md **Hard Rule 11** (additive ≠ discarding) — codifies this rule's "Adding ≠ discarding" (Hard Rule 4a) at the hot-path layer for every-prompt-context-budget enforcement
+- CLAUDE.md / AGENTS.md **Hard Rule 12** (brain-inheritance pattern) — operationalizes this rule's $HOME-vs-/opt scope discipline at the hot-path layer
+- CLAUDE.md / AGENTS.md **Hard Rule 13** (chain operations per fire) — operationalizes this rule's "Don't-freeze-when-corrected" (forward not backward) at the hot-path layer; chain-operations is forward-shaped pattern par excellence

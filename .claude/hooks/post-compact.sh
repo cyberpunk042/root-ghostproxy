@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
-# PostCompact hook — restore project orientation after compaction.
+# post-compact.sh — PostCompact hook: restore project orientation after compaction.
+#
+# Wired event: PostCompact · matcher: (any) · companion: pre-compact.sh
+# Strictness tier (per .claude/rules/hook-architecture.md): **Advisory** —
+#   directive injected via additionalContext (~85% generative compliance)
+# Self-gate (per SB-088): CLAUDE_PROJECT_DIR / cwd self-gate + BOOTSTRAP.md presence
+# **CRITICAL ENVELOPE FIX (SB-133, 2026-05-06)**: emits TOP-LEVEL `systemMessage`
+#   per Claude Code schema for PostCompact (NOT `hookSpecificOutput` envelope).
+#   Was silently failing every compaction since SB-079 introduction. The fix
+#   restores the SB-078 → SB-079 reliability chain (PreCompact writes handoff
+#   doc → PostCompact directs agent to /orient + reads the handoff).
+# SB closures: SB-079 (post-compact directive reliability) ·
+#              SB-133 (envelope schema fix — top-level systemMessage)
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) · .claude/hooks/pre-compact.sh
+#             (the OTHER end of the loop — writes handoff doc before compaction) ·
+#             .claude/commands/orient.md (the deterministic chain this hook directs to) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#               (sacrosanct verbatim directive governing this comment refresh)
 #
 # Why: Compaction summarizes earlier turns and replaces them with a compact summary.
 # Behavioral state degrades — operator directives, sacrosanct quotes, in-progress

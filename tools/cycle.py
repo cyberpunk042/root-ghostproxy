@@ -133,6 +133,15 @@ def evaluate_cycle() -> dict:
         except Exception:
             pass
 
+    # Questions retention layer (operator directive 2026-05-06)
+    questions: list = []
+    qp = PROJECT_ROOT / ".claude" / "active-questions"
+    if qp.exists():
+        try:
+            questions = [ln.strip() for ln in qp.read_text().splitlines() if ln.strip()]
+        except Exception:
+            pass
+
     return {
         "active_mode": mode,
         "cycle": cycle_def,
@@ -151,6 +160,7 @@ def evaluate_cycle() -> dict:
         },
         "objective": objective,
         "priorities": priorities,
+        "questions": questions,
         "lifecycle_signals": lifecycle_signals,
     }
 
@@ -374,6 +384,27 @@ def emit_status_block_ansi_horizontal(result: dict, fence: bool = True) -> None:
     except Exception:
         pass
 
+    # Questions — agent-pending input-needed queue (operator directive 2026-05-06).
+    # Always-render row even when empty so operator can SEE there are no questions
+    # (avoiding SB-082 conditional-drop-when-empty pendulum pattern).
+    try:
+        q_path = Path(__file__).resolve().parent.parent / ".claude" / "active-questions"
+        if not q_path.exists():
+            q_path = Path.home() / ".claude" / "active-questions"
+        qs: list = []
+        if q_path.exists():
+            qs = [ln.strip() for ln in q_path.read_text().splitlines() if ln.strip()]
+        # Detail-presence marker per question (presweep enrichment per operator 2026-05-06)
+        detail_dir = Path.home() / ".claude" / "active-questions-detail"
+        if qs:
+            for i, q in enumerate(qs[:5], start=1):
+                marker = f"  {D}[+detail]{X}" if (detail_dir / f"Q{i}.md").exists() else ""
+                print(f"{lbl('Questions') if i == 1 else ' ' * (LABEL_WIDTH + 5)}  {Y}Q{i}{X}  {q[:140]}{marker}")
+        else:
+            print(f"{lbl('Questions')}  {G}(none pending){X}")
+    except Exception:
+        pass
+
     # Tracker — tier-explicit per SB-125: distinguish real blockers (pending decisions)
     # from Epic-pending open SBs from behavioral recurring patterns. Conflating these
     # was the SB-125 bug; tier labels enforce honest classification.
@@ -528,6 +559,26 @@ def emit_status_block_ansi(result: dict, fence: bool = True) -> None:
                 print(f"{rank_color}{BO}P{i}{X}  {p[:160]}")
         else:
             print(f"{D}(none set — operator-edit via /priorities add <text>){X}")
+        print()
+    except Exception:
+        pass
+
+    # Questions section (operator directive 2026-05-06): agent-pending input-needed
+    try:
+        q_path = Path(__file__).resolve().parent.parent / ".claude" / "active-questions"
+        if not q_path.exists():
+            q_path = Path.home() / ".claude" / "active-questions"
+        qs_v: list = []
+        if q_path.exists():
+            qs_v = [ln.strip() for ln in q_path.read_text().splitlines() if ln.strip()]
+        print(f"{M}{BO}@@ ? QUESTIONS (agent → operator · pending input) @@{X}")
+        detail_dir_v = Path.home() / ".claude" / "active-questions-detail"
+        if qs_v:
+            for i, q in enumerate(qs_v[:5], start=1):
+                marker = f"  {D}[+detail]{X}" if (detail_dir_v / f"Q{i}.md").exists() else ""
+                print(f"{Y}{BO}Q{i}{X}  {q[:160]}{marker}")
+        else:
+            print(f"{G}(none pending){X}")
         print()
     except Exception:
         pass
@@ -738,6 +789,7 @@ def main() -> int:
     parser.add_argument("--diff-fence", action="store_true", help="emit ```diff-fenced block (markdown chat / Claude Code — operator-verified color rendering, SB-063)")
     parser.add_argument("--ansi-fence", action="store_true", help="emit ```ansi-fenced block with ANSI escape codes (full color palette: red/green/orange/blue/magenta/cyan/dim/bold)")
     parser.add_argument("--ansi-horizontal", action="store_true", help="emit compact horizontal layout (single-line-per-section, ~6 lines) per SB-114")
+    parser.add_argument("--highlight-deltas", action="store_true", help="T067 — annotate rows that changed since last fire's cached row-hashes (reads /tmp/.end-of-cycle-stamp-row-hashes.json)")
     parser.add_argument("--mode", choices=list(CYCLE_DEFINITIONS.keys()), help="override active mode")
     args = parser.parse_args()
 
@@ -756,11 +808,95 @@ def main() -> int:
         print(json.dumps(result, indent=2))
         return 0
 
+    def _annotate_row_deltas(text: str) -> str:
+        """T067 — annotate rows changed since last fire's cached row-hashes.
+
+        Reads /tmp/.end-of-cycle-stamp-row-hashes.json (written by Stop hook
+        after PRIOR fire's stamp). Computes current per-row hashes; for rows
+        whose hash differs, prepends '▶ ' marker to the first line of that row
+        section. New rows (not in cache) get '＋ '. Returns annotated text.
+        """
+        import hashlib as _hl
+        import json as _json
+        import re as _re
+        import os as _os
+        cache_p = "/tmp/.end-of-cycle-stamp-row-hashes.json"
+        if not _os.path.exists(cache_p):
+            return text  # no prior cache — nothing to diff (no markers)
+        prev: dict = {}
+        try:
+            with open(cache_p) as _f:
+                prev = _json.load(_f)
+        except Exception:
+            return text
+        if not prev:
+            return text  # empty cache file — no diff target
+        # Strip volatile fields before hashing for parity with hook
+        sem = _re.sub(r"\x1b\[[0-9;]*m", "", text)
+        sem = _re.sub(r"\b\d{2}:\d{2}:\d{2}\b", "TIME", sem)
+        sem = _re.sub(r"\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\b", "ISO", sem)
+        labels = ("Status", "Journey", "Plan", "Priorities", "Questions",
+                  "Tracker", "Progress", "Cursor", "Mission", "Focus",
+                  "Impediment", "Blocked")
+        label_re = _re.compile(rf"^[\s·@@\W]*({'|'.join(labels)})[\s·:]+", _re.MULTILINE)
+        # Walk semantic text + raw text in lockstep; annotate raw lines
+        sem_lines = sem.splitlines()
+        raw_lines = text.splitlines()
+        out_lines = list(raw_lines)
+        cur_label: str | None = None
+        cur_buf: list = []
+        cur_first_idx: int = -1
+        for i, sline in enumerate(sem_lines):
+            m = label_re.match(sline)
+            if m and m.group(1) in labels:
+                # Flush prior section
+                if cur_label is not None and cur_first_idx >= 0:
+                    h = _hl.sha256("\n".join(cur_buf).encode()).hexdigest()
+                    if cur_label not in prev:
+                        out_lines[cur_first_idx] = "[+] " + out_lines[cur_first_idx]
+                    elif prev.get(cur_label) != h:
+                        out_lines[cur_first_idx] = "[Δ] " + out_lines[cur_first_idx]
+                cur_label = m.group(1)
+                cur_buf = [sline]
+                cur_first_idx = i
+            elif cur_label is not None:
+                cur_buf.append(sline)
+        # Flush final section
+        if cur_label is not None and cur_first_idx >= 0:
+            h = _hl.sha256("\n".join(cur_buf).encode()).hexdigest()
+            if cur_label not in prev:
+                out_lines[cur_first_idx] = "＋ " + out_lines[cur_first_idx]
+            elif prev.get(cur_label) != h:
+                out_lines[cur_first_idx] = "▶ " + out_lines[cur_first_idx]
+        return "\n".join(out_lines)
+
     if args.ansi_horizontal:
-        emit_status_block_ansi_horizontal(result, fence=True)
+        if args.highlight_deltas:
+            import io as _io, sys as _sys
+            _buf = _io.StringIO()
+            _orig = _sys.stdout
+            _sys.stdout = _buf
+            try:
+                emit_status_block_ansi_horizontal(result, fence=True)
+            finally:
+                _sys.stdout = _orig
+            print(_annotate_row_deltas(_buf.getvalue()), end="")
+        else:
+            emit_status_block_ansi_horizontal(result, fence=True)
         return 0
     if args.ansi_fence:
-        emit_status_block_ansi(result, fence=True)
+        if args.highlight_deltas:
+            import io as _io2, sys as _sys2
+            _buf2 = _io2.StringIO()
+            _orig2 = _sys2.stdout
+            _sys2.stdout = _buf2
+            try:
+                emit_status_block_ansi(result, fence=True)
+            finally:
+                _sys2.stdout = _orig2
+            print(_annotate_row_deltas(_buf2.getvalue()), end="")
+        else:
+            emit_status_block_ansi(result, fence=True)
         return 0
     if args.status_block and args.color and not args.diff_fence:
         # Raw ANSI to stdout — Bash tool output renders colors in Claude Code

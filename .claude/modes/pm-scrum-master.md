@@ -108,7 +108,7 @@ When the operator runs `/loop <interval> /cycle` and the active mode is `pm-scru
    - Recent commits (`git log --oneline -10`)
    - Recent log files
 5. **Risk + blocker scan** — any new blockers since the last cycle? Operator decisions overdue? Stale tasks that should be re-prioritized?
-6. **Wait** — emit a one-line summary + stand by. Step 2's autonomous resolutions ARE acting; steps 3-6 surface only.
+6. **Wait** — emit a one-line summary + stand by. Step 2's autonomous resolutions ARE acting; steps 3-6 surface only. Per SB-128(b) productive-cycle taxonomy (canonical at `$HOME/.claude/commands/cycle.md`): cycle report's last line MUST end with `Productive output: <category> — <one-line specific>`. PM-mode-relevant categories: (1) SB closure, (5) explicit standby with named blocker/decision, (6) tracker reconciliation. If the cycle was pure-survey with no edit/closure/reconciliation → category 5 with named reason ("no PM-actionable input since last cycle: N blockers unchanged, 0 new decisions").
 
 **Filter strictness (per SB-065 design — pending operator confirmation)**: warn-only initially (resolve in agent's draft, surface for operator to confirm before persisting); promote to auto-apply once trust established. Override mechanism: operator says "don't filter X" → leave as is.
 

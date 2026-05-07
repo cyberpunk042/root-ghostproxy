@@ -1,0 +1,33 @@
+{
+  "_DRAFT_NOTE": "AGENT-DRAFTED 2026-05-06 per SB-095 — DRAFT v1, NOT operator-confirmed. Phase 5a of UX-design pass: fills the 'more minified' tier operator named 2026-05-06 ('we can also create configuration of profiles too ? like one that is more minified ?'). Single-line, 4 widgets, semantic colors per Phase-2 palette. Use case: deep-coding mode where statusline must not distract — only the 4 most-load-bearing signals (Mode + Task + Ctx Used + Blockers).",
+  "_TIER": "t1-minified — single-line, 4 widgets, ~40-60 chars, narrow-terminal-safe",
+  "_USE_CASE": "Deep coding / focused implementation — minimum visual distraction. Switch to higher tier (work/planning/review) when context-switching to PM-style work.",
+  "_RATIONALE_PER_WIDGET": {
+    "mode": "Identity — which agent persona is active (magenta = identity color per palette).",
+    "task": "Active task cursor with readiness — answers 'what am I working on right now' (brightWhite = focus-headline per palette).",
+    "ctxpct": "Context-window % used — answers 'when do I need to compact' (brightYellow = attention-without-alarm per palette).",
+    "blockers": "Pending operator-decision count — answers 'what's blocked on operator' (red = blocker color per palette)."
+  },
+  "_NOT_INCLUDED_AND_WHY": {
+    "objective-layer": "Mission/focus/impediment/P1 deferred to higher tiers — minified is for deep-coding when objective-layer is already mentally loaded.",
+    "git-row": "Git state available via terminal prompt anyway; 1-line statusline can't carry it.",
+    "telemetry-numbers": "Tokens/cost/usage deferred to higher tiers; deep-coding doesn't need spend awareness per-keystroke."
+  },
+  "version": 3,
+  "lines": [
+    [
+      {"id": "F1-mode",     "type": "custom-command", "color": "magenta",     "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-mode.sh",        "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "F1-sep1",     "type": "separator", "character": "  │  "},
+      {"id": "F1-task",     "type": "custom-command", "color": "brightWhite", "commandPath": "$HOME/.local/share/ccstatusline-widgets/selected-task.sh",  "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "F1-flex1",    "type": "flex-separator"},
+      {"id": "F1-ctxpct",   "type": "context-percentage", "color": "brightYellow", "bold": true},
+      {"id": "F1-sep2",     "type": "separator", "character": "  │  "},
+      {"id": "F1-blockers", "type": "custom-command", "color": "red",         "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-blockers.sh", "rawValue": true, "timeout": 1000, "bold": true}
+    ]
+  ],
+  "flexMode": "full",
+  "colorLevel": 2,
+  "globalBold": false,
+  "minimalistMode": false,
+  "powerline": {"enabled": false, "separators": [""], "separatorInvertBackground": [false], "startCaps": [], "endCaps": [], "autoAlign": false, "continueThemeAcrossLines": false}
+}

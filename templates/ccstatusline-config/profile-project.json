@@ -10,12 +10,12 @@
       {"id": "6", "type": "separator", "character": " │ "},
       {"id": "7", "type": "model", "color": "cyan"},
       {"id": "8", "type": "separator", "character": " "},
-      {"id": "9", "type": "context-percentage", "color": "yellow"}
+      {"id": "9", "type": "context-percentage", "color": "brightYellow"}
     ],
     [
       {"id": "20", "type": "git-branch", "color": "magenta"},
       {"id": "21", "type": "separator", "character": " "},
-      {"id": "22", "type": "git-status", "color": "yellow"},
+      {"id": "22", "type": "git-status", "color": "magenta"},
       {"id": "23", "type": "separator", "character": " │ "},
       {"id": "24", "type": "block-reset-timer", "color": "brightBlack"},
       {"id": "25", "type": "separator", "character": " · "},

@@ -1,0 +1,63 @@
+{
+  "_DRAFT_NOTE": "AGENT-DRAFTED 2026-05-06 per SB-095 — DRAFT v1, NOT operator-confirmed. Phase 7 of UX-design pass: narrow-terminal variant of profile-full-aidlc (t4 planning tier). Same 3-line layout (AIDLC action / system / git+usage) with reduced density. Drops: L1-model (already on L2), L1-stage (SFIF carries phase), L2-session-name, L2-thinking, L2-vim, L3-weeklyusage, L3-sescost.",
+  "_TIER": "t4-narrow — 3-line planning variant for narrow terminals (~90 chars)",
+  "_USE_CASE": "Planning mode on narrow terminal — full AIDLC visibility without the t5 vertical overhead.",
+  "_DROPPED_VS_FULL": [
+    "L1-model (redundant with L2-model)",
+    "L1-stage (SFIF carries phase)",
+    "L2-session-name",
+    "L2-thinking",
+    "L2-vim",
+    "L3-weeklyusage",
+    "L3-sescost"
+  ],
+  "version": 3,
+  "lines": [
+    [
+      {"id": "L1-mode",        "type": "custom-command", "color": "magenta",     "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-mode.sh",            "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "L1-sep1",        "type": "separator", "character": "  │  "},
+      {"id": "L1-task",        "type": "custom-command", "color": "brightWhite", "commandPath": "$HOME/.local/share/ccstatusline-widgets/selected-task.sh",        "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "L1-flex1",       "type": "flex-separator"},
+      {"id": "L1-sfif",        "type": "custom-command", "color": "blue",        "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-sfif.sh",            "rawValue": true, "timeout": 1000},
+      {"id": "L1-sep2",        "type": "separator", "character": "  ·  "},
+      {"id": "L1-readiness",   "type": "custom-command", "color": "green",       "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-readiness.sh",       "rawValue": true, "timeout": 1000},
+      {"id": "L1-flex2",       "type": "flex-separator"},
+      {"id": "L1-blockers",    "type": "custom-command", "color": "red",         "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-blockers.sh",        "rawValue": true, "timeout": 1000, "bold": true},
+      {"id": "L1-sep3",        "type": "separator", "character": "  │  "},
+      {"id": "L1-sbs",         "type": "custom-command", "color": "brightYellow","commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-open-sbs.sh",       "rawValue": true, "timeout": 1000},
+      {"id": "L1-sep4",        "type": "separator", "character": "  │  "},
+      {"id": "L1-tasks",       "type": "custom-command", "color": "green",       "commandPath": "$HOME/.local/share/ccstatusline-widgets/aidlc-tasks-progress.sh", "rawValue": true, "timeout": 1000}
+    ],
+    [
+      {"id": "L2-model",       "type": "model", "color": "cyan"},
+      {"id": "L2-flex1",       "type": "flex-separator"},
+      {"id": "L2-ctxbar",      "type": "context-bar", "color": "blue"},
+      {"id": "L2-sep1",        "type": "separator", "character": "  "},
+      {"id": "L2-ctxpct",      "type": "context-percentage", "color": "brightYellow", "bold": true},
+      {"id": "L2-flex2",       "type": "flex-separator"},
+      {"id": "L2-tin",         "type": "tokens-input", "color": "green"},
+      {"id": "L2-sep2",        "type": "separator", "character": "  "},
+      {"id": "L2-tout",        "type": "tokens-output", "color": "green"},
+      {"id": "L2-sep3",        "type": "separator", "character": "  ·  "},
+      {"id": "L2-speed",       "type": "total-speed", "color": "green"}
+    ],
+    [
+      {"id": "L3-branch",      "type": "git-branch",         "color": "magenta", "bold": true},
+      {"id": "L3-sep1",        "type": "separator",          "character": "  "},
+      {"id": "L3-status",      "type": "git-status",         "color": "magenta"},
+      {"id": "L3-sep2",        "type": "separator",          "character": "  "},
+      {"id": "L3-sha",         "type": "git-sha",            "color": "brightBlack"},
+      {"id": "L3-flex1",       "type": "flex-separator"},
+      {"id": "L3-sesusage",    "type": "session-usage",      "color": "magenta", "bold": true},
+      {"id": "L3-sep3",        "type": "separator",          "character": "  ·  "},
+      {"id": "L3-compact",     "type": "compaction-counter", "color": "brightBlack"},
+      {"id": "L3-sep4",        "type": "separator",          "character": "  ·  "},
+      {"id": "L3-cwd",         "type": "current-working-dir","color": "brightBlack"}
+    ]
+  ],
+  "flexMode": "full",
+  "colorLevel": 2,
+  "globalBold": false,
+  "minimalistMode": false,
+  "powerline": {"enabled": false, "separators": [""], "separatorInvertBackground": [false], "startCaps": [], "endCaps": [], "autoAlign": false, "continueThemeAcrossLines": false}
+}

@@ -1,8 +1,36 @@
 #!/usr/bin/env python3
-# Stop hook — emit end-of-cycle status stamp via additionalContext.
+# end-of-cycle-stamp.sh — Stop hook: emit end-of-cycle status stamp via systemMessage.
 #
-# Operator-authored I/O enhancement mode (per directive 2026-05-05,
-# wiki/log/2026-05-05-input-output-enhancement-mode-context-stamp-trail-status.md):
+# Wired event: Stop · matcher: (any)
+# Strictness tier (per .claude/rules/hook-architecture.md): **Advisory** observability —
+#   informational status stamp; no block/deny; reads stamp-config.json for layout
+# Self-gate (per SB-088): CLAUDE_PROJECT_DIR / cwd self-gate + BOOTSTRAP.md presence
+# Tests: .claude/hooks/tests/test-end-of-cycle-stamp-diff-suppression.py
+#        — **PARTIAL FAIL SURFACED** 2026-05-06 evening: 21/22 (1 failing test)
+#        per tools.run-tests output. Surfaced for operator-decision per the
+#        brain-improvement Hooks pass option A protocol (NOT unilateral fix).
+#        Likely SB-138 stamp diff-suppression territory (D038 — emit short
+#        pointer when stamp content unchanged since last fire).
+# SB closures: SB-114 (horizontal mode + per-prompt opt-out + default-hide-when-no-mode-active) ·
+#              SB-115 (slash-command + persistent JSON config redesign — prompt-marker
+#                mechanism failed real-session, replaced) ·
+#              SB-133 (envelope fix — top-level systemMessage required for Stop hook)
+# SB pending: SB-116 (stamp UX redesign Epic placeholder — DRAFT-tier per operator
+#               flagging design quality not at high-standards bar) ·
+#             SB-138 (stamp diff-suppression — emit short pointer when content
+#               unchanged since last fire; D038 directive — partial test failure
+#               likely tracking)
+# Cross-refs: .claude/hooks/README.md (DRAFT v1) · tools/stamp.py (config persistence
+#             layer; reads/writes .claude/stamp-config.json) ·
+#             .claude/commands/stamp-{horizontal,vertical,on,off,auto,status}.md
+#             (6 slash commands — operator UX surface) ·
+#             tools/cycle.py (the rendering engine — emit_status_block_ansi_*
+#             functions produce the stamp content) ·
+#             wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
+#             (sacrosanct verbatim directive governing this comment refresh)
+#
+# Operator-authored I/O enhancement mode (per directive 2026-05-05, sacrosanct verbatim
+# at wiki/log/2026-05-05-input-output-enhancement-mode-context-stamp-trail-status.md):
 # "context status at input and a trail or stamp and status at the end".
 #
 # This hook fires on Claude Code's Stop event (end of agent turn) and invokes
@@ -135,6 +163,77 @@ def main() -> None:
 
     if not stamp:
         _trace("exit-empty-stamp")
+        sys.exit(0)
+
+    # Diff-suppression (operator directive 2026-05-06): if stamp SEMANTIC
+    # content is unchanged since last fire, suppress full render + emit short
+    # pointer. Hash is computed AFTER stripping volatile fields (current-time
+    # timestamps like HH:MM:SS) so the timestamp differing every fire doesn't
+    # defeat the suppression. Normal flowing projects have state-deltas in
+    # tracker/SB-counts/cursor/priorities/questions so the stamp renders
+    # naturally; static-state fires get a 1-line pointer. Pattern parallels
+    # mode-enforcement.sh frequency-control (SB-117).
+    import hashlib as _hashlib
+    import json as _json
+    import re as _re
+    cache_path = "/tmp/.end-of-cycle-stamp-last-hash"
+    rows_cache_path = "/tmp/.end-of-cycle-stamp-row-hashes.json"  # T067 substrate
+
+    def _strip_volatile(s: str) -> str:
+        s = _re.sub(r"\x1b\[[0-9;]*m", "", s)  # ANSI
+        s = _re.sub(r"\b\d{2}:\d{2}:\d{2}\b", "TIME", s)  # HH:MM:SS
+        s = _re.sub(r"\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\b", "ISO", s)
+        return s
+
+    semantic = _strip_volatile(stamp)
+    stamp_hash = _hashlib.sha256(semantic.encode()).hexdigest()
+
+    # T067 (Done When #1): per-row hash cache substrate. Each line that begins
+    # with a known label keyword gets its own hash entry. Future T067 work
+    # (Done When #2-6) consumes this cache to emit per-row delta markers.
+    # This fire only WRITES the cache; consumers will be added in subsequent
+    # T067 fires.
+    row_label_re = _re.compile(r"^[\s·@@\W]*([A-Z][a-zA-Z]+)[\s·:]+", _re.MULTILINE)
+    row_hashes: dict = {}
+    current_label: str | None = None
+    current_buf: list = []
+    for line in semantic.splitlines():
+        m = row_label_re.match(line)
+        if m and m.group(1) in ("Status", "Journey", "Plan", "Priorities", "Questions",
+                                "Tracker", "Progress", "Cursor", "Mission", "Focus",
+                                "Impediment", "Blocked"):
+            if current_label is not None:
+                row_hashes[current_label] = _hashlib.sha256("\n".join(current_buf).encode()).hexdigest()
+            current_label = m.group(1)
+            current_buf = [line]
+        elif current_label is not None:
+            current_buf.append(line)
+    if current_label is not None:
+        row_hashes[current_label] = _hashlib.sha256("\n".join(current_buf).encode()).hexdigest()
+
+    suppress = False
+    try:
+        if os.path.exists(cache_path):
+            with open(cache_path) as _f:
+                prev = _f.read().strip()
+            if prev == stamp_hash:
+                suppress = True
+        with open(cache_path, "w") as _f:
+            _f.write(stamp_hash)
+        # T067 row-cache write (separate from suppress decision; consumers TBD)
+        with open(rows_cache_path, "w") as _f:
+            _json.dump(row_hashes, _f, indent=2)
+    except Exception as exc:
+        _trace("diff-cache-error", f"err={exc!r}")
+
+    if suppress:
+        pointer = (
+            "stamp unchanged since last fire — full render suppressed. "
+            "View on demand:  python3 -m tools.cycle --ansi-horizontal  "
+            "(or --ansi-fence for vertical layout)."
+        )
+        print(json.dumps({"systemMessage": pointer}))
+        _trace("fired-pointer-suppressed", f"hash={stamp_hash[:12]}")
         sys.exit(0)
 
     # systemMessage is the only valid display channel for Stop hook per

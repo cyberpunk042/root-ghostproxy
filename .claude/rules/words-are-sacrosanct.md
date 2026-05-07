@@ -91,3 +91,15 @@ The same conflation pattern recurred multiple times in the same session. The ope
 Same shape as the hub's [CLAUDE.md Hard Rule #4](<second-brain>/CLAUDE.md): "Operator words are SACROSANCT — quote verbatim ALL THE TIME. Never paraphrase, never dilute, never summarize. Verbatim quoting is the alignment mechanism: it lets the operator track that I processed their requirements correctly."
 
 The rule is reproduced here as the project's own rule because the operator restated it as a project requirement. The companion memory at the path in the frontmatter mirrors this rule on the auto-loaded memory layer.
+
+## Cross-references
+
+> **Strictness tier** (per `operating-principles.md` §3): **Strict** — the verbatim-quoting + premise-confirmation gate + conditional-clause grammar (SB-120 closure) MUST hold. This is the highest-strictness rule in the project; operator-words preservation is the alignment substrate everything else depends on.
+
+- [`.claude/rules/README.md`](README.md) — 11 rules with strictness-tier matrix
+- `.claude/rules/operating-principles.md` — extension principles that codify operator-stated patterns (each cites operator-verbatim where applicable)
+- `.claude/rules/work-mode.md` — Sacrosanct Verbatim Quoting (Hard Rule) section is governed by this file
+- [`.claude/hooks/output-discipline-guard.sh`](../hooks/output-discipline-guard.sh) — runtime detection layer for premise-construction (SB-090) + escalation (SB-094) + conditional-clause grammar (SB-120). The hook is the runtime enforcement of the rule statements above.
+- [`.claude/hooks/mindfulness.sh`](../hooks/mindfulness.sh) clause #2 — confirm-don't-construct (cites SB-090 — same rule)
+- `wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md` — sacrosanct verbatim directive governing this rule's BOTTOM-only additive edit pass (rule content above untouched per its own discipline)
+- CLAUDE.md / AGENTS.md **Hard Rule 4** — operator words SACROSANCT (the universal restatement at hot-path layer)

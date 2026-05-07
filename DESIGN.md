@@ -4,6 +4,12 @@
 
 This file is canonical reference material. When operator or future-session agent asks "why is X this way," the answer should be derivable from this file. When making changes that contradict a documented design choice, the change requires re-deriving the rationale here — not silently overriding it.
 
+> **Agent doc-update discipline (operator directive 2026-05-06, sacrosanct)**: when refreshing DESIGN.md, **adding ≠ discarding**. Layer new design subsections at the END (chronological); refresh inline values where empirically drifted; do NOT replace existing Design Principles or Recent design subsections wholesale. Operator-verbatim quote at line 95+ (modules-as-facultative) is sacrosanct — preserve EXACTLY. Design Principles (4 cross-cutting) are doctrinal frame — preserve structure. Anti-Patterns + Trade-offs tables are APPEND-ONLY (existing rows preserved as historical record). Open Design Questions table: mark resolved with D-ID reference (not delete) — preserves provenance per the historical-snapshot-vs-canonical-current discipline.
+
+## Summary
+
+This file documents the design rationale for root-ghostproxy's architectural choices. **4 cross-cutting Design Principles** (deny-by-default at every layer · fail-closed where stakes are high / fail-open where stakes are low · markdown-as-IaC · same policy + different runtimes — no-policy-duplication invariant) form the doctrinal frame. **7 specific Specific Design Choices** (stealth bridge · facultative modules · two-layer hooks · methodology copy-and-adapt · auto_connect false · wifi outbound-only · git init at $HOME) realize the principles in concrete shape. **9 Recent design subsections** capture iterations from cycles 41-49 (unified trigger model · verbosity calibration · end-of-cycle stamp · agent-discipline-gate) plus 2026-05-06 additions (brain-inheritance pattern SB-115 · compound+waterfall axes SB-123 · productive-cycle taxonomy M-E001-1 + Hard Rule 14 · Active Objective Layer SB-118+SB-127+SB-124d · doc-update-discipline as design pattern Hard Rule 11). **Anti-Patterns Deliberately Avoided** + **Trade-offs Taken** tables provide negative-space framing. **Open Design Questions** tracks unresolved decisions with D-ID references for closed ones (preserving provenance). Cross-tool universal — every AI tool consuming this project obeys the same design principles via thin adapters.
+
 ## Design Principles in Force
 
 The project commits to four cross-cutting design principles. Each is the lens through which the architecture's specific choices are evaluated.
@@ -47,7 +53,7 @@ Configuration is markdown files. Methodology, identity, backlog state, hook poli
 - The agent context is `*.md` files at the repo root (this file, AGENTS.md, CLAUDE.md, etc.) — operator and AI tools both read them via standard file I/O.
 - Operator directives are `wiki/log/YYYY-MM-DD-*.md` (verbatim, sacrosanct).
 - Backlog is hierarchical markdown: epics + modules + tasks at `wiki/backlog/{epics,modules,tasks}/`.
-- Architectural decisions are inlined in this file (DESIGN.md) and (when authored) in `wiki/decisions/`.
+- Architectural decisions are inlined in this file (DESIGN.md); operational decisions logbook lives at [`wiki/governance/decisions.md`](wiki/governance/decisions.md) — **40 entries D001-D040** as of 2026-05-06 evening (refresh via `python3 -m tools.decisions append --title --rationale --reversibility`). DESIGN.md is the architectural curation (a subset focused on architectural design rationale); wiki/governance/decisions.md is the operational source-of-truth (every decision with reversibility + downstream effects).
 
 **What it costs:** loss of structured-database affordances. There's no SQL query for "all tasks where readiness > 50 and parent_module = M005." Searching means grepping. The compensating mechanism is `pipeline post` (in the second brain) which builds indexes + manifest from frontmatter; the project as it exists at $HOME has not yet adopted that mechanism (it's available via the second-brain forwarders after M007 connect).
 
@@ -192,6 +198,11 @@ Cross-AI-tool consistency is structural, not coincidental. The agent-safety poli
 | **Hardcoded interface device names** | Hosts vary; `enp2s0` on one host is `eth0` on another. | Configuration uses role-based names (upstream-eth, lan-eth, management-wifi); device names are install-time mappings. |
 | **AI tools authored their own per-tool policy files** | Drift; multiple sources of truth. | The bridge plugin pattern: one canonical envelope, adapters per AI tool. |
 | **Modules required at install time** | Forces operator into full install; loses incrementalism. | Facultative; first-install can have zero modules. |
+| **Going-to-extremes pendulum (SB-082/093)** | Each correction triggers full-opposite swing; never adjusts by single dimension. Recurs across cycles when not structurally prevented. | Hard Rule 11 (additive ≠ discarding) + going-to-extremes pre-flight check (operating-principles.md #12b: state dimension + V_old + check for opposite-extreme; if yes, don't ship). |
+| **Synthetic-test-claimed-as-verified (SB-091)** | Agent crafts test inputs matching its own model; runs test; claims "verified" without realizing test inputs were crafted to confirm the model. P4 violation. | Real-session diag-log evidence required for "verified" status on lifecycle code. Synthetic tests confirm structural fix only — behavioral-verification claim requires empirical (operator-confirmed or real-session captured). |
+| **Platform-blame framing for own model errors (SB-110)** | When fix doesn't render as expected, default-attribute to "platform renders that way" without operator-empirical or diag-log evidence. Removes bug from agent's domain prematurely. | Evidence-priority hierarchy (operating-principles.md #5 extension): tier 1 operator-empirical > tier 2 diag-log > tier 3 subagent-research > tier 4 agent-inference. State the tier behind any platform-behavior claim; default-attribute is tier 4 inference. |
+| **Architectural-vs-functional substitution (SB-111)** | Operator's directive specifies a mechanism ("I NEED IT WIRED" = a hook); agent proposes functionally-equivalent alternative ("agent emits inline") as if it satisfies the directive. | Treat outcome-equivalence ≠ directive-equivalence. Operator's choice of mechanism is part of the directive, not decoration. If named mechanism is impossible, surface that explicitly with evidence; don't substitute silently. |
+| **Hallucinated artifacts gaining reality (SB-095)** | Agent invents an artifact (file, command, draft, hypothetical); subsequent cycles cite it as a real operator-known thing. | Hard Rule 4 (operator-words sacrosanct) + agent-drafted artifacts MUST be flagged as agent-DRAFT at every reference (frontmatter or body header); never treat as operator-known unless operator explicitly acknowledges. |
 
 ### Unified trigger model (signal → action → recovery)
 
@@ -223,15 +234,95 @@ Per cycles 41-43 statusline UX iterations + SB-082 (extremes pendulum recurring)
 
 ### Agent-discipline-gate detection (UserPromptSubmit hook for runtime SB-090/094 enforcement)
 
-**Choice:** combined `output-discipline-guard.sh` UserPromptSubmit hook detects high-confidence premise-construction-risk (SB-090 family) + operator-escalation (SB-094) patterns; emits single-line concise banner via `additionalContext` only when triggered; silent on routine prompts.
+**Choice:** combined `output-discipline-guard.sh` UserPromptSubmit hook detects high-confidence premise-construction-risk (SB-090 family) + operator-escalation (SB-094) patterns + **conditional-clause grammar (SB-120 — added 2026-05-06)**; emits single-line concise banner via `additionalContext` only when triggered; silent on routine prompts.
 
 **Alternatives considered:** rule-text-only fixes in `.claude/rules/*.md` (SB-113 meta showed they don't hold under load — patterns recur); two separate UserPromptSubmit hooks (premise-guard + output-discipline-guard); 24-line verbose banner per detection (operator complained as too noisy).
 
-**Why combined + single-line + high-confidence-only:** rule-text covers the discipline at design time, but runtime requires hook-detection layer. Multiple banners on same UserPromptSubmit would compete with each other. Single hook with two detection paths shares scaffolding. Single-line banner avoids visual noise. High-confidence-only triggers (enumerative observation, observational adjective, pronoun + state-adjective, ≥2 escalation markers) avoid false-positive fatigue (premise-guard's prior failure mode — fired on every "?").
+**Why combined + single-line + high-confidence-only:** rule-text covers the discipline at design time, but runtime requires hook-detection layer. Multiple banners on same UserPromptSubmit would compete with each other. Single hook with **3 detection paths** (premise + escalation + conditional-clause) shares scaffolding. Single-line banner avoids visual noise. High-confidence-only triggers (enumerative observation, observational adjective, pronoun + state-adjective, ≥2 escalation markers, conditional-clause + immediate-imperative co-occurrence) avoid false-positive fatigue (premise-guard's prior failure mode — fired on every "?").
 
 **What it costs:** ~85% generative compliance (agent reads banner; may or may not act on it). False negatives on ambiguous patterns (e.g. some pronoun-contractions still missed).
 
 **What it gains:** deterministic detection of the highest-recurrence patterns. Banner appears in operator's UI as visible alarm — operator catches non-compliance even if agent ignores the nudge. Closes the SB-113 meta gap for hook-detectable patterns.
+
+### Brain-inheritance pattern ($HOME source-of-truth + /opt INHERITS for operational tooling; knowledge flows OTHER direction)
+
+**Choice (SB-115 closure 2026-05-06):** `$HOME` (root-ghostproxy) is the source-of-truth for **operational tooling** — hooks, slash commands, tools/*.py, settings.json wiring conventions, ANSI-fence rendering patterns, statusline widgets, mode-enforcement banner shape. `/opt` second-brain INHERITS / adapts these patterns. **Knowledge** (lessons, sources, sister-project profiles, methodology updates, decisions, principles) flows the OTHER direction (root-ghostproxy → second brain via `gateway contribute` after M007 connect).
+
+**Alternatives considered:** $HOME and /opt as independent peers (each maintains own operational tooling — drift inevitable); /opt as source-of-truth + $HOME inherits (inverts the type=root scope-not-path property — operational tooling lives where the operating-system-setup project IS, not at the second-brain hub).
+
+**Why this asymmetric inheritance:**
+- $HOME is type=root + group=operating-system-setup — root-level operational tooling lives here as canonical. The second brain consumes operational patterns, not authors them.
+- /opt second brain is the knowledge hub — its job is methodology + sources + lessons + patterns. Knowledge flow is /opt → consumers, but operational tooling flow is $HOME → /opt + sister projects.
+- Operator-corrected the agent's "/opt has its own hook, separate from $HOME's" framing (SB-115 instance) — *"WTF WHY WOULD YOU SAY second-brain is different ?? you are the root retart... second-brain take everything from you...."* The framing is asymmetric inheritance, not peer-to-peer.
+
+**What it costs:** when $HOME's hook evolves (e.g., SB-115 redesign of stamp config from prompt-marker to slash-command + persistent JSON), /opt's parallel hook needs explicit propagation — not automatic. Cross-project sync is operator-coordinated, not agent-automatic.
+
+**What it gains:** clear ownership — when the question is "who owns this pattern?", the answer follows the inheritance arrow. No drift between ostensibly-equivalent operational tooling at $HOME and /opt; /opt tracks $HOME improvements deliberately. Codified at hot-path layer in CLAUDE.md / AGENTS.md **Hard Rule 12** for every-prompt enforcement.
+
+### Compound + waterfall axes (two orthogonal design axes for layered context + state-flow)
+
+**Choice (SB-123 closure 2026-05-06):** `.claude/rules/compound-and-waterfall.md` formalizes two orthogonal design axes that govern how state, context, hooks, and directives layer or flow: **compound** (additive layers at-a-moment — mode + priorities + mission + focus + impediment + live state visible simultaneously in mode-enforcement banner) AND **waterfall** (state flows event-to-event — SessionStart → UserPromptSubmit hooks → Stop → PreCompact → PostCompact → /orient).
+
+**Alternatives considered:** single-axis design (only-compound — misses event-flow; only-waterfall — misses simultaneous-layering); ad-hoc per-feature design (no unified framework — drift across hooks/state-files).
+
+**Why two orthogonal axes:**
+- Failure modes are distinct: **compound failure = collide** (layers replacing instead of stacking; SB-121 cron-prompt + operator-typed-prompt collide); **waterfall failure = truncation** (earlier-stage state lost downstream; SB-078 / SB-079 PreCompact / PostCompact reliability).
+- Holding both axes prevents both failure modes. New hooks, state files, brain pieces, render surfaces all evaluated per: "does it ADD to operator's view at-a-moment?" (compound check) AND "does it persist state to durable location for next event?" (waterfall check).
+- Operator directive 2026-05-06: *"This also make me think of the compound and waterfall strategy I talked about once and how it propably fit into hooks and directives and brains files too... it should be compounding"*.
+
+**What it costs:** more design surface to consider per new mechanism; documentation discipline required.
+
+**What it gains:** structural prevention of compound-collide (SB-121) + waterfall-truncation (SB-078/079) failure classes. Cross-references with [`.claude/rules/trigger-model.md`](.claude/rules/trigger-model.md) (mechanism axis) and [`.claude/rules/context-engineering.md`](.claude/rules/context-engineering.md) (timing axis) to provide a 3-axis design space.
+
+### Productive-cycle action vocabulary (M-E001-1 — Hard Rule 14 — universal cross-tool ACTION layer)
+
+**Choice (SB-128(b)+(c) closure 2026-05-06):** `wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md` defines 9 canonical action types every cycle-fire emits — `sb-closure / verified-edit / drift-fix-with-empirical / explicit-standby-with-named-reason / new-artifact / doc-refresh / blocker-surface / operator-directive-register / read-only-audit`. Mandatory cycle-report last-line: `Productive output: <type> — <one-line specific>`. Codified at hot-path layer as **Hard Rule 14** in CLAUDE.md / AGENTS.md.
+
+**Alternatives considered:** per-tool action vocabularies (Claude Code emits one set, opencode emits another — drift); no vocabulary (cycle-fire substance is implicit — SB-128 thin-output bug recurs); lighter vocabulary (4 operator-canonical from mindfulness clause #6 only — incomplete; some cycle-emissions don't fit any of the 4).
+
+**Why 9-type vocabulary + mandatory last-line + cross-tool universal:**
+- 4 operator-canonical types (mindfulness clause #6) cover SB closure / verified-edit / drift-fix / explicit-standby — but couldn't classify all real fires per empirical 13-fire validation (e.g. /audit run was unclassified — read-only-audit added as type 9).
+- 5 agent-extension types (new-artifact / doc-refresh / blocker-surface / operator-directive-register / read-only-audit) flagged as agent-DRAFT per SB-095 — operator-revisable.
+- THIN standby without named subject is the SB-128 bug — the vocabulary structurally forbids "thin standby" (it's not in the list) — SB-099 abdication-as-freeze becomes structurally impossible if cycle MUST emit one of the 9.
+- Cross-tool universal — every AI tool's cycle skill emits the same vocabulary; consistent action layer regardless of which AI tool fires the cycle.
+
+**What it costs:** vocabulary is DRAFT v2 — operator-revisable; future iterations may add/remove/rename types. Cycle-report last-line is overhead per fire (one line of structured output).
+
+**What it gains:** structurally prevents SB-128 thin-output recurrence; cross-tool consistency at action layer; operator can audit cycle output per-fire by checking the last-line declaration; fits the unified trigger-model (signal → action → recovery) — this is the **action** layer.
+
+### Active Objective Layer state files (SB-118 + SB-127 + SB-124d)
+
+**Choice (2026-05-06):** Multi-cycle objective tracking **ABOVE** active-task cursor — state files at `$HOME/.claude/active-{mission,focus,impediment,priorities,task}` managed by `tools/{objective,priorities,tasks}.py` + slash commands `/mission` / `/focus` / `/impediment` / `/priorities` / `/task`. Read by mode-enforcement.sh (banner) + cycle.py (stamp) + mcp_server.py (root_objective MCP tool) + /handoff (handoff doc) + pre-compact.sh (handoff snapshot).
+
+**Alternatives considered:** active-task cursor only (single-layer — operator can't track multi-cycle objective beyond current task); embedded objective in every doc (drift across docs); single state file with multiple sections (hard to update per-layer).
+
+**Why 5 separate state files at increasing granularity:**
+- **Mission** (multi-cycle objective): operator-set; survives across many cycles; e.g. "ship root-ghostproxy MVP — close systemic-bug audit + advance M003 Foundation gate"
+- **Focus** (sub-objective within mission): operator-set; survives across cycles; e.g. "iterate hooks/context/engineering quality + mission+focus build"
+- **Impediment** (block on focus, comes-and-goes): comes-and-goes per cycle; e.g. "(none — focus unblocked)" or specific blocker
+- **Priorities** (imminent-work tier ABOVE PM blockers — SB-127): operator's hot-queue; verbs add/show/clear/remove/promote/demote/set/insert/update for fluid management
+- **Task** (current backlog cursor — SB-124d): single ID like "T012"; pre-compact.sh + /handoff read this for state preservation
+- Granularity matters because each layer has different update frequency + different durability + different consumer set.
+- Operator directives 2026-05-06: *"this make me think if we dont also need a current mission and a current focus... we can even add impediment.. this is another sub-level from a focus that is blocked for example"* + *"my new STP file which would contain a list with task-and/or-focus combo with priotities that should be identified as the imminent work, even before the PM work"*.
+
+**What it costs:** 5 state files to manage; operator must learn 5 verb-vocabularies (`/mission set` vs `/focus set` vs `/impediment set` vs `/priorities add/promote/demote/insert/update` vs `/task set`).
+
+**What it gains:** rich objective layer surfaced consistently across mode-enforcement banner + stamp + MCP server + handoff doc + pre-compact snapshot. Operator can ad-hoc reorganize priorities (insert / update / promote without losing other entries) per SB-130. Cycle skills + cron-fire iterations can pick top priority deterministically.
+
+### Doc-update-discipline as design pattern (additive ≠ discarding — Hard Rule 11)
+
+**Choice (Hard Rule 11 codification 2026-05-06):** When updating any agent-context doc (CLAUDE.md / AGENTS.md / sister docs / sub-READMEs), the discipline is **additive** — layer new content; refresh inline values where empirically drifted (with empirically-verified-YYYY-MM-DD timestamp); do NOT replace existing sections wholesale unless operator explicitly directs. Codified at hot-path layer as Hard Rule 11 in CLAUDE.md / AGENTS.md for every-prompt-context-budget enforcement.
+
+**Alternatives considered:** "rewrite to current state" pattern (lose historical provenance + go-to-extremes pendulum SB-082/093 recurrence); "freeze the doc; never update" (drift accumulates indefinitely); "operator decides every change" (slow + bottlenecks operator).
+
+**Why additive ≠ discarding:**
+- Operator-corrected this exact pattern in 2026-05-06 evening session: *"Why are you not able to just do normal improvements instead of causing regression and we need to revert.. if you had done your update properly that would not have happened..."* The lesson: deletion-because-newer-canonical-exists is regression; addition-of-pointer-to-newer-canonical is improvement.
+- Going-to-extremes pendulum (SB-082/093 family) recurs when an agent rewrites instead of revises. Pattern: agent sees drift between an existing section and a newer canonical → reflex is to REPLACE the section. Operator catches: replacement loses content + introduces new bugs; addition of cross-reference is the right move.
+- Historical provenance is value-add, not waste. Recent Operator Directives table + Recent Work Completed table + ADR table + Operator-Pending Decisions table all use append-only discipline preserving historical accurate-as-of-its-time entries.
+
+**What it costs:** docs grow over time (line counts increase). Per Hard Rule 15 (empirical-count-verification before drift-claim), inline values ARE refreshed; structure is preserved.
+
+**What it gains:** structural prevention of going-to-extremes pendulum (SB-082/093 family). Historical provenance preserved across all append-only sections. Cross-tool universal — every AI tool's doc-update work obeys this discipline.
 
 ## Trade-offs Taken (vs Alternatives)
 
@@ -248,16 +339,31 @@ Per cycles 41-43 statusline UX iterations + SB-082 (extremes pendulum recurring)
 | `auto_connect: false` for type=root | `auto_connect: true` | Friction-by-design appropriate for security-envelope projects |
 | Wifi as outbound-only management | Inbound SSH on wifi | Minimal attack surface on a security-sensitive appliance |
 | `git init` at $HOME | Repo at `$HOME/<projectname>` | Install destinations are sub-paths of $HOME; repo IS the home directory |
+| **Additive ≠ discarding** (Hard Rule 11) | Replace-and-rewrite pattern | Going-to-extremes pendulum (SB-082/093) prevention; historical provenance preserved across all append-only sections; cross-tool universal lesson |
+| **Brain-inheritance pattern** ($HOME → /opt for operational tooling) | Peer-projects framing (independent maintenance) | Clear ownership; no drift between ostensibly-equivalent operational tooling; operator-corrected this exact pattern (SB-115) |
+| **Chain operations per fire** (Hard Rule 13) | Single-edit-per-cycle | THIN-output anti-pattern (SB-128 family) prevention; substance pattern is multi-edit per fire that pulls along tracker + structural fix + regression-test + cross-references + decisions-logbook entry |
+| **Empirical-count-verification before drift-claim** (Hard Rule 15) | Compound prior counts with current cycle's deltas | Compounding errors is recurring drift source across AI tools (SB-129 quality-recompile + ad-hoc count drift across multiple brain files); programmatic walk + parse before refreshing any count |
+| **Productive-cycle taxonomy** (Hard Rule 14 — M-E001-1 vocabulary cross-tool) | Per-tool action vocabularies | Cross-tool drift prevention; structural impossibility of THIN standby (SB-128); 9 canonical action types every cycle-fire emits regardless of which AI tool fires |
 
-## Open Design Questions
+## Open Design Questions (resolved + still-unresolved)
 
-These are unresolved and require operator decision (or future-session investigation):
+> **Historical-snapshot-vs-canonical-current discipline**: questions resolved are marked with D-ID reference (preserves provenance). Still-unresolved + new pending questions are listed below the resolved set. Canonical operational pending decisions live at [CONTEXT.md](CONTEXT.md) Operator-Pending Decisions table (refreshed 2026-05-06 evening with 13 still-pending including new Epic-pending items).
+
+### Resolved (with D-ID + date)
+
+| Question | Resolution | D-ID |
+|---|---|---|
+| Foundation IaC authoring approach | **GREENFIELD** (not extend prior debris) | D019 (2026-05-05) |
+| Cleanup of prior $HOME debris | **LEAVE-IN-PLACE** (cleanup orthogonal/deferred) | D020 (2026-05-05) |
+| install.sh greenfield authored (scaffold-stage stub) | + prior debris backed up | D022 (2026-05-05) |
+| Network bridge configuration tool | **systemd-networkd** (per `--mode {bridge/endpoint/hybrid/auto}` flag decoupled from `--profile`; orthogonal composition) | D023 (2026-05-05) |
+| install.sh implement-stage advance | **GREENLIT** (T012/T013/T014); real-execute = operator-driven future-session run | D024 (2026-05-05) |
+
+### Still unresolved (require operator decision or future-session investigation)
 
 | Question | Blocks | Notes |
 |---|---|---|
 | Suricata IPS mode failopen choice | M005 (Suricata-first path) | NFQUEUE+bypass (fail-OPEN) vs AF_PACKET copy-mode (fail-CLOSED at L2). Different threat models support different choices. |
-| Foundation IaC authoring approach | M003 | Author install.sh from scratch (operator-driven greenfield) vs extend the prior $HOME/install.sh as a starting point. |
-| Network bridge configuration tool | M003 | `ifupdown` (Debian classic) vs `netplan` vs `systemd-networkd`. Each has trade-offs in declarativeness vs operational maturity. |
 | Project-internal verifier language | M004 | Python (aligns with `integrity.py` if extended) vs shell (aligns with install.sh + hooks). |
 | Pre-commit vs CI integration | M004 | Pre-commit catches local-only drift; CI catches drift on every git push. Both possible, both have setup cost. |
 | First module choice | M005 | Suricata-first ("passive before active") vs PolarProxy-first ("de-risk cert distribution first"). Operator decides per priority. |
@@ -265,21 +371,105 @@ These are unresolved and require operator decision (or future-session investigat
 | eBPF integration | Phase-2 | If/when AF_PACKET multi-thread + eBPF load balancing is needed for throughput beyond ~Gigabit. |
 | Active response capability | Phase-3 | Operator-decision: should root-ghostproxy be able to actively respond (rewrite flows, inject responses, honeypot specific destinations)? |
 | Multi-host deployment shape | Phase-2 | How many hosts? Each independent or coordinated? Configuration-management mechanism (Ansible / Salt / NixOS / direct git pull)? |
+| FORWARD/OUTPUT nftables policy (T013) | M003 bridge data path closure | Default-accept vs default-drop FORWARD on the bridge; threat-model question. |
+| Line-1 widget restoration shape (SB-104/105) | ccstatusline UX | Revert SB-103/SB-104 OR different shape (drafted aidlc-context-header.sh widget pending operator direction) |
+| Stamp UX redesign Epic scope (SB-116) | Stamp UX maturity | Mechanism works (SB-114/115 closure); UX design quality DRAFT-tier; full Epic-level redesign awaiting operator scope |
+| Mode-enforcement deeper Epic scope (SB-117) | Mode-enforcement maturity | Mechanism present (SB-056 closure); Epic-level engineering depth + per-mode tuning awaiting operator scope |
+| Statusline + profile-variants design (SB-124b/c) | Statusline UX | Operator-coordinated; tight real-estate; profile-variants config schema (minified/normal/extended) awaiting operator direction |
+| Productive-cycle vocabulary action-selection logic (M-E001-2) | Auto-pilot rework Epic | M-E001-1 vocabulary spec landed (DRAFT v2 — 9 types); M-E001-2 selection logic (which action to pick when multiple fit) awaits operator scope direction |
+| Compound-retention layer mechanism (M-E003-1) | E003 epic | Single state file vs per-category retention layer; operator Q2 decision pending |
+
+## Agent personal-learning notes (operator-allowed, per directive 2026-05-06)
+
+> **Operator directive 2026-05-06 (sacrosanct)**: *"you can take notes of your personal learnings progress here, there is such a room for system project even a root one"*. Entries are **agent-authored** (per SB-095 — agent-DRAFT, not operator-stated). Operator may revise / promote / remove. Each timestamped + initialed `[agent]`. DESIGN.md-specific framing — design-rationale-doc lessons.
+
+### 2026-05-06 evening — DESIGN.md is the WHY (rationale), not the WHAT (architecture) or WHO/WHEN (state)
+
+`[agent]` Three sister docs slice the same project from different angles: ARCHITECTURE.md = *what + how* (technical depth — topology / components / data flow / failure modes); SECURITY.md = *what protects against what* (specific threat protections); DESIGN.md = *why this and not something else* (alternatives considered + costs + gains). Don't duplicate. When a design choice touches architecture (e.g., "two-layer hooks"), the rationale lives in DESIGN.md; the implementation lives in ARCHITECTURE.md; the threat-model justification lives in SECURITY.md (if applicable).
+
+### 2026-05-06 evening — Recent design subsections are append-only (chronological extension)
+
+`[agent]` The Recent design subsections (originally 4 — unified trigger model · verbosity calibration · end-of-cycle stamp · agent-discipline-gate; extended 2026-05-06 with 5 more — brain-inheritance + compound+waterfall + productive-cycle taxonomy + Active Objective Layer + doc-update-discipline) are chronologically extended. Discipline: ADD new subsections at the END after the existing ones; never reorder; never modify existing subsections (they're operator-confirmed design rationale). New design choices that operator confirms become new subsections; agent-DRAFT design proposals stay in agent-personal-learning-notes (this section) until operator promotes them.
+
+### 2026-05-06 evening — Anti-Patterns + Trade-offs tables are append-only
+
+`[agent]` Both tables accumulate over project lifetime. Existing rows are operator-confirmed lessons. Discipline: APPEND new rows at the END (preserving the structural symmetry of the tables — anti-patterns: what we avoid + why + what we do instead; trade-offs: choice + alternative + why this one wins). Don't restructure or remove rows. The historical-provenance value of these tables is high — operators reference them when asking "have we considered X before?".
+
+### 2026-05-06 evening — Open Design Questions table — mark resolved with D-ID, don't delete
+
+`[agent]` When an Open Design Question is resolved (per D-ID in the decisions logbook), the right move is to MOVE the entry from "Still unresolved" to "Resolved (with D-ID)" sub-table and add the D-ID + resolution. Don't delete — preserves the historical context (someone may want to know why a particular question was asked + how it was answered). The historical-snapshot-vs-canonical-current discipline applies: DESIGN.md curates architectural rationale; CONTEXT.md tracks operational pending-decisions live state. Both layers preserved.
+
+### 2026-05-06 evening — Hard Rules 11-15 are operationalization of design principles
+
+`[agent]` The 4 cross-cutting Design Principles (deny-by-default · fail-closed/open · markdown-as-IaC · no-policy-duplication) are the doctrinal frame. CLAUDE.md + AGENTS.md Hard Rules 11-15 (additive ≠ discarding · brain-inheritance · chain-operations · productive-cycle taxonomy · empirical-count-verification) are the OPERATIONALIZATION at hot-path layer for every-prompt-context-budget enforcement. Doctrinal frame in DESIGN.md is read on-demand (when designing); hot-path Hard Rules in CLAUDE.md/AGENTS.md fire every prompt. Layered enforcement: design at slow-thoughtful tier; runtime at fast-reflex tier.
+
+### What this section is NOT
+
+`[agent]` Not the SB tracker (`wiki/governance/systemic-bugs.md`). Not the decisions logbook (`wiki/governance/decisions.md`). Not the session log (`wiki/log/`). Not ARCHITECTURE.md (technical depth) or SECURITY.md (specific threat protections). For DESIGN.md-specific design-rationale-doc lessons that benefit fresh-pickup agents but are too small to warrant their own design subsection. Operator promotes to structured artifact (new design subsection / new anti-pattern row / new trade-off row) when pattern matures.
 
 ## Cross-References
+
+### Top-level brain files (10)
 
 | For… | Read |
 |---|---|
 | What the project is + identity + modules + status | [README.md](README.md) |
-| System topology + components + data flow + module integration interfaces | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Threat model + protections + fail-closed invariants | [SECURITY.md](SECURITY.md) |
+| Cold-pickup orientation | [BOOTSTRAP.md](BOOTSTRAP.md) |
+| System topology + components + data flow + module integration interfaces (the WHAT + HOW; DESIGN.md is the WHY) | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Threat model + protections + fail-closed invariants (the WHAT-PROTECTS-AGAINST-WHAT; DESIGN.md is the WHY) | [SECURITY.md](SECURITY.md) |
 | Tool reference (when scripts exist) | [TOOLS.md](TOOLS.md) |
-| Cross-tool agent contract | [AGENTS.md](AGENTS.md) |
-| Claude Code-specific routing | [CLAUDE.md](CLAUDE.md) |
-| Current operational state | [CONTEXT.md](CONTEXT.md) |
+| Cross-tool agent contract + 15 universal Hard Rules (incl. Hard Rules 11-15 hot-path operationalization of Design Principles) | [AGENTS.md](AGENTS.md) |
+| Claude Code-specific routing + 15 Hard Rules | [CLAUDE.md](CLAUDE.md) |
+| Current operational state (Active Objective Layer + SFIF + pending decisions) | [CONTEXT.md](CONTEXT.md) |
 | Skills directory context (skill-vs-command-vs-hook decision matrix) | [SKILLS.md](SKILLS.md) |
+
+### Subdirectory READMEs (9 — DRAFT v1, agent-authored 2026-05-06 evening)
+
+| For… | Read |
+|---|---|
+| Per-tool composition map + state-file architecture (operational implementation of design principles) | [tools/README.md](tools/README.md) |
+| 30 slash commands by category | [.claude/commands/README.md](.claude/commands/README.md) |
+| 18 hook scripts (10 wired + archive) by event — implementation of two-layer hook architecture | [.claude/hooks/README.md](.claude/hooks/README.md) |
+| 3 modes + cycle-sequence comparison | [.claude/modes/README.md](.claude/modes/README.md) |
+| 11 rules + strictness-tier matrix | [.claude/rules/README.md](.claude/rules/README.md) |
+| 3 brain-loaded sub-agents | [.claude/agents/README.md](.claude/agents/README.md) |
+| 2 skills + mechanism-choice context | [.claude/skills/README.md](.claude/skills/README.md) |
+| 5 install template categories | [templates/README.md](templates/README.md) |
+| Deployment + maintenance toolkit | [scripts/README.md](scripts/README.md) |
+
+### Universal cross-cutting rules (operationalization of design principles)
+
+| For… | Read |
+|---|---|
+| **Compound + waterfall axes** (the design pattern documented in this DESIGN.md as a Recent design subsection) | [.claude/rules/compound-and-waterfall.md](.claude/rules/compound-and-waterfall.md) |
+| **Unified 8-mechanism signal→action→recovery model** (mechanism axis — complement to compound + waterfall) | [.claude/rules/trigger-model.md](.claude/rules/trigger-model.md) |
+| Context-engineering (auto/pre/on-demand/facultative injection — timing axis) | [.claude/rules/context-engineering.md](.claude/rules/context-engineering.md) |
+| Hook architecture rule (2-layer + 3-component design pattern + bypass mechanism per hook) | [.claude/rules/hook-architecture.md](.claude/rules/hook-architecture.md) |
+| Operating principles (4 core + 11 extension + Hard Rules 11-15 mapping) | [.claude/rules/operating-principles.md](.claude/rules/operating-principles.md) |
+| Operator-words sacrosanct + premise-confirmation gate + conditional-clause grammar | [.claude/rules/words-are-sacrosanct.md](.claude/rules/words-are-sacrosanct.md) |
+| Self-reference (what $HOME IS + bidirectional inheritance pattern with /opt second-brain) | [.claude/rules/self-reference.md](.claude/rules/self-reference.md) |
+
+### Brain-improvement mandate (this work block — 2026-05-06)
+
+| For… | Read |
+|---|---|
+| Sacrosanct verbatim directive governing the brain-quality passes | [wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md](wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md) |
+| **M-E001-1 productive-cycle action vocabulary DRAFT v2** (Hard Rule 14 — 9 canonical action types) | [wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md](wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md) |
+| Decision package log (RESOLVED — sub-READMEs scope) | [wiki/log/2026-05-06-194730-decision-package-new-subdir-readmes.md](wiki/log/2026-05-06-194730-decision-package-new-subdir-readmes.md) |
+
+### Backlog + governance + log
+
+| For… | Read |
+|---|---|
 | Methodology engine (canonical) | [wiki/config/methodology.yaml](wiki/config/methodology.yaml) |
+| **40-entry decisions logbook (D001-D040)** — operational source-of-truth for ADR rationale | [wiki/governance/decisions.md](wiki/governance/decisions.md) |
+| **138-row systemic-bugs tracker** — pattern-recurrence + closure record | [wiki/governance/systemic-bugs.md](wiki/governance/systemic-bugs.md) |
+
+### Second brain (canonical sources)
+
+| For… | Read |
+|---|---|
 | Second brain Adoption Guide (the strictly-defined sister-project adoption process) | `<second-brain>/wiki/spine/references/adoption-guide.md` |
-| SFIF model (canonical, in second brain) | `<second-brain>/wiki/spine/models/quality/model-sfif-architecture.md` |
-| Markdown-as-IaC model (canonical, in second brain) | `<second-brain>/wiki/spine/models/agent-config/model-markdown-as-iac.md` |
+| SFIF model canonical | `<second-brain>/wiki/spine/models/quality/model-sfif-architecture.md` |
+| Markdown-as-IaC model canonical | `<second-brain>/wiki/spine/models/agent-config/model-markdown-as-iac.md` |
 | Operator-verbatim project framing | `<second-brain>/raw/notes/2026-05-04-prepare-root-ghostproxy-as-sister-type-root-group-operating-system-setup.md`, `2026-05-04-custom-tailored-model-group-moe-intelligence-layer-and-root-ghostproxy-pain-point.md` |

@@ -6,6 +6,29 @@ this tool computes the underlying state empirically). Use:
     python3 -m tools.progress              # human-readable report
     python3 -m tools.progress --json       # JSON output
     python3 -m tools.progress --callout    # just the "Current position" callout block
+
+Composes-with:
+- Slash commands: /progress, /sync-progress (drift detect + apply), /cycle (every mode's step),
+  /audit step 4
+- Hooks: pre-compact.sh reads compute_progress() output to include in its auto-snapshot;
+  mode-enforcement banner surfaces stage from this output
+- MCP: root_progress tool at tools.mcp_server wraps compute_progress()
+- Sister tool: tools.cycle imports compute_progress() for cycle-status block
+
+Operator-authority surfaces (read this tool's output when operator invokes them; agent
+does NOT auto-invoke these): /handoff, /terminate, /finish-smoothly are operator-typed
+session-control commands; they collect state via tools.progress when run.
+
+Idempotency invariant: read-only; reads frontmatter from wiki/backlog/{tasks,modules}/*.md +
+EPIC_DOC; computes counts; never mutates filesystem.
+
+Action vocabulary (Hard Rule 14): emits `read-only-audit` (default) OR
+`drift-fix-with-empirical` action type when used as drift-detector by /sync-progress
+per Hard Rule 14 + the M-E001-1 vocabulary.
+
+Test file: implicit (currently exercised via /cycle integration tests).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

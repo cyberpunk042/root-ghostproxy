@@ -21,6 +21,24 @@ Usage:
 Per operator directive 2026-05-05: tools for "adding to the blocking or looking
 at it or doing operatoin on it are also the kind of things that can become
 highly useful tools."
+
+Composes-with:
+- Slash commands: /blockers (primary), /cycle PM step 2 + step 5, /audit step 5
+- Hooks: mode-enforcement.sh's LIVE STATE block surfaces blocker count
+- MCP: root_blockers tool at tools.mcp_server wraps detect_drift() + parse logic
+- Skill: surface-blockers (auto-trigger on "what's blocking" prose; routes to /blockers)
+- Sister tool: tools.decisions — every resolve appends a linked D### entry per governance discipline
+
+Idempotency invariant: list/get/verify/next-id are read-only; add/update/resolve write
+to wiki/governance/blockers.md with frontmatter regeneration on each call.
+
+Action vocabulary (Hard Rule 14): emits `blocker-surface` (read paths) OR
+`operator-directive-register` (add/update/resolve mutation paths) per the canonical
+M-E001-1 vocabulary at wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md.
+
+Test file: .claude/hooks/tests/test-blockers.py (run via `python3 -m tools.run-tests`).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

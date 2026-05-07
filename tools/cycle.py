@@ -13,6 +13,36 @@ Usage:
     python3 -m tools.cycle              # human-readable cycle summary for active mode
     python3 -m tools.cycle --json       # JSON output (for MCP / scripting)
     python3 -m tools.cycle --mode pm    # force a specific mode (override active)
+
+Composes-with:
+- Slash commands: /cycle (this tool's primary consumer; routes per active-mode), /orient
+- Hooks: end-of-cycle-stamp.sh + mode-enforcement.sh both consume cycle-status JSON for
+  display blocks (--diff-fence / --ansi-fence / --ansi-horizontal modes)
+- Mode files: dispatches to pm-scrum-master / devops-architect / dual-expert per
+  $HOME/.claude/active-mode (per CYCLE_DEFINITIONS dict)
+- MCP: cycle JSON consumed by sub-agents + sister-project agents via /opt gateway integration
+
+Sister tools imported: tools.state.read_state(), tools.blockers.detect_drift(),
+tools.progress.compute_progress() — composes the read-side surface for cycle status.
+
+Idempotency invariant: read-only orchestration; no state mutation; re-run on same
+filesystem state = same JSON output.
+
+Action vocabulary (Hard Rule 14): the slash command `/cycle` (which this tool backs)
+emits one of 9 canonical action types per fire — mandatory cycle-report last-line
+`Productive output: <type> — <one-line specific>`. Per-mode action subset:
+  PM-mode: blocker-surface · sb-closure · drift-fix-with-empirical · explicit-standby
+  Architect-mode: verified-edit · sb-closure · drift-fix-with-empirical · new-artifact
+                  · doc-refresh · explicit-standby
+  Dual-mode: ANY of the 9 (broadest scope)
+See wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md.
+
+Lifecycle signals: per .claude/rules/loop-cron-lifecycle.md L1-L7 scenarios; this tool
+auto-flags applicable signals in JSON output for self-evaluation per cycle.
+
+Test file: implicit (cycle dispatch exercised via /cycle integration runs).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

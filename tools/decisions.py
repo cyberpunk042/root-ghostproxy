@@ -18,6 +18,34 @@ Append (writes to disk; only run with operator approval):
         --reversibility "fully-reversible" \\
         --downstream "M003 unblocks; T-M003-7 hook refinement still queued" \\
         --linked-blocker "B001"
+
+Composes-with:
+- Slash commands: /decisions (primary), /log (decision-shaped log triggers append),
+  /audit step 10 (verify)
+- Hooks: end-of-cycle-stamp surfaces decision count; pre-compact.sh reads recent D-IDs
+  to include in its auto-snapshot
+- MCP: 4 root_decisions_* tools at tools.mcp_server (list, get, verify, next_id)
+- Sister tool: tools.blockers — resolve() appends a linked D### entry; --linked-blocker
+  field is the bidirectional governance link
+
+Operator-authority surfaces (read this tool's output when operator invokes them; agent
+does NOT auto-invoke these): /handoff, /terminate, /finish-smoothly are operator-typed
+session-control commands; they collect recent decisions via tools.decisions when run.
+
+Idempotency invariant: list/get/verify/next-id are read-only; append writes to
+wiki/governance/decisions.md with format-validation per ENTRY_PATTERN regex.
+
+Action vocabulary (Hard Rule 14): emits `read-only-audit` (default invocations) OR
+`operator-directive-register` action type (append path) per Hard Rule 14 + M-E001-1
+vocabulary at wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md.
+
+Test file: .claude/hooks/tests/test-decisions.py + tools/tests/test-decisions-tier3.py
+(run via `python3 -m tools.run-tests`).
+
+Sacrosanct discipline: every D### entry MUST contain operator-verbatim quote in
+--verbatim field per .claude/rules/words-are-sacrosanct.md (alignment substrate).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

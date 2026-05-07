@@ -33,6 +33,41 @@ Slash command: `/questions <verb> [args]`
     promote <N>     — move question N up one rank
     demote <N>      — move question N down one rank
     set <text>      — replace entire list (semicolon-separated for multi)
+    update <N> <text> — replace text of question N (position unchanged)
+    insert <N> <text> — insert at position N (shifts rest down)
+    detail <N> [<text>] — show or write SRP detail companion file Q<N>.md
+    solve [first|last|all|N|N,M|Q1] — solving-mode view with full detail
+
+Composes-with:
+- Slash commands: /questions (this tool's primary consumer; 12 verbs per SB-134)
+- Hooks: mode-enforcement.sh surfaces pending question count + first 3 (per the SB-134
+  binding rule that questions MUST surface every prompt or they're invisible);
+  end-of-cycle-stamp.sh shows count + first 3 in stamp render
+- MCP: root_questions tool at tools.mcp_server wraps the read side
+- Sister tools: tools.priorities (operator-authored hot-queue) — questions are the
+  agent-authored input-needed parallel; tools.objective (mission/focus/impediment)
+
+State files:
+    $HOME/.claude/active-questions          — main queue (one question per line)
+    $HOME/.claude/active-questions-detail/  — per-question SRP detail (Q<N>.md companions)
+
+E003 compound retention layer: questions are part of E003 Epic (Milestone v0.2 ai-natural-task-management).
+Closes operator-stated bug: *"questions that do not cummulate in a file like it should
+and surface to me with definition via the agent and even the stamp or anything that
+needs it relative to what the project does"*.
+
+Idempotency invariant: mutations write whole-file atomically; detail companions are
+per-Q files (independent atomic writes); solve view is pure read-side.
+
+Action vocabulary (Hard Rule 14): emits `new-artifact` (add/insert/detail with text) OR
+`operator-directive-register` (clear/remove/answer/promote/demote/set/update) OR
+`read-only-audit` (show/solve/detail-without-text) per the M-E001-1 vocabulary at
+wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md.
+
+Test file: tools/tests/test-questions.py (33/51 passing 2026-05-06; partial-fail
+surfaced for operator-decision per Hooks-pass discipline).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

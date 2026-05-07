@@ -118,6 +118,58 @@ cd $HOME
 - `ensure_nftables_d_include()` idempotently provisions `/etc/nftables.conf` with `include "/etc/nftables.d/*.nft"` (creates fresh OR appends with backup-first if missing).
 - `wpa_supplicant@mgmt0.service` enabled at install; conditional start (skipped if SSID/PSK placeholders unfilled to avoid auth-fail log spam).
 
+#### Idempotency invariants — files CREATED / OVERWRITTEN / LEFT UNTOUCHED + re-run behavior (T016 deliverable, empirically verified 2026-05-07 cron F46)
+
+**Files install.sh CREATES** (when not pre-existing on host):
+
+| Path pattern | Operator-flag gate | Created by op_function |
+|---|---|---|
+| `/root/.claude/settings.json` | always (hooks=1) | `op_install_endpoint_safety_policy` |
+| `/root/.claude/hooks/*.sh` (18 files) + `/root/.claude/hooks/integrity.py` | always (hooks=1) | `op_install_endpoint_safety_policy` |
+| `/root/.claude/agents/*.md` (3 brain-loaded sub-agents) | always | `op_install_endpoint_safety_policy` |
+| `/root/.claude/modes/*.md` (3 mode files) | always | `op_install_endpoint_safety_policy` |
+| `/root/.claude/rules/*.md` (12 rule files) | always | `op_install_endpoint_safety_policy` |
+| `/root/.claude/commands/*.md` (43-44 slash commands) | always | `op_install_endpoint_safety_policy` |
+| `/root/.claude/skills/*/SKILL.md` (2 skills) | always | `op_install_endpoint_safety_policy` |
+| `/root/.claude/integrity.json` (SHA-256 baselines for 5 safety-policy artefacts) | `--with-integrity` (default on) | `op_install_integrity_sentinel` |
+| `/root/.config/opencode/plugin/claude-bridge.ts` | `--with-opencode` (default on) | `op_install_opencode_bridge` |
+| `/root/tools/*.py` (15 modules) | `--with-tools` (default on) | `op_install_tools` |
+| `/etc/systemd/network/30-ghostproxy-bridge.netdev` | `--with-bridge` (default on, mode=bridge) | `op_install_network_bridge` |
+| `/etc/systemd/network/30-ghostproxy-bridge.network` | same | same |
+| `/etc/systemd/network/40-ghostproxy-bridge-members.network` | same | same |
+| `/etc/wpa_supplicant/wpa_supplicant-mgmt0.conf` | `--with-wifi` (default on) + operator-supplied credentials | `op_install_management_wifi` |
+| `/etc/nftables.d/management-wifi-outbound-only.nft` | `--with-wifi` | same |
+
+**Files install.sh OVERWRITES on re-run when out-of-sync** (backup-first pattern):
+
+- Same list as CREATES, when current content diverges from what install.sh would render
+- Pattern: `<dest>.ghostproxy.bak.<UTC-timestamp>` (e.g. `settings.json.ghostproxy.bak.2026-05-07T15-30-00Z`)
+- `install_file()` (line 1546) computes SHA-256 of source vs destination → if identical: log `unchanged: <path>`, skip; if divergent: `backup_if_exists()` (line 1509) moves existing → `<path>.ghostproxy.bak.<ts>`, then writes new content
+- `/etc/nftables.conf`: APPENDED with `include "/etc/nftables.d/*.nft"` directive only if missing (per `ensure_nftables_d_include()`); existing operator-authored rules preserved with backup-first
+
+**Files install.sh LEAVES UNTOUCHED** (never modified by any op_function):
+
+- `/root/.bashrc`, `/root/.profile`, `/root/.bash_history` — operator's shell config
+- `/root/.gitconfig` — operator's git identity
+- `/root/.ssh/*` — never touched by any safety-policy op
+- `/home/*` — other users; install scope is `/root` only (Path-A safe per `SRC == DEST_HOME` short-circuit)
+- `/root/*` files outside `.claude/` and `.config/opencode/` and `tools/` — operator's project work
+- `*.ghostproxy.bak.*` files — preserved across runs (operator-controlled cleanup; uninstall.sh also preserves per "Planned invariants" above)
+- `/etc/systemd/network/*` files NOT prefixed with `30-ghostproxy-` or `40-ghostproxy-` — operator's other network configs preserved
+- `/etc/nftables.d/*` files NOT named `management-wifi-*` — operator's other rulesets preserved
+- `/etc/nftables.conf` body content — only the `include` directive is added (with backup); existing rules preserved
+
+**Re-run behavior** (`./install.sh; ./install.sh` on consistent host):
+
+- Each `install_file()` call detects identical content via SHA-256 → logs `unchanged: <path>` → skips
+- Exit 0
+- No new backup files created (no overwrites occurred)
+- `op_verify` runs read-only (does not mutate state); reports PASS/FAIL per check
+- `--check` flag (line 100) confirms idempotency: read-only verification; exit 1 if drift, exit 0 if all in-sync
+- Empirically demonstrable: F35+F46 ran `./install.sh --check` showing 13/16 PASS (3 wifi-credentials gated per CONTEXT.md, expected per literal); zero state mutations since the integrity baseline refresh in F35
+
+**Idempotency claim is testable** per the recipe: `./install.sh && ./install.sh; ./install.sh --check` — should produce identical end state, second run is no-op (no backups created), `--check` exits 0 if no other drift. Operator-empirical full-execute on real Debian 13 host is T012 last-2% (D024 GREENLIT, operator-driven).
+
 ### `uninstall.sh` (planned, M003)
 
 **Purpose.** Remove project-installed config from the host. Restores prior state where backups exist; removes config where the project itself authored it.

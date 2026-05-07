@@ -60,11 +60,20 @@ Run the deterministic checks below, in sequence. Report each pass/fail with cont
    done
    ```
 
-8. **All commands present**:
+8. **All commands present** (empirically counted 2026-05-07 per Hard Rule 15):
    ```bash
-   ls $HOME/.claude/commands/ | wc -l
+   ls $HOME/.claude/commands/*.md | wc -l
    ```
-   Expected: 28 (orient, cycle, mode-{pm,architect,dual,status,clear}, blockers, progress, decisions, log, audit, sync-progress, help-root, handoff, stamp-{horizontal,vertical,on,off,auto,status}, install-agent-brain, mission, focus, impediment, priorities, terminate, finish-smoothly)
+   Expected: 45 (44 commands + README.md). Empirical count must be re-derived rather than memorized — categories per `/help-root` SUMMARY block:
+   - 1 orient + 1 cycle
+   - 5 mode-{pm,architect,dual,status,clear}
+   - 3 governance (blockers, progress, decisions)
+   - 4 utility (log, audit, sync-progress, help-root)
+   - 3 operator-authority session-control (handoff, terminate, finish-smoothly)
+   - 8 stamp-* (6 config + 2 deltas T067)
+   - 3 objective (mission, focus, impediment)
+   - 1 priorities + 1 questions + 1 task + 1 install-agent-brain
+   - 12 statusline-* (5-tier + 2 narrow variants + 3 meta)
 
 9. **All modes present**:
    ```bash

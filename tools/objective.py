@@ -32,6 +32,29 @@ them in the LIVE STATE additionalContext (parallel to active-mode + open-SBs
 + recent-logs + task-cursor).
 
 Schema: each file is a single-line text value (no JSON). Empty file = unset.
+
+Composes-with:
+- Slash commands: /mission, /focus, /impediment (3 thin wrappers per state-file layer)
+- Hooks: mode-enforcement.sh reads all 3 state files + surfaces in LIVE STATE additionalContext
+  (per-prompt banner); end-of-cycle-stamp.sh reads them for stamp render
+- MCP: root_objective tool at tools.mcp_server wraps the read side for sub-agents
+- Sister tools: tools.priorities (imminent-work hot-queue ABOVE this layer per SB-127);
+  tools.questions (E003 retention layer for agent-pending questions)
+
+State-file layer hierarchy (top → bottom granularity):
+    active-mode → active-priorities → active-mission → active-focus → active-impediment
+                                                                      → active-task (cursor)
+
+Idempotency invariant: set/clear write atomic single-line files; show is read-only;
+empty file = unset (treated as "no value" by mode-enforcement banner).
+
+Action vocabulary (Hard Rule 14): emits `operator-directive-register` (set/clear paths)
+OR `read-only-audit` (show path) per the M-E001-1 vocabulary at
+wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md.
+
+Test file: tools/tests/test-objective.py (run via `python3 -m tools.run-tests`).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

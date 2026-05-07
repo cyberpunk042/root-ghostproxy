@@ -17,6 +17,21 @@ SECOND_BRAIN_ROOT  — resolved at import time:
                          (callers handle the "not reachable" case via .exists())
 
 All other paths are derived from these two roots — never hardcoded.
+
+Composes-with:
+- ALL other tools/*.py modules import from this module (PROJECT_ROOT, SECOND_BRAIN_ROOT,
+  TASKS_GLOB, MODULES_GLOB, LOG_GLOB, EPIC_DOC, DECISIONS_DOC, etc.)
+- Hooks ($HOME/.claude/hooks/*.sh) import via sys.path.insert + tools._paths
+- MCP server (mcp_server.py) inherits paths transitively
+
+Idempotency invariant: pure read-time path resolution; no side effects on import;
+re-import = same paths returned.
+
+Action vocabulary (Hard Rule 14): N/A — utility module; not a cycle-action emitter.
+
+Test file: implicit (every other tool's import test exercises this module).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

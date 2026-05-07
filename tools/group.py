@@ -79,6 +79,39 @@ USAGE EXAMPLES — 5 root-ghostproxy pipeline candidates (DRAFT, agent-proposed)
 #     ],
 #     merge=lambda parts: synthesize_spec_draft(parts),
 #   )
+#
+# ----------------------------------------------------------------------
+# Composes-with (DRAFT v1):
+# ----------------------------------------------------------------------
+# - Slash commands: future /compound or /chain dispatch (not yet wired); /cycle
+#   compound-sync step (forward-anchor per compound-and-waterfall.md trigger c)
+# - Hooks: output-discipline-guard.sh chain-detect (forward-anchor per trigger a)
+# - MCP: future tool wrap (not wired)
+# - Sister tools: any tool whose mutations form coherent multi-file groups
+#   (governance batches: tools.blockers + tools.decisions + tools.progress)
+#
+# Operator-stated 5-pattern catalog (DRAFT — preserved verbatim above):
+#   task-complete-cascade · stage-transition · sb-closure-batch ·
+#   multi-file-coherent-edit · research-then-build
+#
+# Idempotency invariant: pure functional composition primitive; no I/O;
+# composability is at the caller's discretion. Each callable is responsible
+# for its own idempotency.
+#
+# Action vocabulary (Hard Rule 14): no direct emission; this is a primitive
+# CONSUMED by other tools/commands which then emit per their action surface.
+# When chain/group/tree drives a coherent multi-edit per fire, the calling
+# cycle emits ONE action type covering the whole batch (per SB-131 chain-batched
+# pattern; chain-operations is the substance pattern, single-edit-per-fire
+# is the THIN-output anti-pattern).
+#
+# Test file: tools/tests/test-group.py (when authored; spec at
+# wiki/log/2026-05-06-204500-q1-step-2-tools-group-py-draft-v1-spec.md).
+#
+# E003 multi-group component: this is Layer A primitive; Layer B is per-tool
+# adopters; Layer C is /cycle compound-sync step (operator-decision pending).
+#
+# Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

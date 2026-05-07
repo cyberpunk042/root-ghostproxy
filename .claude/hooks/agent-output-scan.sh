@@ -46,6 +46,14 @@ DEFAULT_PHRASES = [
     "work-block exhausted",
     "agent-actionable substantive work",  # often paired with "exhausted"
     "operator-scope-pending",
+    # Phase 3 additions 2026-05-07 (SB-099 abdication-as-freeze cousin pattern
+    # per operating-principles.md extension #10 — freeze-disguised-as-respect;
+    # 5 phrases operator literally cited as the failure mode):
+    "Holding here, your move",
+    "I'm not going to act on a guess",
+    "Standing by until you direct",
+    "Tell me literally what you see",
+    "I'll wait for your call",
 ]
 
 

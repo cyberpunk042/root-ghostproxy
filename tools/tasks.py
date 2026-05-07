@@ -20,6 +20,41 @@ active-task state file (SB-124d audit — task cursor management):
     python3 -m tools.tasks active show                # print current active-task + drill-down
     python3 -m tools.tasks active set T012            # set active task (validates ID exists)
     python3 -m tools.tasks active clear               # empty state file
+
+create verbs (M-E002-1 piling-tasks vocabulary per E002 Epic):
+    python3 -m tools.tasks create under-epic   --epic <slug>           --title <text>
+    python3 -m tools.tasks create under-task   --task <T###>           --title <text>
+    python3 -m tools.tasks create from-blocker --blocker <SB-NNN|B###> --title <text>
+
+Composes-with:
+- Slash commands: /task (cursor + create verbs), /cycle (PM step 4 backlog status reads
+  this), /audit
+- Hooks: pre-compact.sh reads active-task from state file for its auto-snapshot
+- MCP: future root_tasks tool (not yet wired)
+- Sister tool: tools.progress.compute_progress() reads task frontmatter (status/readiness)
+  and depends on this module's parse logic via shared frontmatter format
+
+Operator-authority surfaces (read active-task state file when operator invokes them; agent
+does NOT auto-invoke these): /handoff, /terminate, /finish-smoothly are operator-typed
+session-control commands; they collect cursor state when run.
+
+State file: $HOME/.claude/active-task (one-line text, e.g. `T012`); SB-124d cursor.
+
+Idempotency invariant: list/get/claimable/active-show are read-only; active-set/clear
+write atomic single-line file; create verbs author new T###-slug.md with frontmatter
++ default Done When checklist (DRAFT scaffolds — operator promotes via per-file yes).
+
+Action vocabulary (Hard Rule 14): emits `read-only-audit` (list/get/claimable/show) OR
+`operator-directive-register` (active set/clear) OR `new-artifact` (create-under-* /
+from-blocker; agent-DRAFT flagged per SB-095) per Hard Rule 14 + M-E001-1 vocabulary.
+
+4-level backlog hierarchy: Milestone (v0.2) → Epic (sfif-rollout / E001 / E002 / E003) →
+Module (M001-M013) → Task (T###); create verbs honor parent_epic / parent_task /
+parent_blocker frontmatter linkage.
+
+Test file: tools/tests/test-tasks-create.py (run via `python3 -m tools.run-tests`).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

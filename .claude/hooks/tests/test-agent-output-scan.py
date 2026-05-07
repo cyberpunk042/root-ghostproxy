@@ -156,6 +156,30 @@ rc, out = run_hook(json.dumps({"transcript_path": phase2b_path}))
 expect("T9P2b 'operator-Epic-scope-pending' detected", rc == 0 and out.strip() != "")
 os.unlink(phase2b_path)
 
+# Test 9-Phase3: SB-099 abdication-as-freeze phrases (cousin pattern, Phase 3)
+phase3_path = make_transcript([
+    {"role": "assistant", "content": "Holding here, your move. I'll wait for your call."},
+])
+rc, out = run_hook(json.dumps({"transcript_path": phase3_path}))
+expect("T9P3 SB-099 abdication-phrase 'Holding here, your move' detected",
+       rc == 0 and out.strip() != "")
+if out.strip():
+    sysmsg = json.loads(out).get("systemMessage", "")
+    # Hook lowercases matched phrases in warning text
+    expect("T9P3 warning lists 'holding here, your move' (case-insensitive)",
+           "holding here, your move" in sysmsg.lower())
+    expect("T9P3 warning lists 'i'll wait for your call' (case-insensitive)",
+           "i'll wait for your call" in sysmsg.lower())
+os.unlink(phase3_path)
+
+phase3b_path = make_transcript([
+    {"role": "assistant", "content": "I'm not going to act on a guess. Standing by until you direct."},
+])
+rc, out = run_hook(json.dumps({"transcript_path": phase3b_path}))
+expect("T9P3b SB-099 'Standing by until you direct' detected",
+       rc == 0 and out.strip() != "")
+os.unlink(phase3b_path)
+
 # Test 10: only LAST assistant turn scanned (older clean turns not flagged twice)
 multi_turn_path = make_transcript([
     {"role": "assistant", "content": "operator-driven future-session"},  # OLDER turn (would flag)

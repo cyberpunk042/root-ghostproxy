@@ -76,7 +76,7 @@ Currently `.claude/hooks/policy-block.sh` blocks `.claude/projects/-root/*.jsonl
 - [x] SB-142 status flipped open → structurally-fixed (proactive layer)
 - [ ] M-E006-3a confirmation flow designed + implementation path operator-confirmed
 - [ ] M-E006-3b PreToolUse Skill-tool-invocation guard hook authored + tested + wired (operator-pending: scope-confirm whether to add as new hook or extend existing)
-- [ ] M-E006-3c pre-compact.sh skill-invocation audit log section added + handoff template extended
+- [x] M-E006-3c pre-compact.sh skill-invocation audit log section added + handoff template extended — **landed 2026-05-07** (`pre-compact.sh` lines 226-245: step 7 of recovery instructions points to new "## Skill-invocation context (SB-142 — phantom-invocation guard)" section embedded in handoff template; explicit MUST-verify chain (a/b/c) + MUST-NOT execute on phantom + confirmation phrasing + cousin SB cross-references + mitigation pointer; Python compile PASS; operator-empirical pending next compact event)
 - [ ] M-E006-3d forensic-transcript-audit decision (operator-pending: defensive-vs-false-positive scope)
 - [ ] Empirical: 1+ post-compact session demonstrates clause #10 catching phantom invocation OR no phantom invocations occur (either confirms mitigation + 3 layer effective, or absence of repro)
 - [ ] SB-142 status flipped structurally-fixed → verified (operator-empirical confirmation)

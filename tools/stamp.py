@@ -34,6 +34,26 @@ Slash commands in $HOME/.claude/commands/ (thin wrappers):
     /stamp-off        → set enabled=off
     /stamp-auto       → set enabled=auto (default mode-conditional)
     /stamp-status     → show current config
+
+Composes-with:
+- Slash commands: 6 /stamp-* (this tool's primary consumers; thin wrappers above)
+- Hooks: end-of-cycle-stamp.sh (Stop event) reads stamp-config.json each fire to decide
+  layout + enabled; this is the runtime consumer
+- MCP: not wired (config-mutation surface; operator-only)
+
+Config-file: $HOME/.claude/stamp-config.json (JSON; written by configure subcommand;
+read by end-of-cycle-stamp.sh). Operator-editable directly with same schema.
+
+Idempotency invariant: configure writes whole-file JSON (one key change at a time);
+re-run with same args = same content. No incremental state to corrupt.
+
+Action vocabulary (Hard Rule 14): emits `operator-directive-register` (configure path)
+OR `read-only-audit` (show path) per Hard Rule 14 + the M-E001-1 vocabulary at
+wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md.
+
+Test file: implicit (stamp config + render exercised in real-session render).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

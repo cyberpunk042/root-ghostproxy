@@ -25,6 +25,41 @@ Wiring (operator action):
           }
         }
     Then verify in a fresh $HOME session via Claude Code's MCP listing.
+
+Tool surface (10 root_* tools as of 2026-05-06 evening; empirically counted via
+`@server.tool()` decorator scan; closes phantom-count drift per TOOLS.md):
+    root_state                — active mode + git + reachability checks
+    root_blockers             — drift detection vs governance/blockers.md
+    root_progress             — SFIF stage + module/task readiness
+    root_decisions_list       — list D### entries
+    root_decisions_get        — get a specific D### with full body
+    root_decisions_next_id    — next D### in sequence
+    root_decisions_verify     — format-integrity check
+    root_objective            — mission/focus/impediment state-files (SB-118)
+    root_questions            — agent-pending questions (SB-134)
+    root_orient               — composite tool (state + blockers + progress + objective + questions)
+
+Composes-with:
+- Sister tools: imports tools.state, tools.blockers, tools.progress, tools.decisions,
+  and (when wired) tools.objective + tools.questions for read-side surface
+- Sub-agents: brain-loaded sub-agents in .claude/agents/ consume these MCP tools
+  during their delegated work (cross-process structured returns)
+- Slash commands: /orient surfaces what's available; /audit verifies registration
+
+Read-only contract: this server exposes ONLY read operations (no write tools). Per
+operator directive 2026-05-05 *"MCP we must not overflow especially with things that
+are useless or confusing or useless or we dont even refer to anywhere so will never
+be used..."* — every tool here has a downstream caller; defensible scope.
+
+Idempotency invariant: pure read-side; same filesystem state = same JSON returns.
+
+Action vocabulary (Hard Rule 14): each tool emits `read-only-audit` action type per
+the M-E001-1 vocabulary at wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md.
+
+Test file: implicit (server registration verified by `tools.gateway` orient --orient-as
+sister from /opt second-brain).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

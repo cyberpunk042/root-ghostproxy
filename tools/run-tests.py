@@ -16,6 +16,28 @@ Test discovery:
     tools/tests/test-*.py            — tool regression tests (2 files)
 
 Exit code 0 if all PASS; 1 on any FAIL.
+
+Composes-with:
+- Slash commands: /audit (composition surface for "verify everything green"); /cycle
+  Architect mode (test-pass evidence is the verified-edit gate per Hard Rule 14)
+- Hooks: not directly consumed by hooks; hooks use their own per-test files in
+  .claude/hooks/tests/
+- Sister tools: this is the canonical aggregator across all 13 test files (215/234
+  aggregate as of 2026-05-06 evening; 3 partial-fail surfaced for operator-decision)
+
+Idempotency invariant: pure read-only orchestration; runs each test as subprocess;
+parses Result line; aggregates pass/fail. No filesystem mutation.
+
+Action vocabulary (Hard Rule 14): emits `verified-edit` action type when used as the
+canonical verifier per Architect-mode `/cycle` step 7 — pass output IS the verification
+evidence required per work-mode.md status-claim discipline (P4 — Declarations
+Aspirational Until Verified).
+
+This is THE canonical verifier for the `verified-edit` M-E001-1 action type per
+wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md. Any code-edit
+status claim should inline this tool's exit code + per-suite breakdown.
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

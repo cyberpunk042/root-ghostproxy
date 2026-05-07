@@ -228,6 +228,74 @@ finally:
     if mode_backup is not None:
         mode_file.write_text(mode_backup)
 
+# Test 14: cross-mode state-file persistence (SB-117 sub-item — cross-mode composability)
+# Mission/focus/priorities live in separate .claude/active-* files independent of
+# active-mode; switching modes MUST NOT lose objective layer. Banner under each
+# mode MUST surface the SAME persisted mission + focus content (with different
+# mode-persona wrapper).
+mission_file = HOME / ".claude" / "active-mission"
+focus_file = HOME / ".claude" / "active-focus"
+mission_backup = mission_file.read_text() if mission_file.exists() else None
+focus_backup = focus_file.read_text() if focus_file.exists() else None
+mode_backup = mode_file.read_text() if mode_file.exists() else None
+TEST_MISSION = "x14-cross-mode-mission-marker"
+TEST_FOCUS = "x14-cross-mode-focus-marker"
+try:
+    # Set objective layer with markers; must persist across mode switches
+    mission_file.write_text(TEST_MISSION)
+    focus_file.write_text(TEST_FOCUS)
+
+    # Fire under dual-expert: banner MUST surface both markers
+    mode_file.write_text("dual-expert")
+    rc, out, _ = run_hook()
+    if out.strip():
+        d = json.loads(out)
+        ctx_dual = d.get("hookSpecificOutput", {}).get("additionalContext", "")
+        expect("cross-mode: dual-expert banner surfaces persisted mission",
+               TEST_MISSION in ctx_dual, f"head={ctx_dual[:200]}")
+        expect("cross-mode: dual-expert banner surfaces persisted focus",
+               TEST_FOCUS in ctx_dual, f"head={ctx_dual[:200]}")
+    else:
+        expect("cross-mode: dual-expert fires under test markers", False, "empty")
+        ctx_dual = ""
+
+    # Switch to pm-scrum-master: SAME markers MUST appear (state persisted)
+    mode_file.write_text("pm-scrum-master")
+    rc, out, _ = run_hook()
+    if out.strip():
+        d = json.loads(out)
+        ctx_pm = d.get("hookSpecificOutput", {}).get("additionalContext", "")
+        expect("cross-mode: pm-scrum-master banner ALSO surfaces persisted mission",
+               TEST_MISSION in ctx_pm, f"head={ctx_pm[:200]}")
+        expect("cross-mode: pm-scrum-master banner ALSO surfaces persisted focus",
+               TEST_FOCUS in ctx_pm, f"head={ctx_pm[:200]}")
+        # Banner content differs (mode-persona wrapper differs) but objective layer same
+        expect("cross-mode: dual vs pm banner content differs (persona differs)",
+               ctx_dual != ctx_pm if ctx_dual else True)
+    else:
+        expect("cross-mode: pm-scrum-master fires under test markers", False, "empty")
+
+    # Switch to devops-architect: SAME markers MUST persist
+    mode_file.write_text("devops-architect")
+    rc, out, _ = run_hook()
+    if out.strip():
+        d = json.loads(out)
+        ctx_arch = d.get("hookSpecificOutput", {}).get("additionalContext", "")
+        expect("cross-mode: devops-architect banner ALSO surfaces persisted mission",
+               TEST_MISSION in ctx_arch, f"head={ctx_arch[:200]}")
+        expect("cross-mode: devops-architect banner ALSO surfaces persisted focus",
+               TEST_FOCUS in ctx_arch, f"head={ctx_arch[:200]}")
+    else:
+        expect("cross-mode: devops-architect fires under test markers", False, "empty")
+finally:
+    # Restore in reverse order — mode last so any leak doesn't leave test-mode set
+    if focus_backup is not None:
+        focus_file.write_text(focus_backup)
+    if mission_backup is not None:
+        mission_file.write_text(mission_backup)
+    if mode_backup is not None:
+        mode_file.write_text(mode_backup)
+
 print()
 for line in results:
     print(line)

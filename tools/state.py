@@ -15,6 +15,20 @@ Fields:
     git-uncommitted   count of uncommitted files (0 if clean / not init)
     bootstrap-exists  <project>/BOOTSTRAP.md presence (sanity check)
     second-brain      <second-brain-root>/ reachability (env-var-resolved)
+
+Composes-with:
+- Slash commands: /orient (calls indirectly via /cycle), /audit (step 6)
+- Hooks: mode-enforcement.sh reads active-mode via this module's logic equivalent
+- MCP: root_state tool at tools.mcp_server wraps read_state() for structured returns
+- Other tools: tools.cycle imports read_state() to surface in cycle JSON
+
+Idempotency invariant: read-only; no state mutation; re-run = same output if filesystem unchanged.
+
+Action vocabulary (Hard Rule 14): emits `read-only-audit` action type (state queries; no mutation).
+
+Test file: tests/test-state.py (when authored; currently exercised transitively via tools.cycle tests).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

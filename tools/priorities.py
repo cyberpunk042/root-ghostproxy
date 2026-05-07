@@ -27,6 +27,34 @@ Slash command: `/priorities <verb> [args]`
     promote <N>     — move priority N up one rank
     demote <N>      — move priority N down one rank
     set <text>      — replace entire list with single-line text (semicolon-separated for multi)
+    insert <N> <text> — insert at position N, shifting rest down (SB-130)
+    update <N> <text> — replace text at position N without touching others (SB-130)
+
+Composes-with:
+- Slash commands: /priorities (this tool's primary consumer; 9 verbs)
+- Hooks: mode-enforcement.sh surfaces priorities ABOVE PM-tier in banner; end-of-cycle-stamp.sh
+  reads top-3 for stamp render
+- MCP: root_priorities tool at tools.mcp_server wraps the read side
+- Sister tools: tools.objective (mission/focus/impediment — strategic layer BELOW priorities);
+  tools.questions (agent-pending — distinct retention layer per SB-134)
+
+Tier hierarchy (per SB-127 imminent-work tier):
+    priorities (imminent) > mission/focus/impediment (objective layer) > backlog cursor
+                                                                       > PM blockers (B###)
+
+Mindfulness clause #5 (P1-first): per .claude/hooks/mindfulness.sh — agent must address
+top priority FIRST per cycle; jumping to lower-priority items = short-circuit (SB-128 family).
+
+Idempotency invariant: read-side (show) is pure; mutation verbs (add/clear/remove/
+promote/demote/set/insert/update) write the whole list atomically (no partial-state).
+
+Action vocabulary (Hard Rule 14): emits `operator-directive-register` (mutation verbs)
+OR `read-only-audit` (show) per the M-E001-1 vocabulary at
+wiki/log/2026-05-06-181500-auto-pilot-action-vocabulary-draft.md.
+
+Test file: tools/tests/test-priorities.py (run via `python3 -m tools.run-tests`).
+
+Brain-improvement mandate: wiki/log/2026-05-06-194730-brain-improvement-mandate-readme-first.md
 """
 
 from __future__ import annotations

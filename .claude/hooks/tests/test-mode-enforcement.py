@@ -296,6 +296,67 @@ finally:
     if mode_backup is not None:
         mode_file.write_text(mode_backup)
 
+# Test 15: state-delta marker prepended on differential re-fire (SB-117 sub-item — signal-tuning)
+# Banner re-fire when content differs MUST include "[Δ since last fire: <fields>]" marker
+# identifying which top-level section changed (PERSONA / PRIORITIES / MISSION / FOCUS /
+# IMPEDIMENT / LIVE STATE).
+import subprocess as _sp_d  # alias for direct subprocess call (bypasses run_hook's cache-clear)
+mission_file = HOME / ".claude" / "active-mission"
+focus_file = HOME / ".claude" / "active-focus"
+mission_backup = mission_file.read_text() if mission_file.exists() else None
+focus_backup = focus_file.read_text() if focus_file.exists() else None
+mode_backup = mode_file.read_text() if mode_file.exists() else None
+delta_cache_path = Path("/tmp/.mode-enforcement-last-banner")
+try:
+    # Step 1: prime cache by firing once with mission-A (run_hook clears cache, fires, leaves cache populated)
+    mission_file.write_text("delta-test-mission-AAA")
+    mode_file.write_text("dual-expert")
+    rc, out, _ = run_hook()
+    expect("delta-marker setup: prime fire produces banner", out.strip() != "", "prime empty")
+
+    # Step 2: change mission, fire DIRECTLY (skip run_hook's cache-clear so prior banner persists)
+    mission_file.write_text("delta-test-mission-BBB")
+    env = os.environ.copy()
+    env["CLAUDE_PROJECT_DIR"] = str(HOME)
+    r = _sp_d.run([HOOK], input="", env=env, capture_output=True, text=True, cwd=str(HOME))
+    if r.stdout.strip():
+        d = json.loads(r.stdout)
+        ctx = d.get("hookSpecificOutput", {}).get("additionalContext", "")
+        expect("delta-marker: prefix `[Δ since last fire:` present",
+               ctx.startswith("[Δ since last fire:"),
+               f"head={ctx[:80]}")
+        expect("delta-marker: identifies MISSION as changed section",
+               "MISSION" in ctx[:100],
+               f"head={ctx[:100]}")
+        # Verify FOCUS was NOT flagged (only mission changed)
+        head = ctx[:100]
+        expect("delta-marker: FOCUS NOT flagged (focus unchanged)",
+               "FOCUS" not in head,
+               f"head={head}")
+    else:
+        expect("delta-marker: differential fire produces output", False, "empty")
+
+    # Step 3: change focus AS WELL, fire again — both MISSION and FOCUS should flag
+    focus_file.write_text("delta-test-focus-CCC")
+    r = _sp_d.run([HOOK], input="", env=env, capture_output=True, text=True, cwd=str(HOME))
+    if r.stdout.strip():
+        d = json.loads(r.stdout)
+        ctx = d.get("hookSpecificOutput", {}).get("additionalContext", "")
+        head = ctx[:200]
+        expect("delta-marker step 3: prefix present",
+               head.startswith("[Δ since last fire:"))
+        expect("delta-marker step 3: FOCUS flagged",
+               "FOCUS" in head, f"head={head}")
+finally:
+    if focus_backup is not None:
+        focus_file.write_text(focus_backup)
+    if mission_backup is not None:
+        mission_file.write_text(mission_backup)
+    if mode_backup is not None:
+        mode_file.write_text(mode_backup)
+    if delta_cache_path.exists():
+        delta_cache_path.unlink()
+
 print()
 for line in results:
     print(line)

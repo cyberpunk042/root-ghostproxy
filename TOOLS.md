@@ -170,6 +170,55 @@ cd $HOME
 
 **Idempotency claim is testable** per the recipe: `./install.sh && ./install.sh; ./install.sh --check` — should produce identical end state, second run is no-op (no backups created), `--check` exits 0 if no other drift. Operator-empirical full-execute on real Debian 13 host is T012 last-2% (D024 GREENLIT, operator-driven).
 
+#### Recovery / console-only fallback (T013 Done-When 5 deliverable, agent-authored 2026-05-07 cron F48 — operator-revisable)
+
+When the management wifi (`mgmt0`) or bridge (`gpbr0`) misbehaves and SSH access is lost, the operator must be able to recover via direct console (keyboard + monitor on the host). This subsection documents the fallback procedures.
+
+**Scenario A — wifi-mgmt0 fails to associate** (operator's existing SSID changed, AP down, or credentials drift)
+
+1. Boot host with keyboard + monitor attached → console login as `root` (no SSH dependency)
+2. Diagnose: `journalctl -u wpa_supplicant@mgmt0 -n 50` → look for auth-failure / SSID-not-found / no-carrier
+3. Diagnose: `ip link show mgmt0` → confirm interface UP; if DOWN run `ip link set mgmt0 up`
+4. Hot-fix: edit `/etc/wpa_supplicant/wpa_supplicant-mgmt0.conf` (update SSID/PSK if changed); `systemctl restart wpa_supplicant@mgmt0`
+5. Verify: `wpa_cli -i mgmt0 status` → should report `wpa_state=COMPLETED`; `ip addr show mgmt0` → IP assigned
+6. SSH should restore once carrier + IP land
+
+**Scenario B — bridge `gpbr0` brings up with no carrier** (LAN-side disconnected, operator's switch/router off)
+
+1. Console login as above
+2. Diagnose: `ip link show gpbr0` → state UP but `NO-CARRIER` flag = no upstream link detected
+3. Diagnose: `ip link show <member1> <member2>` → bridge members; check each for cable + LED + carrier
+4. Diagnose: `journalctl -u systemd-networkd -n 50` → bridge brought up + members enslaved
+5. The bridge `ConfigureWithoutCarrier=yes` setting (per `30-ghostproxy-bridge.network`) means it WILL come up without carrier — this is intentional for IPS pass-through (host doesn't depend on inspected segment being up)
+6. If carrier is genuinely needed: physically reconnect cables, then `systemctl restart systemd-networkd`
+
+**Scenario C — bridge breaks SSH access entirely (worst case — emergency disable)**
+
+1. Console login
+2. Disable systemd-networkd: `systemctl stop systemd-networkd && systemctl disable systemd-networkd`
+3. Move ghostproxy network configs out of the way: `mkdir -p /root/ghostproxy-disabled-configs && mv /etc/systemd/network/{30,40}-ghostproxy-* /root/ghostproxy-disabled-configs/`
+4. Restart networking with classic ifupdown OR networkd: `dhclient mgmt0` (or operator's preferred network manager)
+5. Once SSH access restored: investigate root cause via `journalctl -u systemd-networkd --since "1 hour ago"`
+6. Re-enable when fixed: move configs back + `systemctl enable --now systemd-networkd`
+
+**Scenario D — install.sh broke the safety envelope (settings.json / hooks tampered)**
+
+1. Console login
+2. The integrity sentinel (`integrity.py`) fail-CLOSES every Claude tool call → Claude Code is unusable until restored
+3. Recovery: `cd $HOME && ./install.sh` (re-applies hooks + settings + integrity baseline; idempotent so safe to re-run)
+4. If install.sh itself broken: restore from backup `<file>.ghostproxy.bak.<UTC-ts>` (preserved per "Files install.sh LEAVES UNTOUCHED" subsection)
+5. Verify: `./install.sh --check` should report 13/16 PASS minimum (3 wifi-credentials gated remain; everything else green)
+
+**Scenario E — emergency: revert all ghostproxy changes**
+
+1. Console login
+2. Run `./uninstall.sh` (when implemented per M003 planned section below) — restores prior state from backups
+3. Pre-uninstall.sh manual fallback: locate `*.ghostproxy.bak.*` files via `find /root /etc -name "*.ghostproxy.bak.*" 2>/dev/null`; manually restore via `mv <backup> <original>`
+4. Disable ghostproxy systemd units: `systemctl disable wpa_supplicant@mgmt0 systemd-networkd`
+5. Reboot to confirm clean state
+
+**Recovery doc maintenance**: when install.sh adds new touchpoints (new systemd unit / new config file / new hook), add scenario coverage to this subsection. The doc must stay synchronized with install.sh's actual touchpoints (cross-reference with the Idempotency invariants subsection above).
+
 ### `uninstall.sh` (planned, M003)
 
 **Purpose.** Remove project-installed config from the host. Restores prior state where backups exist; removes config where the project itself authored it.

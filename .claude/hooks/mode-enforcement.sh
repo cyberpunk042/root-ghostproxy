@@ -415,6 +415,30 @@ def compose_reminder(mode: str, sections: dict, state: dict) -> tuple[str, list]
     return text, keys
 
 
+def compute_section_deltas(last: str, current: str) -> list:
+    """Per SB-117 sub-item — agent-feedback signal-tuning beyond frequency-control.
+
+    Returns list of banner section names whose content differs between cached
+    and current. Sections checked: PERSONA, PRIORITIES, MISSION, FOCUS,
+    IMPEDIMENT, LIVE STATE. Used to prepend `[Δ since last fire: <fields>]`
+    marker so operator/agent can see WHICH state-axis caused the re-fire.
+
+    Returns empty list if regex fails or sections don't differ.
+    """
+    sections = ["PERSONA", "CYCLE STEPS", "PRIORITIES", "MISSION", "FOCUS", "IMPEDIMENT", "LIVE STATE"]
+    deltas = []
+    for s in sections:
+        others_pat = "|".join(re.escape(o) + ":" for o in sections if o != s)
+        pat = rf"{re.escape(s)}:(.*?)(?={others_pat}|$)"
+        last_match = re.search(pat, last, re.DOTALL)
+        cur_match = re.search(pat, current, re.DOTALL)
+        last_text = last_match.group(1).strip() if last_match else None
+        cur_text = cur_match.group(1).strip() if cur_match else None
+        if last_text != cur_text:
+            deltas.append(s)
+    return deltas
+
+
 def main() -> None:
     _trace("entered")
 
@@ -469,6 +493,7 @@ def main() -> None:
     # update, SB tracker delta, log slug change, task cursor advance all
     # produce content delta and surface). Cache file at /tmp scope.
     cache_path = Path("/tmp/.mode-enforcement-last-banner")
+    delta_marker = ""
     try:
         if cache_path.exists():
             last = cache_path.read_text()
@@ -476,6 +501,13 @@ def main() -> None:
                 _trace(f"exit-suppressed-identical:{mode}",
                        f"reminder_len={len(reminder)} suppressed=true")
                 sys.exit(0)
+            # SB-117 signal-tuning: identify which section(s) changed since last fire
+            try:
+                deltas = compute_section_deltas(last, reminder)
+                if deltas:
+                    delta_marker = f"[Δ since last fire: {', '.join(deltas)}] "
+            except Exception as delta_exc:
+                _trace(f"delta-compute-error:{repr(delta_exc)[:60]}")
         cache_path.write_text(reminder)
     except Exception as exc:
         _trace(f"frequency-cache-error:{repr(exc)[:60]}")
@@ -483,7 +515,7 @@ def main() -> None:
     output = {
         "hookSpecificOutput": {
             "hookEventName": "UserPromptSubmit",
-            "additionalContext": reminder,
+            "additionalContext": delta_marker + reminder,
         }
     }
     print(json.dumps(output))

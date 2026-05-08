@@ -118,6 +118,48 @@ Anti-pattern: "Platform limitation" framing (closes SB-110, 2026-05-06). When a 
 
 Anti-pattern: architectural-vs-functional substitution (closes SB-111, 2026-05-06). When operator's directive specifies a mechanism ("I NEED IT WIRED" = a hook), do NOT propose functionally-equivalent alternatives ("agent emits inline") as if they satisfy the directive. The operator's choice of mechanism is part of the directive, not just decoration around an outcome. Treat outcome-equivalence and directive-equivalence as different. If the named mechanism is impossible, surface that explicitly with evidence; don't substitute silently.
 
+**Don't minimize when enumerating** (extension — closes SB-051/052/053 cluster, 2026-05-07 cron F67). When listing items, count, or enumerate (SBs / decisions / fixes / commands / tools / files / etc.), the agent MUST list ALL items OR explicitly state "first N of M total" with M cited.
+
+Operator directive (sacrosanct, repeated multiple times): *"do not minimize"*. The "do not minimize" rule has no codified rule-layer extension before this — was operator-stated but rule-layer-uncovered, leading to SB-051/052/053 recurrences:
+- SB-051: "Listed 4 fixes when 10+"
+- SB-052: "Listed 10 when 15+"
+- SB-053: "Listed 15 when 50+"
+
+Pattern: agent under-counts in enumeration without flagging the truncation, presenting partial as if complete.
+
+Required behavior:
+1. **Empirical-count-first** — when listing N items, run a programmatic count FIRST (`grep -c` / `ls | wc -l` / `find | wc -l` / etc.) per Hard Rule 15 empirical-count-verification before drift-claim.
+2. **List ALL items by default** — when count is reasonable (≤20 typically), list every item.
+3. **Explicit truncation when needed** — when count is large (>20 or operator-attention-budget), explicitly state "showing first N of M total — full list at <path/grep>" with M cited.
+4. **Never silently truncate** — listing a partial set without acknowledging truncation IS minimization, regardless of intent.
+
+Anti-pattern: "Here are some examples..." or "Here are the main ones..." without count + truncation acknowledgment. Cousin: SB-095 hallucinated-artifacts (artifact-form: present partial-list as if complete — listing-axis variant).
+
+Per SB-113 rule-only-fix gap meta: rule-layer fix reduces but doesn't eliminate; behavioral residual remains; operator catching is the verification mechanism.
+
+**Spec-first discipline before major artefacts** (extension — closes SB-077, 2026-05-07 cron F65). Before authoring a major artefact (Epic / Module / install.sh op_function / new schema / new widget set / new tool module / new rule / new hook), the agent MUST verify the spec-substrate exists FIRST:
+
+1. **Methodology engine consultation** — `wiki/config/methodology.yaml` ALLOWED/FORBIDDEN per current stage; if doc-stage, only docs allowed; if scaffold-stage, only schemas + stubs; if implement-stage, only implementation. Spec-first means: read what stage the work is in, then deliver per stage's allowed outputs.
+
+2. **Source-trace before authoring** — for vendor-specific or external-pattern work, dispatch research sub-agent FIRST OR verify operator-supplied source; for project-internal work, read existing patterns/conventions (e.g. read existing widget set before authoring new one; read existing module schemas before authoring new module). Don't invent shape from training-data inference (per principle #5 research-first).
+
+3. **Operator-stated requirement check** — verify operator literally requested the artefact OR the artefact is named in tracker-row / decision-logbook / module-page. Don't speculatively author without operator-stated need.
+
+Anti-pattern: speculative authoring (profile JSONs, AIDLC widget sets, install.sh op_functions built without reading methodology.yaml / existing patterns / operator-stated need first). Per SB-077 history: "profile schemas authored speculatively, AIDLC widget set built without reading methodology.yaml first, multiple iterations of cycle-and-fix instead of spec-first" (operator: *"a massive bug"*). Cousin to principle #5 research-first (which covers vendor/external research) — spec-first is the project-internal-first version.
+
+**Sub-agent dispatch retry pattern** (extension — closes SB-049, 2026-05-07 cron F59). On first sub-agent dispatch failure (denial / inappropriate-result / empty-result), the agent MUST attempt at least one retry with adjusted parameters BEFORE classifying the dispatch path as blocked.
+
+Required retry-parameter axes:
+1. **Different `subagent_type`** — if scope-mismatch suspected (e.g. wrong specialist agent for the task)
+2. **Refined prompt** — narrower scope if too-broad; broader scope if too-narrow; different phrasing if ambiguous
+3. **Narrowed thoroughness** — drop from "very thorough" to "medium" if budget-overflow; or escalate "quick" → "thorough" if results were too shallow
+
+The agent MUST distinguish:
+- **Dispatch capability unavailable** (genuine block) — `Agent` tool not loaded; subagent_type doesn't exist; harness denies subagent dispatch
+- **This prompt didn't fit this subagent** (retry-candidate) — first attempt's specifics weren't optimal; different params likely yield results
+
+Anti-pattern: treating first-attempt failure as definitive evidence that the dispatch path is blocked. Cousin to SB-099 abdication-as-freeze (treats first-failure as block) + SB-090 premise-construction (constructs "this dispatch is impossible" without empirical retry). Per F55 + F59: when sub-agent dispatch is genuinely required for a task (e.g. M-E004-1 doctor pattern research Phase A — sub-agent survey of second-brain + openfleet), one retry minimum before reporting blocked.
+
 ### 6. Comments-don't-deroute (operator's mid-flight context)
 
 Per operator's implicit meta-rule (test session 2026-05-05): when operator adds a comment mid-flight (typically prefixed by an aside like "btw" or parenthetical), the agent should TREAT THE COMMENT AS CONTEXT-ADDITIVE, not as a redirection.

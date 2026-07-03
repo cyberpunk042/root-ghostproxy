@@ -10,7 +10,7 @@
 Matured the regression-test layer (the `verified-edit` substrate per Hard Rule 14)
 by fixing two real defects that made the aggregate both under-report and silently
 false-green, then corrected a fabricated test-count that had propagated across four
-brain files. Net: the runner now reports the true **224/224 across 12 test files**,
+brain files. Net: the runner now reports the true **241/241 across 13 test files** (12 hook + 1 tool),
 and the brain docs match empirical reality with a Hard Rule 15 timestamp.
 
 ## What was wrong, and the fix
@@ -40,7 +40,7 @@ check (rc 0), but its 20 assertions dropped out of the aggregate total silently.
 
 **Fix**: the test now also emits the canonical `Result: 20/20 passed` line. The
 aggregate went from a misleading 203/204 (opt-write-block failing, t015 uncounted)
-to a true **224/224**.
+to a true **224/224**, and the new tool test brought it to **241/241 across 13 files**.
 
 ### 3. `opt-write-block.sh` docstring — stale "NOT YET WIRED" (drift-fix)
 
@@ -68,24 +68,40 @@ narrated "→ 322/322 across 14 files" as truth-at-time-of-writing) was left
 unmodified per CONTEXT.md's append-only discipline — drift in past rows is
 acceptable; only live claims are corrected.
 
+### 5. First tool-layer regression test — `tools/tests/test-group.py` (new)
+
+`tools/group.py` (the chain/group/tree composition primitive) documented an
+intended test file at its line ~108 (*"Test file: tools/tests/test-group.py
+(when authored)"*) that was never written — so the deterministic tool layer had
+zero regression coverage, and the runner's `tools/tests/` discovery path sat
+empty. Authored 17 assertions covering `chain` (feed-forward, empty, single,
+failure-stops-and-does-not-run-later-steps), `group` (order, empty,
+all-run-despite-failure, `GroupError` aggregation with correct index/result
+slots), and `tree` (root→branches→merge, identical-seed-per-branch, merge
+order). Pure functions → fully deterministic. This makes 13 test files / 241
+assertions total.
+
 ## Verification (inline, per Hard Rule 1 / P4)
 
 ```
 $ HOME=<repo> python3 -m tools.run-tests
   ✓ test-opt-write-block.py                     5/  5
   ✓ test-t015-op-verify-smoke.py               20/ 20
-  ... (12 files)
-AGGREGATE: 224/224 PASS across 12 files
+  ✓ test-group.py                              17/ 17
+  ... (13 files)
+AGGREGATE: 241/241 PASS across 13 files
 ```
 
 ## Productive output
 
 `verified-edit` — two test-layer defects fixed (opt-write-block env-coupling +
-t015 aggregate under-count) + docstring drift-fix + 4-file fabricated-count
-correction; regression suite green at 224/224, empirically verified.
+t015 aggregate under-count) + docstring drift-fix + 4-file fabricated-count correction + first tool-layer
+regression test (tools/tests/test-group.py); regression suite green at 241/241
+across 13 files, empirically verified.
 
 ## Cross-references
 
+- Added: `tools/tests/test-group.py` (first tool-layer test) + `.gitignore` whitelist entry for `tools/tests/` (mirrors the `.claude/hooks/tests/` shape; without it the deny-all re-ignored the new subdir)
 - Fixed files: `.claude/hooks/tests/test-opt-write-block.py`,
   `.claude/hooks/tests/test-t015-op-verify-smoke.py`,
   `.claude/hooks/opt-write-block.sh`, `CLAUDE.md`, `AGENTS.md`,

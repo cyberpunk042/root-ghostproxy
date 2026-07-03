@@ -679,6 +679,8 @@ cd /tmp/root-ghostproxy
 sudo ./install.sh                       # base profile (hooks + opencode + bridge + wifi + integrity)
 sudo ./install.sh --profile full        # base + ccstatusline (npm-based)
 sudo ./install.sh --mode endpoint       # endpoint-only (no bridge/wifi ops)
+# Sovereign-os node consumption (proxy mode disabled) — canonical guide:
+#   docs/sovereign-os-endpoint-usage.md  (`--profile base --mode endpoint`)
 
 # 4. Per-op toggles (override profile defaults)
 sudo ./install.sh --no-bridge --no-wifi   # safety policy + opencode bridge plugin only

@@ -9,7 +9,7 @@ current_stage: test
 readiness: 95
 sfif_stage: Foundation
 created: 2026-05-04
-updated: 2026-05-16
+updated: 2026-07-03
 sources:
   - id: parent-module
     type: wiki
@@ -35,6 +35,7 @@ Document explicitly what install.sh creates, overwrites, and leaves alone — an
 - [x] Re-run behavior: re-running install.sh on a consistent host outputs `unchanged: <path>` per file; exit 0; no state mutation — landed 2026-05-07 cron F46 with empirical evidence cross-ref to F35+F46 `--check` runs (13/16 PASS, 3 wifi-credentials gated per CONTEXT.md).
 - [x] Documentation: lives at TOOLS.md per-tool reference section per literal (chosen primary location).
 - [x] Verification: idempotency claim is testable — recipe documented at TOOLS.md ("Idempotency claim is testable per the recipe: `./install.sh && ./install.sh; ./install.sh --check`"). Worker-verifiable surrogate gate `./install.sh --check` (read-only) runs without state mutation per NC-5 RESOLVE (operator-territory). **Full real-execute empirical on Debian 13 host** is T012 last-2% (D024 GREENLIT, operator-driven future-session) — split out as DW#6b operator-territory per same NC-3 split pattern (source-side worker-verifiable / runtime-deployed operator-verified).
+- [x] **Behavioral idempotency test (worker-verifiable surrogate — DW#6c)**: the recipe from DW#6a is now EXERCISED end-to-end against the real installer — `.claude/hooks/tests/test-t016-idempotency-smoke.py` (9/9, landed 2026-07-03). Runs `install.sh --profile project --dest <tmpdir>` twice into a throwaway dir (project profile disables all OS-level ops, so the effect is confined to the temp dir), and asserts the invariant empirically: run 1 → N files `installed:` / 0 `unchanged:`; run 2 → 0 `installed:` / 0 `updated:` / 0 backups / N `unchanged:` (every prior file), stable skip count. This upgrades the idempotency claim from *documented + recipe* to *documented + behaviorally-tested*. Discovered by `python3 -m tools.run-tests`. (DW#6b full OS-level real-execute on a Debian 13 host remains operator-territory.)
 
 ## Test Plan
 
@@ -49,10 +50,13 @@ Document explicitly what install.sh creates, overwrites, and leaves alone — an
 | DW#5 | T016 deliverable located in TOOLS.md (chosen primary location) | `grep -q 'T016 deliverable' TOOLS.md` |
 | DW#6a | Testable recipe documented (worker-verifiable) | `grep -q 'Idempotency claim is testable' TOOLS.md` |
 | DW#6b | Real-execute empirical on Debian 13 host | **operator-territory** — D024 GREENLIT, deferred |
+| DW#6c | Behavioral idempotency test (recipe exercised, isolated `--dest`) | `python3 .claude/hooks/tests/test-t016-idempotency-smoke.py` → 9/9 (landed 2026-07-03) |
 
 ## Resolution
 
 **Files edited**: T016 task file only (frontmatter `status: in-progress → review`, `current_stage: document → test`, `readiness: 75 → 95`; DW#6 marked complete with split into DW#6a worker-verifiable / DW#6b operator-territory; Test Plan section added; this Resolution section added).
+
+**2026-07-03 addendum (DW#6c behavioral test)**: the DW#6a recipe is now implemented as a worker-verifiable behavioral test — `.claude/hooks/tests/test-t016-idempotency-smoke.py` (9/9) runs the installer twice into an isolated `--dest` (project profile, no OS-level ops) and asserts installed→unchanged with zero re-writes/backups. First behavioral (not just documentary) coverage of the idempotency invariant. DW#6b (OS-level real-execute) stays operator-territory.
 
 **No source-file edits**: All 5 documentation deliverables (DW#1-5) already landed 2026-05-07 cron F46 in `TOOLS.md` lines 121-173 (`#### Idempotency invariants — files CREATED / OVERWRITTEN / LEFT UNTOUCHED + re-run behavior (T016 deliverable, empirically verified 2026-05-07 cron F46)`). Per operator-doctrine 2026-05-16 "do not rewrite everything everytime make augmentations" + methodology principle 12 "Augment, never rewrite" — this fire verifies + closes, does not re-author.
 
